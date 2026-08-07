@@ -218,13 +218,13 @@
       .workspace-body {
         display: grid;
         min-height: 410px;
-        grid-template-columns: 224px minmax(0, 1fr);
+        grid-template-columns: 144px minmax(0, 1fr);
       }
 
       .page-panel {
         display: flex;
         min-width: 0;
-        padding: 16px 12px 12px;
+        padding: 14px 10px 10px;
         flex-direction: column;
         gap: 12px;
         border-right: 1px solid var(--line);
@@ -694,22 +694,23 @@
         }
 
         .workspace-body {
-          grid-template-columns: 1fr;
+          grid-template-columns: 132px minmax(0, 1fr);
         }
 
         .page-panel {
           padding: 10px;
-          border-right: 0;
-          border-bottom: 1px solid var(--line);
+          border-right: 1px solid var(--line);
+          border-bottom: 0;
         }
 
         .page-list {
-          flex-direction: row;
-          overflow-x: auto;
+          flex-direction: column;
+          overflow-x: hidden;
+          overflow-y: auto;
         }
 
         .page-row {
-          min-width: 160px;
+          min-width: 0;
         }
 
         .actionbar {
@@ -906,13 +907,13 @@
 
       .workspace-body {
         min-height: 0;
-        grid-template-columns: 224px minmax(0, 1fr);
+        grid-template-columns: 144px minmax(0, 1fr);
       }
 
       .page-panel {
         min-height: 0;
-        padding: 16px 12px;
-        gap: 9px;
+        padding: 12px 8px;
+        gap: 8px;
         border-right: 1px solid var(--line);
         background: #131319;
       }
@@ -924,20 +925,20 @@
 
       .page-panel-title {
         color: #6b6b77;
-        font-size: 10px;
-        font-weight: 750;
+        font-size: 9px;
+        font-weight: 400;
         letter-spacing: 0.1em;
       }
 
       .page-count {
         color: #777783;
-        font-size: 10px;
-        font-weight: 700;
+        font-size: 9px;
+        font-weight: 400;
       }
 
       .page-list {
         flex: 1 1 auto;
-        gap: 4px;
+        gap: 3px;
         padding: 0;
       }
 
@@ -948,8 +949,8 @@
 
       .page-select {
         width: 100%;
-        min-height: 34px;
-        padding: 0 12px;
+        min-height: 30px;
+        padding: 0 8px;
         grid-template-columns: minmax(0, 1fr) 8px;
         gap: 8px;
         border-radius: 8px;
@@ -981,26 +982,26 @@
       }
 
       .page-name {
-        font-size: 12px;
-        font-weight: 600;
+        font-size: 10px;
+        font-weight: 400;
       }
 
       .sidebar-actions {
         display: flex;
         flex: 0 0 auto;
         flex-direction: column;
-        gap: 8px;
+        gap: 6px;
       }
 
       .page-panel .import-project {
         width: 100%;
-        min-height: 34px;
+        min-height: 30px;
         border: 1px solid rgba(196, 167, 255, 0.26);
         border-radius: 8px;
         background: rgba(117, 89, 255, 0.12);
         color: #d9c8ff;
-        font-size: 11px;
-        font-weight: 700;
+        font-size: 10px;
+        font-weight: 400;
         cursor: pointer;
       }
 
@@ -1012,10 +1013,10 @@
       .page-panel .button,
       .page-panel .add-page {
         width: 100%;
-        min-height: 34px;
+        min-height: 30px;
         border-radius: 8px;
-        font-size: 12px;
-        font-weight: 650;
+        font-size: 10px;
+        font-weight: 400;
       }
 
       .page-panel .add-page {
@@ -1023,7 +1024,8 @@
         border: 0;
         color: #646470;
         background: transparent;
-        font-size: 11px;
+        font-size: 10px;
+        font-weight: 400;
       }
 
       .page-panel .add-page:hover {
@@ -1112,8 +1114,8 @@
       }
 
       .send-icon {
-        width: 18px;
-        height: 18px;
+        width: 16px;
+        height: 16px;
         fill: none;
         stroke: currentColor;
         stroke-width: 1.8;
@@ -1167,21 +1169,24 @@
       }
 
       .viewport {
-        width: min(100%, calc((100vh - 124px) * 1.6));
-        height: auto;
-        max-height: 100%;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: var(--preview-source-width, 1440px);
+        height: var(--preview-source-height, 900px);
+        max-width: none;
+        max-height: none;
         min-height: 0;
-        aspect-ratio: 1440 / 900;
         border: 1px solid rgba(255, 255, 255, 0.18);
         border-radius: 0;
         background: #09090c;
         box-shadow: 0 26px 64px rgba(0, 0, 0, 0.32);
-        transform: translate3d(
+        transform: translate3d(-50%, -50%, 0) translate3d(
             var(--preview-pan-x, 0px),
             var(--preview-pan-y, 0px),
             0
           )
-          scale(var(--preview-zoom, 1));
+          scale(var(--preview-scale, 0.5));
         transform-origin: center;
         transition: transform 160ms ease;
         will-change: transform;
@@ -1326,7 +1331,7 @@
         position: absolute;
         right: 16px;
         bottom: 44px;
-        left: 240px;
+        left: 160px;
         z-index: 20;
         grid-column: auto;
         border-radius: 9px;
@@ -1378,10 +1383,10 @@
       [hidden] { display: none !important; }
 
       @media (max-width: 820px) {
-        .workspace-body { grid-template-columns: 190px minmax(0, 1fr); }
+        .workspace-body { grid-template-columns: 132px minmax(0, 1fr); }
         .toolbar { gap: 6px; }
         .topbar-action.end-session { display: none; }
-        .result { left: 206px; }
+        .result { left: 148px; }
       }
 
       @media (max-width: 640px) {
@@ -1390,9 +1395,9 @@
         .identity { grid-column: 1; justify-self: start; }
         .project { width: 160px; text-align: left; }
         .toolbar { grid-column: 2; }
-        .workspace-body { grid-template-columns: 1fr; }
-        .page-panel { display: none; }
-        .result { left: 16px; }
+        .workspace-body { grid-template-columns: 120px minmax(0, 1fr); }
+        .page-panel { display: flex; }
+        .result { left: 136px; }
       }
     </style>
   </head>
@@ -1450,9 +1455,9 @@
           </div>
 
           <div class="toolbar">
-            <button class="icon-button close-session" id="endButton" title="关闭当前任务" aria-label="关闭当前任务">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round">
-                <path d="M6 6l12 12M18 6 6 18" />
+            <button class="icon-button close-session" id="endButton" title="关闭工作台" aria-label="关闭工作台">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M18.364 5.36374C19.6226 6.64472 20.4798 8.27679 20.8271 10.0536C21.1743 11.8303 20.9961 13.672 20.3149 15.3457C19.6337 17.0194 18.4802 18.4499 17.0001 19.4563C15.5201 20.4628 13.78 21 12 21C10.22 21 8.47992 20.4628 6.99988 19.4563C5.51984 18.4499 4.36628 17.0194 3.68509 15.3457C3.0039 13.672 2.82567 11.8303 3.17293 10.0536C3.5202 8.2768 4.37736 6.64474 5.63603 5.36375M12 3V7.72749" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
               </svg>
             </button>
             <button class="icon-button" id="fullscreenButton" title="放大工作台">
@@ -1491,13 +1496,13 @@
               <button class="button" id="undoButton" title="撤销上次修改" hidden>撤销上次修改</button>
               <button class="button current-send" id="primaryButton" disabled>
                 <span class="sidebar-button-content">
-                  <span id="primaryButtonLabel">发送当前页面</span>
+                  <span id="primaryButtonLabel">当前页面</span>
                   <svg class="send-icon" viewBox="0 0 20 20"><path d="m3 3 14 7-14 7 2.5-7L3 3Z" stroke-linejoin="round"/><path d="M5.5 10H13" stroke-linecap="round"/></svg>
                 </span>
               </button>
               <button class="button secondary-send" id="sendAllButton" aria-label="全部发送到 Figma">
                 <span class="sidebar-button-content">
-                  <span id="sendAllButtonLabel">发送全部页面</span>
+                  <span id="sendAllButtonLabel">全部页面</span>
                   <svg class="send-icon" viewBox="0 0 20 20"><path d="m3 3 14 7-14 7 2.5-7L3 3Z" stroke-linejoin="round"/><path d="M5.5 10H13" stroke-linecap="round"/></svg>
                 </span>
               </button>
@@ -1516,13 +1521,12 @@
                 title="可交互的前端页面预览"
                 sandbox="allow-forms allow-modals allow-popups-by-user-activation allow-same-origin allow-scripts"
               ></iframe>
-              <img
+              <canvas
                 class="preview-image"
                 id="previewFallback"
-                alt="前端页面静态预览"
-                draggable="false"
+                aria-label="前端页面静态预览"
                 hidden
-              />
+              ></canvas>
               <div class="empty" id="emptyState">
                 <div class="empty-icon">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
@@ -1701,7 +1705,11 @@
         let previewLoadTimer = null;
         let openingHtml = false;
         let importingProject = false;
+        const PREVIEW_MIN_ZOOM = 50;
+        const PREVIEW_MAX_ZOOM = 300;
+        const PREVIEW_PAN_GUTTER = 32;
         let previewZoom = 100;
+        let previewFitScale = 1;
         let previewPanX = 0;
         let previewPanY = 0;
         let previewPointerId = null;
@@ -1840,6 +1848,7 @@
         elements.previewStage.addEventListener("pointerup", endPreviewPan);
         elements.previewStage.addEventListener("pointercancel", endPreviewPan);
         window.addEventListener("resize", () => {
+          updatePreviewGeometry();
           clampPreviewPan();
           applyPreviewTransform();
         });
@@ -2351,7 +2360,10 @@
         }
 
         function setPreviewZoom(value) {
-          previewZoom = Math.min(150, Math.max(50, value));
+          previewZoom = Math.min(
+            PREVIEW_MAX_ZOOM,
+            Math.max(PREVIEW_MIN_ZOOM, value),
+          );
           if (previewZoom <= 100) resetPreviewPan();
           else clampPreviewPan();
           render();
@@ -2402,18 +2414,66 @@
             return;
           }
           const scale = previewZoom / 100;
-          const stageWidth = elements.previewStage.clientWidth;
-          const stageHeight = elements.previewStage.clientHeight;
+          const stageStyle = getComputedStyle(elements.previewStage);
+          const stageWidth = Math.max(
+            1,
+            elements.previewStage.clientWidth -
+              parseFloat(stageStyle.paddingLeft || "0") -
+              parseFloat(stageStyle.paddingRight || "0"),
+          );
+          const stageHeight = Math.max(
+            1,
+            elements.previewStage.clientHeight -
+              parseFloat(stageStyle.paddingTop || "0") -
+              parseFloat(stageStyle.paddingBottom || "0"),
+          );
+          const scaledWidth =
+            elements.viewport.offsetWidth * previewFitScale * scale;
+          const scaledHeight =
+            elements.viewport.offsetHeight * previewFitScale * scale;
           const maxX = Math.max(
-            0,
-            (elements.viewport.offsetWidth * scale - stageWidth) / 2,
+            PREVIEW_PAN_GUTTER,
+            Math.abs(scaledWidth - stageWidth) / 2,
           );
           const maxY = Math.max(
-            0,
-            (elements.viewport.offsetHeight * scale - stageHeight) / 2,
+            PREVIEW_PAN_GUTTER,
+            Math.abs(scaledHeight - stageHeight) / 2,
           );
           previewPanX = Math.min(maxX, Math.max(-maxX, previewPanX));
           previewPanY = Math.min(maxY, Math.max(-maxY, previewPanY));
+        }
+
+        function updatePreviewGeometry(viewport = previewDimensions()) {
+          const width = viewport.width;
+          const height = viewport.height;
+          const stageStyle = getComputedStyle(elements.previewStage);
+          const availableWidth = Math.max(
+            1,
+            elements.previewStage.clientWidth -
+              parseFloat(stageStyle.paddingLeft || "0") -
+              parseFloat(stageStyle.paddingRight || "0") -
+              36,
+          );
+          const availableHeight = Math.max(
+            1,
+            elements.previewStage.clientHeight -
+              parseFloat(stageStyle.paddingTop || "0") -
+              parseFloat(stageStyle.paddingBottom || "0") -
+              36,
+          );
+          previewFitScale = Math.min(
+            1,
+            availableWidth / width,
+            availableHeight / height,
+          );
+          elements.viewport.style.setProperty(
+            "--preview-source-width",
+            `${width}px`,
+          );
+          elements.viewport.style.setProperty(
+            "--preview-source-height",
+            `${height}px`,
+          );
         }
 
         function applyPreviewTransform() {
@@ -2421,8 +2481,8 @@
           elements.previewStage.classList.toggle("is-pannable", pannable);
           elements.previewStage.title = pannable ? "按住拖拽视图" : "";
           elements.viewport.style.setProperty(
-            "--preview-zoom",
-            String(previewZoom / 100),
+            "--preview-scale",
+            String(previewFitScale * (previewZoom / 100)),
           );
           elements.viewport.style.setProperty(
             "--preview-pan-x",
@@ -2455,11 +2515,12 @@
           const activePage = (state.pages || []).find(
             (page) => page.id === state.activePageId,
           );
+          updatePreviewGeometry(activePage?.viewport);
           elements.canvasTitle.textContent = activePage?.name || "页面";
           elements.viewportLabel.textContent = `视图缩放 · ${previewZoom}%`;
           elements.zoomValue.textContent = `${previewZoom}%`;
-          elements.zoomOut.disabled = previewZoom <= 50;
-          elements.zoomIn.disabled = previewZoom >= 150;
+          elements.zoomOut.disabled = previewZoom <= PREVIEW_MIN_ZOOM;
+          elements.zoomIn.disabled = previewZoom >= PREVIEW_MAX_ZOOM;
           applyPreviewTransform();
           elements.workspaceLabel.textContent = state.figmaConnected
             ? "已连接"
@@ -2588,7 +2649,7 @@
             busy || !state.previewUrl || ended || !(state.pages || []).length;
           elements.sendAllLabel.textContent = linked
             ? "更新全部页面"
-            : "发送全部页面";
+            : "全部页面";
           elements.undo.hidden = !state.undoAvailable || ended;
           elements.primary.hidden =
             ended ||
@@ -2676,7 +2737,7 @@
             if (requestId === previewRequestId && !previewReady) {
               void loadPreviewFallback(requestId);
             }
-          }, 8_000);
+          }, 2_500);
         }
 
         async function loadPreviewFallback(requestId) {
@@ -2699,25 +2760,78 @@
           if (requestId !== previewRequestId) return;
 
           const image = readPreviewImage(result);
-          previewLoading = false;
-          previewReady = Boolean(image?.dataUrl);
-          if (previewReady) {
-            elements.previewFallback.src = image.dataUrl;
-            elements.previewFallback.hidden = false;
-            elements.preview.hidden = true;
-            const activePage = (state.pages || []).find(
-              (page) => page.id === state.activePageId,
-            );
-            elements.previewFallback.alt = `${activePage?.name || state.projectName || "页面"}静态预览`;
+          previewReady = false;
+          if (image?.dataUrl) {
+            updatePreviewGeometry(image);
+            try {
+              const bitmap = await createImageBitmap(previewImageBlob(image.dataUrl));
+              if (requestId !== previewRequestId) {
+                bitmap.close();
+                return;
+              }
+              const canvas = elements.previewFallback;
+              canvas.width = image.width || bitmap.width;
+              canvas.height = image.height || bitmap.height;
+              const context = canvas.getContext("2d");
+              context.clearRect(0, 0, canvas.width, canvas.height);
+              context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+              bitmap.close();
+              previewReady = true;
+              canvas.hidden = false;
+              elements.preview.hidden = true;
+              const activePage = (state.pages || []).find(
+                (page) => page.id === state.activePageId,
+              );
+              canvas.setAttribute("aria-label", `${activePage?.name || state.projectName || "页面"}静态预览`);
+            } catch {
+              previewUsingFallback = false;
+              const context = elements.previewFallback.getContext("2d");
+              context.clearRect(0, 0, elements.previewFallback.width, elements.previewFallback.height);
+            }
           } else {
             previewUsingFallback = false;
-            elements.previewFallback.removeAttribute("src");
+            const context = elements.previewFallback.getContext("2d");
+            context.clearRect(0, 0, elements.previewFallback.width, elements.previewFallback.height);
           }
+          previewLoading = false;
           render();
         }
 
+        function previewImageBlob(dataUrl) {
+          const separator = dataUrl.indexOf(",");
+          if (separator < 0) throw new Error("Invalid preview image data URL");
+          const header = dataUrl.slice(0, separator);
+          const mimeType = /^data:([^;,]+)/.exec(header)?.[1] || "image/png";
+          const binary = atob(dataUrl.slice(separator + 1));
+          const bytes = new Uint8Array(binary.length);
+          for (let index = 0; index < binary.length; index += 1) {
+            bytes[index] = binary.charCodeAt(index);
+          }
+          return new Blob([bytes], { type: mimeType });
+        }
+
+        function activePreviewUrl() {
+          if (!state.previewUrl) return "";
+          const activePage = (state.pages || []).find(
+            (page) => page.id === state.activePageId,
+          );
+          const pagePath = String(activePage?.path || "").replace(/^\/+/, "");
+          if (!pagePath) return state.previewUrl;
+          try {
+            const base = new URL(state.previewUrl);
+            return new URL(pagePath, `${base.origin}/`).toString();
+          } catch {
+            return state.previewUrl;
+          }
+        }
+
         function canUseLivePreview() {
-          return location.hash === "#demo";
+          // The workspace itself is already hosted inside an MCP Apps iframe.
+          // A nested localhost iframe can be replaced by the browser's blocked
+          // error document, which still fires `load` and looks successful to us.
+          // Always use the CDB-rendered image inside the workspace; the HTML
+          // button remains the interactive, browser-hosted preview path.
+          return false;
         }
 
         function renderDisplayMode() {
@@ -2787,7 +2901,7 @@
           if (value.phase === "applying") return "正在应用修改…";
           if (value.phase === "opening") return "正在准备…";
           if (value.phase === "error") return "重试";
-          return "发送当前页面";
+          return "当前页面";
         }
 
         function isBusy(phase) {
@@ -2835,7 +2949,19 @@
         }
 
         function previewDimensions() {
-          return { width: 1440, height: 900 };
+          const activePage = (state.pages || []).find(
+            (page) => page.id === state.activePageId,
+          );
+          const width = Number(activePage?.viewport?.width);
+          const height = Number(activePage?.viewport?.height);
+          return {
+            width: Number.isFinite(width)
+              ? Math.min(1920, Math.max(320, Math.round(width)))
+              : 1440,
+            height: Number.isFinite(height)
+              ? Math.min(1200, Math.max(480, Math.round(height)))
+              : 900,
+          };
         }
 
         function demoState() {

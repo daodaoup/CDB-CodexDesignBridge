@@ -7,7 +7,7 @@ Codex Design Bridge（简称 CDB）把本地前端页面、Codex 和 Figma Deskt
 CDB 使用本机回环连接，不依赖官方 Figma MCP，也不消耗官方 Figma MCP 配额。
 
 当前公开版本：`0.7.0`  
-Codex 插件构建：`0.7.0+codex.20260806151451`
+Codex 插件构建：`0.7.0+codex.20260807151937`
 
 > 0.7.0 源码和自动化测试已经完成，但真实 Codex Apps UI、Figma Desktop 往返和 macOS 安装仍属于发布验收门禁。自动化通过不等于桌面链路已经完整验收。
 

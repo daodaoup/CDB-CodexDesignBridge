@@ -159,7 +159,7 @@ test("publishes the design workspace as an MCP Apps resource", async (t) => {
   assert.match(resource.contents[0].text, /open_design_preview_in_browser/);
   assert.doesNotMatch(resource.contents[0].text, /id="closeButton"/);
   assert.match(resource.contents[0].text, /id="endButton"/);
-  assert.match(resource.contents[0].text, /aria-label="关闭当前任务"/);
+  assert.match(resource.contents[0].text, /aria-label="关闭工作台"/);
   assert.match(resource.contents[0].text, /id="endDialog"/);
   assert.match(resource.contents[0].text, /end_design_session/);
   assert.match(resource.contents[0].text, /Figma 中还有尚未发送给 Codex 的修改/);
@@ -172,7 +172,7 @@ test("publishes the design workspace as an MCP Apps resource", async (t) => {
   assert.match(resource.contents[0].text, /import_html_project/);
   assert.match(resource.contents[0].text, /collectDroppedFiles/);
   assert.match(resource.contents[0].text, /id="sendAllButton"/);
-  assert.match(resource.contents[0].text, /发送当前页面/);
+  assert.match(resource.contents[0].text, /id="primaryButtonLabel">当前页面</);
   assert.match(resource.contents[0].text, /全部发送到 Figma/);
   assert.match(resource.contents[0].text, /id="receiveButton"/);
   assert.match(resource.contents[0].text, /让 Codex 处理/);
@@ -198,7 +198,8 @@ test("publishes the design workspace as an MCP Apps resource", async (t) => {
   );
   assert.match(resource.contents[0].text, /class="preview-frame"/);
   assert.match(resource.contents[0].text, /id="previewFallback"/);
-  assert.match(resource.contents[0].text, /aspect-ratio: 1440 \/ 900/);
+  assert.match(resource.contents[0].text, /--preview-source-width/);
+  assert.match(resource.contents[0].text, /--preview-source-height/);
   assert.match(resource.contents[0].text, /id="zoomControl"/);
   assert.match(resource.contents[0].text, /id="zoomOutButton"/);
   assert.match(resource.contents[0].text, /id="zoomInButton"/);
@@ -212,12 +213,13 @@ test("publishes the design workspace as an MCP Apps resource", async (t) => {
   );
   assert.match(resource.contents[0].text, /视图缩放 · 100%/);
   assert.match(resource.contents[0].text, /let previewZoom = 100;/);
-  assert.match(resource.contents[0].text, /Math\.min\(150, Math\.max\(50, value\)\)/);
-  assert.match(resource.contents[0].text, /--preview-zoom/);
+  assert.match(resource.contents[0].text, /PREVIEW_MAX_ZOOM = 300/);
+  assert.match(resource.contents[0].text, /PREVIEW_MIN_ZOOM = 50/);
+  assert.match(resource.contents[0].text, /--preview-scale/);
   assert.match(resource.contents[0].text, /id="previewStage"/);
   assert.match(
     resource.contents[0].text,
-    /transform: translate3d\([\s\S]*?--preview-pan-x[\s\S]*?--preview-pan-y[\s\S]*?scale\(var\(--preview-zoom, 1\)\)/,
+    /transform: translate3d\(-50%, -50%, 0\)[\s\S]*?--preview-pan-x[\s\S]*?--preview-pan-y[\s\S]*?scale\(var\(--preview-scale, 0\.5\)\)/,
   );
   assert.match(resource.contents[0].text, /pointerdown", startPreviewPan/);
   assert.match(resource.contents[0].text, /setPointerCapture\?\.\(event\.pointerId\)/);
@@ -226,12 +228,20 @@ test("publishes the design workspace as an MCP Apps resource", async (t) => {
     resource.contents[0].text,
     /previewZoom <= 100\) resetPreviewPan\(\)/,
   );
+  assert.match(resource.contents[0].text, /Math\.abs\(scaledWidth - stageWidth\)/);
+  assert.match(resource.contents[0].text, /activePage\?\.viewport/);
+  assert.match(resource.contents[0].text, /availableWidth \/ width/);
   assert.doesNotMatch(resource.contents[0].text, /data-device=/);
   assert.doesNotMatch(resource.contents[0].text, /aspect-ratio: 820 \/ 1024/);
   assert.doesNotMatch(resource.contents[0].text, /aspect-ratio: 390 \/ 844/);
   assert.match(resource.contents[0].text, /allow-same-origin allow-scripts/);
   assert.match(resource.contents[0].text, /function loadPreview\(\)/);
-  assert.match(resource.contents[0].text, /location\.hash === "#demo"/);
+  assert.match(resource.contents[0].text, /function activePreviewUrl\(\)/);
+  assert.match(resource.contents[0].text, /new URL\(pagePath, `\$\{base\.origin\}\/`\)/);
+  assert.match(
+    resource.contents[0].text,
+    /function canUseLivePreview\(\)\s*\{[\s\S]*?return false;/,
+  );
   assert.match(resource.contents[0].text, /mode: requestedMode/);
   assert.match(resource.contents[0].text, /\? "inline" : "fullscreen"/);
   assert.doesNotMatch(resource.contents[0].text, /data-page-remove/);

@@ -935,7 +935,7 @@ async function openWorkspace({ projectDir, previewUrl, forceHandoff = false }) {
   const startedAt = Date.now();
   const project = await normalizeProjectDir(projectDir);
   const report = await preflightDesignProject(project);
-  let state = await getWorkspace(project);
+  let state = await getWorkspace(project, report);
   state = {
     ...state,
     mode: "workspace",
@@ -1079,14 +1079,14 @@ async function openWorkspace({ projectDir, previewUrl, forceHandoff = false }) {
   return publicState(state);
 }
 
-async function getWorkspace(projectDir) {
+async function getWorkspace(projectDir, preparedReport = null) {
   const project = await normalizeProjectDir(projectDir);
   if (states.has(project)) {
     return synchronizeBridgeState(project, states.get(project));
   }
 
   const binding = await readBinding(project);
-  const report = await preflightDesignProject(project);
+  const report = preparedReport || await preflightDesignProject(project);
   const pages = workspacePagesFromReport(report, binding.pages);
   const activePageId = pages.some((page) => page.id === binding.activePageId)
     ? binding.activePageId
