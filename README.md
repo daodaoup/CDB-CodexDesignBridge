@@ -1,5 +1,7 @@
 # Codex Design Bridge
 
+[English](README.md) | [简体中文](README.zh-CN.md)
+
 Codex Design Bridge (CDB) is a designer-first workspace embedded in Codex. It previews static frontend pages, sends editable layers to a local Figma development plugin, and applies supported Figma changes back to the existing source without using the official Figma MCP quota.
 
 Current source candidate: `0.7.0`. The Codex plugin build in this repository is `0.7.0+codex.20260806151451`; the workbench displays the public version `V 0.7.0`.
