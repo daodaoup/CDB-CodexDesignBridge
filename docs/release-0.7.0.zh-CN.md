@@ -1,0 +1,42 @@
+# Codex Design Bridge 0.7.0
+
+## 版本主题
+
+把 Figma 中的结构调整从“提示 Codex 猜测”升级为可验证、可回滚的源码事务，并让静态 HTML/CSS 的 Flex 布局以可编辑 Auto Layout 进入 Figma。
+
+## 核心变化
+
+- 本地 Bridge 协议升级到 14，新增权威 `nodeMove` / `nodeReparent` schema；协议 13 客户端可迁移连接，未知未来协议安全保留为待处理。
+- Protocol 14 握手要求 Figma 插件单独上报正式版本；与当前 CDB 正式版本不一致时明确拒绝连接，工作台状态保留已连接的 Figma 插件版本。
+- Figma 采集完整记录旧/新父级、索引、相对 bounds、世界变换、目标布局、定位和约束；克隆替换与删除原节点合并为一个原子结构变化。
+- 源码端在同一事务中完成 DOM 重挂和 CSS 几何调整，保留稳定 ID、文字、事件、ARIA 和业务属性；任一步失败都不留下半写入状态。
+- 写回后自动打开真实本地预览，验证稳定节点、父级、索引和关键位置；误差超过 2px 或预检失败时自动 Undo，并返回明确阶段和原因。
+- CSS Flex 导入为 Figma Auto Layout，覆盖 direction、wrap、gap、padding、双轴对齐、Fixed/Hug/Fill 及常用 item 属性。
+- Figma Auto Layout 修改可回写为 CSS flex；基础 Grid 模板、间距与 placement 可确定性捕获和回写。
+- 同一页面再次导入时复用页面根和未变 Frame/Text；检测到尚未发送的 Figma 修改时拒绝静默覆盖。
+- 同源、受限大小的 PNG/JPEG/WebP 作为可编辑图片填充导入；安全 SVG 继续作为可编辑对象。
+- 新增无终端 Windows 一键安装入口：等待 Codex 自然退出后更新个人源和运行缓存，不强杀应用；诊断 `.cmd` 入口继续保留。
+
+## 固定验收场景
+
+`examples/codex-landing` 的 `daodao` 按钮从 `hero-actions` 移动到 `hero-copy`：无需截图或人工定位，源码父级、顺序、视觉位置和稳定属性应全部正确，自动验证后 `pendingChangeCount = 0`。
+
+## 自动化证据
+
+- `npm.cmd run check` 通过。
+- 共 100 项：94 通过、0 失败、6 项 macOS 专用测试在 Windows 跳过。
+- 覆盖协议快照、结构原子性、失败零写入、Undo、Flex/Grid 双向映射、插件增量复用、未发送修改保护，以及真实 MCP/WebSocket/浏览器预览验证。
+- Windows 安装器 `CheckOnly`、18 个核心文件哈希、一键安装入口静态安全约束和不完整包拒绝测试通过。
+
+## 兼容与迁移
+
+- 升级后关闭旧 Figma 插件窗口并重新运行 CDB；旧协议 13 可在迁移期连接，但要使用结构协议 14 必须更新插件。
+- 个人插件源码、运行缓存和安装报告必须为同一精确候选；当前任务不会热切换缓存，安装后需新建 Codex 任务。
+- UI 只显示 `V 0.7.0`，内部缓存可使用短 `+codex.<时间戳>` 后缀。
+
+## 已知边界
+
+- 完整闭环以静态 HTML/CSS 和稳定映射为主；动态模板、循环/条件渲染、复杂组件语义保持 pending。
+- Grid 通过布局元数据和图层顺序保持语义，不承诺完整原生 Figma Grid 编辑体验。
+- 不包含 React/Vue/Vite 工程转换、ZIP、100MB 分块上传、完整 Figma→HTML 设计模型、Component/Variant/Variable、复杂响应式推断和高频高级视觉效果。
+- 当前 Windows 自动化通过；真实 Figma Desktop 往返和 macOS 同候选验收完成前，不宣称跨平台正式通过。

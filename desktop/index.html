@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; frame-src http://127.0.0.1:* http://localhost:*;"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Codex Design Bridge</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="toolbar">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">C</div>
+          <div>
+            <h1>Codex Design Bridge</h1>
+            <p id="project-path">尚未选择项目</p>
+          </div>
+        </div>
+        <div class="toolbar-actions">
+          <div id="status-chip" class="status-chip empty">
+            <span class="status-dot" aria-hidden="true"></span>
+            <span id="status-label">未启动</span>
+          </div>
+          <button id="copy-token" class="icon-button" type="button" disabled>
+            连接 Figma
+          </button>
+          <button id="refresh" class="icon-button" type="button" disabled>
+            刷新预览
+          </button>
+          <button id="import-figma" class="figma-button" type="button" disabled>
+            导入到 Figma
+          </button>
+          <button id="choose-project" class="primary-button" type="button">
+            选择项目
+          </button>
+        </div>
+      </header>
+
+      <section class="workspace">
+        <div id="empty-state" class="empty-state">
+          <div class="empty-illustration" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <h2>选择一个前端项目</h2>
+          <p>
+            Bridge 会在后台自动启动。你可以在这里预览页面，或一键导入到
+            Figma。
+          </p>
+          <button id="empty-choose-project" class="primary-button" type="button">
+            选择项目目录
+          </button>
+        </div>
+
+        <div id="preview-shell" class="preview-shell" hidden>
+          <iframe
+            id="preview"
+            title="前端页面预览"
+            sandbox="allow-forms allow-modals allow-same-origin allow-scripts"
+          ></iframe>
+          <div id="update-overlay" class="update-overlay" hidden>
+            <div class="spinner" aria-hidden="true"></div>
+            <strong id="overlay-title">Codex 正在更新前端</strong>
+            <span id="overlay-detail">完成后页面会自动刷新</span>
+          </div>
+        </div>
+      </section>
+
+      <footer class="status-bar">
+        <span id="footer-status">选择一个前端项目开始预览</span>
+        <span id="project-name">No project</span>
+      </footer>
+    </main>
+    <script src="./renderer.js"></script>
+  </body>
+</html>

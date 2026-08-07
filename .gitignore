@@ -1,0 +1,36 @@
+node_modules/
+.pnpm-store/
+
+# CDB local runtime state
+.figma-sync/
+.codex/
+.cdb-imports/
+**/.figma-sync/
+**/.codex/design-bridge.json
+**/.codex/design-bridge-token
+
+# Local secrets and environment overrides
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Logs and temporary output
+*.log
+npm-debug.log*
+coverage/
+dist/
+build/
+tmp/
+temp/
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Local release artifacts
+releases/*.zip
+releases/*.sha256

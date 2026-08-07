@@ -1,0 +1,7 @@
+interface:
+  display_name: "CDB"
+  short_description: "在 Codex 页面与 Figma 设计之间双向同步"
+  default_prompt: "使用 $start-design 打开或恢复 CDB 工作台。"
+
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CDB Design Workspace</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0d0d12;
+      --topbar: #101015;
+      --sidebar: #131319;
+      --canvas: #1a1a20;
+      --surface: #202029;
+      --line: rgba(255, 255, 255, 0.07);
+      --text: #f3f3f5;
+      --muted: #777783;
+      --quiet: #555560;
+      --accent: #b894ff;
+      --accent-strong: #c4a7ff;
+      --accent-soft: rgba(117, 89, 255, 0.2);
+      --connected: #38ffb9;
+      --coral: #ff6b5c;
+      --phone: #070709;
+    }
+
+    * { box-sizing: border-box; }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", sans-serif;
+    }
+
+    button {
+      border: 0;
+      color: inherit;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    svg { display: block; }
+
+    .workspace {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: grid;
+      grid-template-rows: 52px minmax(0, 1fr) 36px;
+      overflow: hidden;
+      border-radius: 8px;
+      background: var(--bg);
+    }
+
+    .topbar {
+      position: relative;
+      z-index: 10;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--line);
+      background: var(--topbar);
+    }
+
+    .topbar-left,
+    .toolbar,
+    .device-switcher,
+    .status-group,
+    .button-content {
+      display: flex;
+      align-items: center;
+    }
+
+    .topbar-left { gap: 14px; }
+
+    .brand {
+      grid-column: 2;
+      min-width: 0;
+      justify-self: center;
+    }
+
+    .project-name {
+      display: block;
+      max-width: 220px;
+      overflow: hidden;
+      color: #e7e7eb;
+      font-size: 13px;
+      font-weight: 650;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .toolbar {
+      grid-column: 3;
+      justify-self: end;
+      gap: 12px;
+      height: 52px;
+    }
+
+    .device-switcher {
+      width: 76px;
+      height: 34px;
+      justify-content: center;
+      gap: 7px;
+      padding: 0 10px;
+      border-radius: 9px;
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--connected);
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .figma-logo { width: 14px; height: 20px; flex: 0 0 auto; }
+
+    .device-option {
+      padding: 0;
+      background: transparent;
+      color: inherit;
+    }
+
+    .device-option.legacy { display: none; }
+
+    .tool-button,
+    .action-button {
+      height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: #15151a;
+      color: #a5a5b0;
+      transition: border-color 160ms ease, background 160ms ease, color 160ms ease, transform 160ms ease;
+    }
+
+    .tool-button { width: 34px; padding: 0; }
+
+    .action-button {
+      gap: 7px;
+      padding: 0 12px;
+      font-size: 12px;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+
+    .action-button.end-design { width: 88px; padding: 0 4px; }
+    .action-button.html-action { width: 79px; }
+    .tool-button:hover,
+    .action-button:hover {
+      border-color: rgba(196, 167, 255, 0.34);
+      background: #1b1b22;
+      color: #f0ecff;
+      transform: translateY(-1px);
+    }
+
+    .tool-icon { width: 20px; height: 20px; fill: none; stroke: currentColor; }
+
+    .main-layout {
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 224px minmax(0, 1fr);
+    }
+
+    .sidebar {
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--line);
+      background: var(--sidebar);
+    }
+
+    .panel-section { padding: 16px 12px 0; }
+
+    .panel-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 18px;
+      margin-bottom: 9px;
+    }
+
+    .panel-title,
+    .pages-total {
+      margin: 0;
+      color: #6b6b77;
+      font-size: 10px;
+      font-weight: 750;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .pages-total {
+      width: 28px;
+      color: #777783;
+      letter-spacing: 0;
+      text-align: right;
+      text-transform: none;
+    }
+
+    .nav-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      max-height: 224px;
+      overflow-y: auto;
+    }
+
+    .nav-item {
+      width: 100%;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      border-radius: 8px;
+      background: var(--surface);
+      color: #8a8a95;
+      font-size: 12px;
+      font-weight: 600;
+      text-align: left;
+    }
+
+    .nav-item.active {
+      background: var(--accent-soft);
+      color: #d08dff;
+    }
+
+    .nav-item[hidden] { display: none; }
+
+    .nav-item:hover { color: #d7d7de; }
+
+    .page-state {
+      width: 6px;
+      height: 6px;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      background: #717171;
+    }
+
+    .nav-item.active .page-state {
+      background: #38d99b;
+      box-shadow: 0 0 0 3px rgba(56, 217, 155, 0.08);
+    }
+
+    .layers-panel {
+      flex: 1;
+      min-height: 0;
+      padding: 0;
+    }
+
+    .layers-heading,
+    .layers-list,
+    .sidebar-footer { display: none; }
+
+    .sidebar-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 0 12px 16px;
+    }
+
+    .send-button {
+      width: 100%;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      border-radius: 8px;
+      background: #373737;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 650;
+    }
+
+    .send-button.current {
+      background: linear-gradient(100deg, #aa84ef 0%, #c4a7ff 100%);
+    }
+
+    .send-button:hover { filter: brightness(1.08); }
+    .send-icon { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+
+    .canvas {
+      position: relative;
+      min-width: 0;
+      min-height: 0;
+      overflow: hidden;
+      background: var(--canvas);
+    }
+
+    .canvas::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image: radial-gradient(circle, rgba(255, 255, 255, 0.115) 0.8px, transparent 0.9px);
+      background-size: 28px 28px;
+      background-position: 14px 14px;
+    }
+
+    .canvas-background-grid { display: none; }
+
+    .canvas-meta {
+      position: absolute;
+      top: 18px;
+      left: 20px;
+      z-index: 2;
+    }
+
+    .canvas-title {
+      display: block;
+      margin-bottom: 4px;
+      color: #ededf0;
+      font-size: 12px;
+      font-weight: 650;
+    }
+
+    .canvas-subtitle { color: #666672; font-size: 10px; }
+
+    .preview-stage { display: none; }
+
+    .music-preview {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      display: grid;
+      place-items: center;
+      padding: 18px 36px;
+    }
+
+    .phone-shell {
+      height: min(776px, calc(100% - 2px));
+      aspect-ratio: 356 / 776;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      background: var(--phone);
+      box-shadow: 0 28px 70px rgba(0, 0, 0, 0.38);
+    }
+
+    .phone-status {
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 720;
+    }
+
+    .phone-signals { display: flex; align-items: center; gap: 6px; }
+
+    .phone-header {
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+    }
+
+    .phone-icon-button {
+      width: 24px;
+      height: 24px;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      background: transparent;
+      color: #fff;
+    }
+
+    .phone-hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 2px;
+    }
+
+    .album-art {
+      width: 142px;
+      aspect-ratio: 1;
+      position: relative;
+      overflow: hidden;
+      border-radius: 16px;
+      background:
+        radial-gradient(circle at 63% 48%, rgba(255, 229, 136, 0.96) 0 7%, rgba(255, 166, 75, 0.8) 8% 17%, transparent 18%),
+        radial-gradient(circle at 26% 18%, #7c291e 0 22%, transparent 23%),
+        radial-gradient(circle at 78% 18%, #d76a44 0 20%, transparent 21%),
+        radial-gradient(circle at 21% 72%, #9f3828 0 24%, transparent 25%),
+        radial-gradient(circle at 76% 76%, #64251f 0 25%, transparent 26%),
+        linear-gradient(145deg, #56201d, #d85c38 53%, #6c211e);
+      box-shadow: inset 0 0 30px rgba(255, 177, 79, 0.24);
+    }
+
+    .album-orb {
+      position: absolute;
+      border-radius: 50%;
+      mix-blend-mode: screen;
+      opacity: 0.62;
+    }
+
+    .album-orb.one { width: 62px; height: 62px; top: 29px; left: 32px; background: rgba(235, 72, 37, 0.64); }
+    .album-orb.two { width: 52px; height: 52px; top: 58px; left: 68px; background: rgba(255, 199, 87, 0.66); }
+    .album-orb.three { width: 38px; height: 38px; top: 15px; right: -5px; background: rgba(255, 176, 106, 0.64); }
+    .album-orb.four { width: 44px; height: 44px; bottom: 3px; left: 46px; background: rgba(255, 105, 58, 0.48); }
+    .album-glow { position: absolute; inset: 41%; border-radius: 50%; background: #fff1a6; box-shadow: 0 0 25px 16px rgba(255, 190, 78, 0.56); }
+
+    .album-title {
+      margin: 16px 0 0;
+      color: #fff;
+      font-size: 20px;
+      font-weight: 760;
+      letter-spacing: -0.02em;
+    }
+
+    .album-meta { margin-top: 8px; color: #898990; font-size: 11px; }
+    .album-detail { margin-top: 5px; color: #505057; font-size: 9px; }
+
+    .play-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 22px 20px 12px;
+    }
+
+    .play-button {
+      height: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border-radius: 22px;
+      background: #111116;
+      color: #f7f7f8;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .play-button.primary { background: var(--coral); }
+    .play-button svg { width: 15px; height: 15px; }
+
+    .track-list {
+      min-height: 0;
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      padding: 7px 20px 4px;
+    }
+
+    .track-row {
+      min-height: 46px;
+      display: grid;
+      grid-template-columns: 24px minmax(0, 1fr) auto 8px;
+      align-items: center;
+      gap: 8px;
+      color: #f5f5f6;
+    }
+
+    .track-index { color: #4b4b53; font-size: 11px; }
+    .track-copy { min-width: 0; }
+    .track-title { display: block; font-size: 12px; font-weight: 700; }
+    .track-row.active .track-title { color: var(--coral); }
+    .track-artist { display: block; margin-top: 3px; color: #67676f; font-size: 9px; }
+    .track-time { color: #8a8a91; font-size: 9px; }
+    .track-more { color: #45454c; font-size: 15px; line-height: 1; }
+    .playing-wave { width: 16px; height: 16px; color: var(--coral); }
+
+    .phone-nav {
+      height: 69px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      flex: 0 0 auto;
+      padding: 9px 12px 6px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      background: #09090b;
+    }
+
+    .phone-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      padding: 0;
+      background: transparent;
+      color: #5b5b64;
+      font-size: 8px;
+    }
+
+    .phone-nav-item.active { color: var(--coral); }
+    .phone-nav-item svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+
+    .home-indicator {
+      width: 108px;
+      height: 3px;
+      position: absolute;
+      bottom: 7px;
+      left: 50%;
+      z-index: 4;
+      transform: translateX(-50%);
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.34);
+    }
+
+    .properties { display: none; }
+
+    .statusbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      border-top: 1px solid var(--line);
+      background: #101015;
+      color: #62626d;
+      font-size: 10px;
+    }
+
+    .status-group { gap: 10px; }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      background: #31c48d;
+      box-shadow: 0 0 0 3px rgba(49, 196, 141, 0.08);
+    }
+
+    .status-message { display: none; }
+    .status-separator { color: #383842; }
+    .status-right { min-width: 206px; justify-content: flex-end; }
+    .figma-state { width: 39px; justify-content: flex-end; text-align: right; }
+
+    @media (max-width: 900px) {
+      .main-layout { grid-template-columns: 190px minmax(0, 1fr); }
+      .toolbar { gap: 6px; }
+      .action-button.end-design { display: none; }
+      .music-preview { padding-inline: 18px; }
+    }
+
+    @media (max-width: 680px) {
+      .main-layout { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .topbar { grid-template-columns: 1fr auto; }
+      .brand { display: none; }
+      .topbar-left { grid-column: 1; display: flex; gap: 8px; }
+      .topbar-left .device-switcher,
+      .topbar-left .refresh-button { display: none; }
+      .toolbar { grid-column: 2; }
+    }
+
+    @media (max-width: 430px) {
+      .action-button.end-design { display: none; }
+      .toolbar { gap: 7px; }
+    }
+  </style>
+</head>
+
+<body>
+  <main data-codex-id="workspace" class="workspace">
+    <header data-codex-id="topbar" class="topbar">
+      <div data-codex-id="topbar-left" class="topbar-left">
+        <div data-codex-id="device-switcher" class="device-switcher" aria-label="Figma connection status">
+          <svg data-codex-id="connection-logo" class="figma-logo" viewBox="0 0 14 20" aria-hidden="true">
+            <circle cx="4.5" cy="3.5" r="3.5" fill="#F24E1E"/>
+            <circle cx="9.5" cy="3.5" r="3.5" fill="#FF7262"/>
+            <circle cx="4.5" cy="10" r="3.5" fill="#A259FF"/>
+            <circle cx="9.5" cy="10" r="3.5" fill="#1ABCFE"/>
+            <circle cx="4.5" cy="16.5" r="3.5" fill="#0ACF83"/>
+          </svg>
+          <button data-codex-id="device-mobile" class="device-option legacy" type="button">Mobile</button>
+          <button data-codex-id="device-desktop" class="device-option" type="button">已连接</button>
+        </div>
+
+        <button data-codex-id="refresh-button" class="tool-button" type="button" aria-label="刷新预览">
+          <svg data-codex-id="refresh-icon" class="tool-icon" viewBox="0 0 20 20">
+            <path d="M6 6H1V1M1 6l3-2.71A9 9 0 1 1 1.22 12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div data-codex-id="brand" class="brand">
+        <span data-codex-id="project-name" class="project-name">项目一</span>
+      </div>
+
+      <div data-codex-id="toolbar" class="toolbar">
+        <button data-codex-id="end-design-action" class="action-button end-design" type="button">结束本次设计</button>
+
+        <button data-codex-id="zoom-control" class="tool-button" type="button" aria-label="适配画布">
+          <svg data-codex-id="fit-icon" class="tool-icon" viewBox="0 0 22 22">
+            <path d="M7.44 3H3v4.44M14.56 3H19v4.44M7.44 19H3v-4.44M14.56 19H19v-4.44" stroke-width="2.56" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+
+        <button data-codex-id="open-preview-action" class="action-button html-action" type="button">
+          <svg data-codex-id="open-preview-icon" width="15" height="15" viewBox="0 0 15 15" fill="none">
+            <path d="M5.625 11.25 9.375 7.5 5.625 3.75" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span data-codex-id="open-preview-label">HTML</span>
+        </button>
+      </div>
+    </header>
+
+    <div data-codex-id="main-layout" class="main-layout">
+      <aside data-codex-id="sidebar" class="sidebar">
+        <section data-codex-id="pages-panel" class="panel-section">
+          <div data-codex-id="pages-heading" class="panel-heading">
+            <h2 data-codex-id="pages-title" class="panel-title">Pages</h2>
+            <span data-codex-id="pages-total" class="pages-total">3 个</span>
+          </div>
+
+          <nav data-codex-id="pages-list" class="nav-list" aria-label="Pages">
+            <button data-codex-id="page-home" class="nav-item active" type="button">
+              <span data-codex-id="page-home-label">Home</span>
+              <span data-codex-id="page-home-state" class="page-state"></span>
+            </button>
+            <button data-codex-id="page-discover" class="nav-item" type="button">
+              <span data-codex-id="page-discover-label">Discover</span>
+              <span data-codex-id="page-discover-state" class="page-state"></span>
+            </button>
+            <button data-codex-id="page-library" class="nav-item" type="button">
+              <span data-codex-id="page-library-label">Library</span>
+              <span data-codex-id="page-library-state" class="page-state"></span>
+            </button>
+          </nav>
+        </section>
+
+        <section data-codex-id="layers-panel" class="layers-panel">
+          <div data-codex-id="layers-heading" class="layers-heading">
+            <button data-codex-id="layer-visibility-button" type="button" aria-label="Layer visibility"></button>
+          </div>
+          <div data-codex-id="layers-list" class="layers-list"></div>
+        </section>
+
+        <div data-codex-id="sidebar-actions" class="sidebar-actions">
+          <button data-codex-id="send-current-page-button" class="send-button current" type="button">
+            <span data-codex-id="send-current-page-label">发送当前页面</span>
+            <svg data-codex-id="send-current-page-icon" class="send-icon" viewBox="0 0 20 20">
+              <path d="m3 3 14 7-14 7 2.5-7L3 3Z" stroke-linejoin="round"/>
+              <path d="M5.5 10H13" stroke-linecap="round"/>
+            </svg>
+          </button>
+          <button data-codex-id="settings-button" class="send-button" type="button">
+            <span data-codex-id="send-all-pages-label">发送全部页面</span>
+            <svg data-codex-id="send-all-pages-icon" class="send-icon" viewBox="0 0 20 20">
+              <path d="m3 3 14 7-14 7 2.5-7L3 3Z" stroke-linejoin="round"/>
+              <path d="M5.5 10H13" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+
+        <div data-codex-id="sidebar-footer" class="sidebar-footer"></div>
+      </aside>
+
+      <section data-codex-id="canvas" class="canvas">
+        <div data-codex-id="canvas-background-grid" class="canvas-background-grid"></div>
+
+        <div data-codex-id="canvas-meta" class="canvas-meta">
+          <span data-codex-id="canvas-title" class="canvas-title">Home</span>
+          <span data-codex-id="canvas-subtitle" class="canvas-subtitle">Mobile · 375 × 740</span>
+        </div>
+
+        <div data-codex-id="preview-stage" class="preview-stage" aria-hidden="true">
+          <div data-codex-id="preview-frame" class="preview-frame">
+            <div data-codex-id="preview-notch" class="preview-notch"></div>
+            <div data-codex-id="preview-surface" class="preview-surface"></div>
+          </div>
+        </div>
+
+        <div data-codex-id="music-preview" class="music-preview">
+          <article data-codex-id="music-phone" class="phone-shell" aria-label="Sonder album mobile page">
+            <div data-codex-id="phone-status" class="phone-status">
+              <span data-codex-id="phone-time">9:41</span>
+              <span data-codex-id="phone-signals" class="phone-signals">
+                <svg data-codex-id="cellular-icon" width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="6" width="3" height="6" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" width="3" height="12" rx="1"/></svg>
+                <svg data-codex-id="wifi-icon" width="14" height="12" viewBox="0 0 14 12" fill="none"><path d="M1 4.2A9.3 9.3 0 0 1 13 4.2M3.2 7A5.8 5.8 0 0 1 10.8 7M5.6 9.5a2.3 2.3 0 0 1 2.8 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="7" cy="11" r="1" fill="currentColor"/></svg>
+                <svg data-codex-id="battery-icon" width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="1" y="1" width="20" height="10" rx="3" stroke="currentColor"/><rect x="3" y="3" width="16" height="6" rx="1.5" fill="currentColor"/><path d="M23 4v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </span>
+            </div>
+
+            <header data-codex-id="phone-header" class="phone-header">
+              <button data-codex-id="phone-back-button" class="phone-icon-button" type="button" aria-label="Back">
+                <svg data-codex-id="phone-back-icon" width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="m11 4-5 5 5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <button data-codex-id="phone-menu-button" class="phone-icon-button" type="button" aria-label="More">
+                <svg data-codex-id="phone-menu-icon" width="18" height="18" viewBox="0 0 18 18" fill="currentColor"><circle cx="9" cy="4" r="1.3"/><circle cx="9" cy="9" r="1.3"/><circle cx="9" cy="14" r="1.3"/></svg>
+              </button>
+            </header>
+
+            <section data-codex-id="album-hero" class="phone-hero">
+              <div data-codex-id="album-art" class="album-art">
+                <span data-codex-id="album-orb-one" class="album-orb one"></span>
+                <span data-codex-id="album-orb-two" class="album-orb two"></span>
+                <span data-codex-id="album-orb-three" class="album-orb three"></span>
+                <span data-codex-id="album-orb-four" class="album-orb four"></span>
+                <span data-codex-id="album-glow" class="album-glow"></span>
+              </div>
+              <h1 data-codex-id="album-title" class="album-title">Sonder</h1>
+              <span data-codex-id="album-meta" class="album-meta">Kiasmos · Album · 2024</span>
+              <span data-codex-id="album-detail" class="album-detail">12 Tracks · 56 Min</span>
+            </section>
+
+            <div data-codex-id="play-actions" class="play-actions">
+              <button data-codex-id="play-all-button" class="play-button primary" type="button">
+                <svg data-codex-id="play-all-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.2" stroke="currentColor" stroke-width="1.5"/><path d="m6.8 5.4 4 2.6-4 2.6V5.4Z" fill="currentColor"/></svg>
+                <span data-codex-id="play-all-label">Play All</span>
+              </button>
+              <button data-codex-id="shuffle-button" class="play-button" type="button">
+                <svg data-codex-id="shuffle-icon" viewBox="0 0 16 16" fill="none"><path d="M2 4h2.2c3.6 0 3.6 8 7.6 8H14M11.5 9.5 14 12l-2.5 2.5M2 12h2.1c1.1 0 1.9-.7 2.6-1.7M9.3 5.7c.7-1 1.5-1.7 2.7-1.7h2M11.5 1.5 14 4l-2.5 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span data-codex-id="shuffle-label">Shuffle</span>
+              </button>
+            </div>
+
+            <section data-codex-id="track-list" class="track-list" aria-label="Track list">
+              <div data-codex-id="track-held" class="track-row active">
+                <span data-codex-id="track-held-index" class="track-index">01</span>
+                <div data-codex-id="track-held-copy" class="track-copy"><span data-codex-id="track-held-title" class="track-title">Held</span><span data-codex-id="track-held-artist" class="track-artist">Kiasmos</span></div>
+                <svg data-codex-id="playing-wave" class="playing-wave" viewBox="0 0 16 16" fill="none"><path d="M2 9V7m3 5V4m3 10V2m3 10V4m3 5V7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                <span data-codex-id="track-held-time" class="track-time">5:01</span>
+              </div>
+              <div data-codex-id="track-blurred" class="track-row">
+                <span data-codex-id="track-blurred-index" class="track-index">02</span>
+                <div data-codex-id="track-blurred-copy" class="track-copy"><span data-codex-id="track-blurred-title" class="track-title">Blurred</span><span data-codex-id="track-blurred-artist" class="track-artist">Kiasmos</span></div>
+                <span data-codex-id="track-blurred-time" class="track-time">4:42</span><span data-codex-id="track-blurred-more" class="track-more">⋮</span>
+              </div>
+              <div data-codex-id="track-shed" class="track-row">
+                <span data-codex-id="track-shed-index" class="track-index">03</span>
+                <div data-codex-id="track-shed-copy" class="track-copy"><span data-codex-id="track-shed-title" class="track-title">Shed</span><span data-codex-id="track-shed-artist" class="track-artist">Kiasmos</span></div>
+                <span data-codex-id="track-shed-time" class="track-time">5:23</span><span data-codex-id="track-shed-more" class="track-more">⋮</span>
+              </div>
+              <div data-codex-id="track-orgon" class="track-row">
+                <span data-codex-id="track-orgon-index" class="track-index">04</span>
+                <div data-codex-id="track-orgon-copy" class="track-copy"><span data-codex-id="track-orgon-title" class="track-title">Orgon</span><span data-codex-id="track-orgon-artist" class="track-artist">Kiasmos</span></div>
+                <span data-codex-id="track-orgon-time" class="track-time">6:11</span><span data-codex-id="track-orgon-more" class="track-more">⋮</span>
+              </div>
+              <div data-codex-id="track-swept" class="track-row">
+                <span data-codex-id="track-swept-index" class="track-index">05</span>
+                <div data-codex-id="track-swept-copy" class="track-copy"><span data-codex-id="track-swept-title" class="track-title">Swept</span><span data-codex-id="track-swept-artist" class="track-artist">Kiasmos</span></div>
+                <span data-codex-id="track-swept-time" class="track-time">4:58</span><span data-codex-id="track-swept-more" class="track-more">⋮</span>
+              </div>
+            </section>
+
+            <nav data-codex-id="phone-nav" class="phone-nav" aria-label="Music app navigation">
+              <button data-codex-id="phone-nav-home" class="phone-nav-item active" type="button"><svg data-codex-id="phone-nav-home-icon" viewBox="0 0 20 20"><path d="m3 9 7-6 7 6v8H3V9Z"/><path d="M8 17v-5h4v5"/></svg><span data-codex-id="phone-nav-home-label">Home</span></button>
+              <button data-codex-id="phone-nav-search" class="phone-nav-item" type="button"><svg data-codex-id="phone-nav-search-icon" viewBox="0 0 20 20"><circle cx="8.5" cy="8.5" r="5.5"/><path d="m13 13 4 4"/></svg><span data-codex-id="phone-nav-search-label">Search</span></button>
+              <button data-codex-id="phone-nav-library" class="phone-nav-item" type="button"><svg data-codex-id="phone-nav-library-icon" viewBox="0 0 20 20"><rect x="3" y="3" width="14" height="14" rx="2"/><path d="M7 6v8M10 6v8M13 6v8"/></svg><span data-codex-id="phone-nav-library-label">Library</span></button>
+              <button data-codex-id="phone-nav-profile" class="phone-nav-item" type="button"><svg data-codex-id="phone-nav-profile-icon" viewBox="0 0 20 20"><circle cx="10" cy="6" r="3"/><path d="M4.5 17c.5-3.2 2.3-5 5.5-5s5 1.8 5.5 5"/></svg><span data-codex-id="phone-nav-profile-label">Profile</span></button>
+            </nav>
+            <span data-codex-id="home-indicator" class="home-indicator"></span>
+          </article>
+        </div>
+
+      </section>
+
+      <aside data-codex-id="properties" class="properties" aria-hidden="true"></aside>
+    </div>
+
+    <footer data-codex-id="statusbar" class="statusbar">
+      <div data-codex-id="status-left" class="status-group">
+        <span data-codex-id="status-dot" class="status-dot"></span>
+        <span data-codex-id="status-message" class="status-message">Preview ready</span>
+        <span data-codex-id="page-count">已发送1个页面、137个编辑图层</span>
+      </div>
+      <div data-codex-id="status-right" class="status-group status-right">
+        <span data-codex-id="save-state">CDB WORKSPACE</span>
+        <span data-codex-id="status-separator-right" class="status-separator">|</span>
+        <span data-codex-id="figma-state" class="figma-state">V 0.5.2</span>
+      </div>
+    </footer>
+  </main>
+
+  <script>
+    const pageButtons = document.querySelectorAll('.nav-item');
+    pageButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        pageButtons.forEach((item) => item.classList.remove('active'));
+        button.classList.add('active');
+      });
+    });
+     const phoneNavItems = document.querySelectorAll('.phone-nav-item');
+    const phoneNavItems = document.querySelectorAll('.phone-nav-item');
+    phoneNavItems.forEach((button) => {
+      button.addEventListener('click', () => {
+        phoneNavItems.forEach((item) => item.classList.remove('active'));
+        button.classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>

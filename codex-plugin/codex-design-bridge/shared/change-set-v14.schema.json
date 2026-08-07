@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cdb.local/schema/change-set-v14.json",
+  "title": "CDB page ChangeSet protocol 14",
+  "type": "object",
+  "required": ["protocolVersion", "changeSetId", "pageId", "sourceHash", "changes"],
+  "properties": {
+    "protocolVersion": { "const": 14 },
+    "changeSetId": { "type": "string", "minLength": 1 },
+    "pageId": { "type": "string", "minLength": 1 },
+    "sourceHash": { "type": "string", "minLength": 1 },
+    "changes": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          { "$ref": "#/$defs/nodeMove" },
+          { "$ref": "#/$defs/genericChange" }
+        ]
+      }
+    },
+    "annotations": { "type": "array" },
+    "figma": { "type": ["object", "null"] }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "sourceRef": {
+      "type": "object",
+      "required": ["selector"],
+      "properties": {
+        "selector": {
+          "type": "string",
+          "pattern": "^(\\[data-codex-id=(?:\\\"[^\\\"]+\\\"|'[^']+')\\]|#[A-Za-z_][A-Za-z0-9_-]*)$"
+        }
+      },
+      "additionalProperties": true
+    },
+    "bounds": {
+      "type": "object",
+      "required": ["x", "y", "width", "height"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "width": { "type": "number", "minimum": 0 },
+        "height": { "type": "number", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "worldTransform": {
+      "type": "array",
+      "prefixItems": [
+        { "type": "number" }, { "type": "number" },
+        { "type": "number" }, { "type": "number" },
+        { "type": "number" }, { "type": "number" }
+      ],
+      "items": false
+    },
+    "nodeMove": {
+      "type": "object",
+      "required": [
+        "property", "nodeId", "sourceRef", "fromParentId", "toParentId",
+        "fromParentSourceRef", "toParentSourceRef", "fromIndex", "toIndex",
+        "beforeBounds", "afterBounds", "beforeWorldTransform",
+        "afterWorldTransform", "parentLayout", "positioning"
+      ],
+      "properties": {
+        "property": { "enum": ["nodeMove", "nodeReparent"] },
+        "nodeId": { "type": "string", "minLength": 1 },
+        "sourceRef": { "$ref": "#/$defs/sourceRef" },
+        "fromParentId": { "type": "string", "minLength": 1 },
+        "toParentId": { "type": "string", "minLength": 1 },
+        "fromParentSourceRef": { "$ref": "#/$defs/sourceRef" },
+        "toParentSourceRef": { "$ref": "#/$defs/sourceRef" },
+        "fromIndex": { "type": "integer", "minimum": 0 },
+        "toIndex": { "type": "integer", "minimum": 0 },
+        "beforeBounds": { "$ref": "#/$defs/bounds" },
+        "afterBounds": { "$ref": "#/$defs/bounds" },
+        "beforeWorldTransform": { "$ref": "#/$defs/worldTransform" },
+        "afterWorldTransform": { "$ref": "#/$defs/worldTransform" },
+        "parentLayout": { "enum": ["NONE", "HORIZONTAL", "VERTICAL", "GRID"] },
+        "positioning": { "enum": ["AUTO", "ABSOLUTE"] },
+        "constraints": { "type": ["object", "null"] },
+        "grid": {
+          "type": ["object", "null"],
+          "properties": {
+            "row": { "type": "integer", "minimum": 1 },
+            "column": { "type": "integer", "minimum": 1 }
+          },
+          "required": ["row", "column"],
+          "additionalProperties": false
+        },
+        "replacement": { "type": "boolean" }
+      },
+      "additionalProperties": true
+    },
+    "genericChange": {
+      "type": "object",
+      "required": ["property", "nodeId"],
+      "properties": {
+        "property": {
+          "type": "string",
+          "minLength": 1,
+          "not": { "enum": ["nodeMove", "nodeReparent"] }
+        },
+        "nodeId": { "type": ["string", "null"] }
+      },
+      "additionalProperties": true
+    }
+  }
+}

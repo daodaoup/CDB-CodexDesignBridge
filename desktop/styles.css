@@ -1,0 +1,336 @@
+:root {
+  color-scheme: light;
+  font-family:
+    Inter, "SF Pro Display", "Segoe UI", "Microsoft YaHei", sans-serif;
+  color: #1c2027;
+  background: #e8ebef;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+button {
+  font: inherit;
+}
+
+.app-shell {
+  display: grid;
+  grid-template-rows: 72px minmax(0, 1fr) 36px;
+  width: 100%;
+  height: 100%;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 0 22px;
+  border-bottom: 1px solid #d9dde3;
+  background: rgba(255, 255, 255, 0.96);
+}
+
+.brand,
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+}
+
+.brand {
+  min-width: 0;
+  gap: 12px;
+}
+
+.brand-mark {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  color: white;
+  background: #171a1f;
+  font-size: 16px;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(18, 22, 28, 0.16);
+}
+
+.brand h1 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.brand p {
+  max-width: 520px;
+  margin: 3px 0 0;
+  overflow: hidden;
+  color: #777e89;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.toolbar-actions {
+  flex: 0 0 auto;
+  gap: 9px;
+}
+
+.status-chip {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  height: 34px;
+  padding: 0 12px;
+  border: 1px solid #e0e3e7;
+  border-radius: 9px;
+  color: #626975;
+  background: #f7f8f9;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #a4a9b1;
+}
+
+.status-chip.ready .status-dot,
+.status-chip.completed .status-dot {
+  background: #23a36d;
+  box-shadow: 0 0 0 3px rgba(35, 163, 109, 0.12);
+}
+
+.status-chip.starting .status-dot,
+.status-chip.updating .status-dot {
+  background: #e99a25;
+  box-shadow: 0 0 0 3px rgba(233, 154, 37, 0.12);
+}
+
+.status-chip.failed .status-dot {
+  background: #db4b4b;
+  box-shadow: 0 0 0 3px rgba(219, 75, 75, 0.12);
+}
+
+.primary-button,
+.icon-button,
+.figma-button {
+  height: 34px;
+  padding: 0 13px;
+  border-radius: 9px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 650;
+  transition:
+    background 120ms ease,
+    border-color 120ms ease,
+    opacity 120ms ease;
+}
+
+.primary-button {
+  border: 1px solid #171a1f;
+  color: #fff;
+  background: #171a1f;
+}
+
+.primary-button:hover {
+  background: #2a2e35;
+}
+
+.figma-button {
+  border: 1px solid #7357e8;
+  color: #fff;
+  background: #7357e8;
+}
+
+.figma-button:hover {
+  border-color: #6549dc;
+  background: #6549dc;
+}
+
+.icon-button {
+  border: 1px solid #daddE2;
+  color: #373c44;
+  background: #fff;
+}
+
+.icon-button:hover {
+  border-color: #bdc2c9;
+  background: #f8f9fa;
+}
+
+button:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.workspace {
+  min-height: 0;
+  padding: 16px;
+  background: #e8ebef;
+}
+
+.empty-state,
+.preview-shell {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid #d7dbe1;
+  border-radius: 13px;
+  background: #fff;
+  box-shadow:
+    0 1px 2px rgba(25, 30, 38, 0.05),
+    0 8px 28px rgba(25, 30, 38, 0.06);
+}
+
+.empty-state {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  padding: 40px;
+  text-align: center;
+}
+
+.empty-state[hidden],
+.preview-shell[hidden] {
+  display: none;
+}
+
+.empty-illustration {
+  position: relative;
+  width: 132px;
+  height: 88px;
+  margin-bottom: 24px;
+  border: 1px solid #cfd4db;
+  border-radius: 10px;
+  background:
+    linear-gradient(#eef1f4 0 0) 12px 12px / 38px 5px no-repeat,
+    linear-gradient(#f3f5f7 0 0) 12px 26px / 106px 42px no-repeat,
+    #fff;
+  box-shadow: 0 12px 36px rgba(36, 42, 50, 0.12);
+}
+
+.empty-illustration span {
+  position: absolute;
+  top: 5px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #c6cbd2;
+}
+
+.empty-illustration span:nth-child(1) {
+  left: 8px;
+}
+
+.empty-illustration span:nth-child(2) {
+  left: 15px;
+}
+
+.empty-illustration span:nth-child(3) {
+  left: 22px;
+}
+
+.empty-state h2 {
+  margin: 0;
+  font-size: 20px;
+  letter-spacing: -0.02em;
+}
+
+.empty-state p {
+  max-width: 460px;
+  margin: 10px 0 22px;
+  color: #717985;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.preview-shell {
+  position: relative;
+}
+
+#preview {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #fff;
+}
+
+.update-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  color: #252a31;
+  background: rgba(248, 249, 250, 0.86);
+  backdrop-filter: blur(5px);
+}
+
+.update-overlay[hidden] {
+  display: none;
+}
+
+.update-overlay strong {
+  margin-top: 14px;
+  font-size: 14px;
+}
+
+.update-overlay span {
+  margin-top: 5px;
+  color: #737b86;
+  font-size: 12px;
+}
+
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #d7dbe0;
+  border-top-color: #252a31;
+  border-radius: 50%;
+  animation: spin 800ms linear infinite;
+}
+
+.status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 0 18px;
+  border-top: 1px solid #d7dbe1;
+  color: #676f7a;
+  background: #f8f9fa;
+  font-size: 11px;
+}
+
+#footer-status {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#project-name {
+  flex: 0 0 auto;
+  color: #9298a1;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

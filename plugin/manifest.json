@@ -1,0 +1,16 @@
+{
+  "name": "CDB",
+  "id": "1555555555555555555",
+  "api": "1.0.0",
+  "main": "code.js",
+  "ui": "ui.html",
+  "editorType": ["figma"],
+  "documentAccess": "dynamic-page",
+  "networkAccess": {
+    "allowedDomains": ["none"],
+    "devAllowedDomains": [
+      "http://localhost:9847",
+      "ws://localhost:9847"
+    ]
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "name": "codex-design-bridge",
+  "version": "0.7.0",
+  "private": true,
+  "description": "A Codex-embedded design workspace with a local, quota-free Figma plugin round trip.",
+  "type": "module",
+  "main": "./desktop/main.js",
+  "bin": {
+    "figma-sync": "./bin/figma-sync.js"
+  },
+  "scripts": {
+    "start": "node ./bin/figma-sync.js start",
+    "desktop": "electron .",
+    "example": "node ./scripts/serve-example.js",
+    "test": "node --test --test-concurrency=1",
+    "check": "node ./scripts/validate-repository.mjs && node --check ./bin/figma-sync.js && node --check ./src/server.js && node --check ./src/page.js && node --check ./src/page-change-store.js && node --check ./src/design-task-store.js && node --check ./src/codex-runner.js && node --check ./plugin/code.js && node --check ./scripts/serve-example.js && node --check ./desktop/main.js && node --check ./desktop/page-capture.js && node --check ./desktop/preview-service.js && node --check ./desktop/renderer.js && node --check ./desktop/preload.cjs && node --check ./codex-plugin/codex-design-bridge/mcp/browser-capture.mjs && node --check ./codex-plugin/codex-design-bridge/mcp/fast-page-patch.mjs && node --check ./codex-plugin/codex-design-bridge/mcp/local-figma-bridge.mjs && node --check ./codex-plugin/codex-design-bridge/mcp/patch-transaction.mjs && node --check ./codex-plugin/codex-design-bridge/mcp/project-contract.mjs && node --check ./codex-plugin/codex-design-bridge/mcp/workspace-lease.mjs && node --check ./codex-plugin/codex-design-bridge/mcp/preview-process-guard.cjs && node --check ./codex-plugin/codex-design-bridge/mcp/server.mjs && node --test --test-concurrency=1"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@xmldom/xmldom": "^0.8.11",
+    "ws": "^8.18.3"
+  },
+  "devDependencies": {
+    "electron": "^43.2.0"
+  }
+}

@@ -1,0 +1,875 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="color-scheme" content="light dark" />
+    <style>
+      :root {
+        font: 12px/1.4 Inter, system-ui, sans-serif;
+        color: var(--figma-color-text);
+        background: var(--figma-color-bg);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: 20px;
+      }
+
+      h1 {
+        margin: 0 0 6px;
+        font-size: 18px;
+      }
+
+      .subtitle {
+        margin: 0 0 20px;
+        color: var(--figma-color-text-secondary);
+      }
+
+      .status {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 16px;
+        padding: 14px;
+        border: 1px solid var(--figma-color-border);
+        border-radius: 10px;
+        background: var(--figma-color-bg-secondary);
+      }
+
+      .status-copy {
+        display: grid;
+        gap: 2px;
+      }
+
+      .status-copy strong {
+        font-size: 13px;
+      }
+
+      .status-detail {
+        color: var(--figma-color-text-secondary);
+        font-size: 11px;
+      }
+
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--figma-color-icon-tertiary);
+      }
+
+      .dot.connected {
+        background: #22a06b;
+      }
+
+      .dot.error {
+        background: #e5484d;
+      }
+
+      label {
+        display: block;
+        margin: 10px 0 4px;
+        color: var(--figma-color-text-secondary);
+      }
+
+      input {
+        width: 100%;
+        height: 32px;
+        padding: 0 9px;
+        color: var(--figma-color-text);
+        background: var(--figma-color-bg-secondary);
+        border: 1px solid var(--figma-color-border);
+        border-radius: 6px;
+        outline: none;
+      }
+
+      input:focus {
+        border-color: var(--figma-color-border-brand);
+      }
+
+      details {
+        margin-top: 12px;
+        padding: 0 10px 10px;
+        border: 1px solid var(--figma-color-border);
+        border-radius: 7px;
+        background: var(--figma-color-bg-secondary);
+      }
+
+      details summary {
+        padding: 9px 0;
+        color: var(--figma-color-text-secondary);
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .buttons {
+        margin-top: 0;
+      }
+
+      .pages {
+        margin: 0 0 16px;
+        border: 1px solid var(--figma-color-border);
+        border-radius: 10px;
+        overflow: hidden;
+      }
+
+      .pages-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 12px;
+        background: var(--figma-color-bg-secondary);
+      }
+
+      .pages-header strong { font-size: 12px; }
+      .pages-header span { color: var(--figma-color-text-secondary); font-size: 11px; }
+
+      .page-list {
+        max-height: 210px;
+        overflow: auto;
+      }
+
+      .page-row {
+        display: grid;
+        grid-template-columns: 20px minmax(0, 1fr) auto;
+        gap: 8px;
+        align-items: center;
+        padding: 9px 10px;
+        border-top: 1px solid var(--figma-color-border);
+        cursor: pointer;
+      }
+
+      .page-row.active { background: var(--figma-color-bg-selected); }
+      .page-row input { width: 14px; height: 14px; margin: 0; }
+      .page-copy { min-width: 0; display: grid; gap: 2px; }
+      .page-copy strong, .page-copy span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .page-copy span { color: var(--figma-color-text-secondary); font-size: 10px; }
+      .page-state { color: var(--figma-color-text-secondary); font-size: 10px; }
+      .page-state.conflict, .page-state.failed { color: var(--figma-color-text-danger); }
+      .page-state.source_changed, .page-state.figma_changed { color: var(--figma-color-text-warning); }
+
+      .page-actions {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
+        padding: 9px;
+        border-top: 1px solid var(--figma-color-border);
+      }
+
+      .page-actions button { height: 30px; padding: 0 6px; font-size: 10px; }
+
+      button {
+        width: 100%;
+        height: 40px;
+        border: 0;
+        border-radius: 8px;
+        color: var(--figma-color-text-onbrand);
+        background: var(--figma-color-bg-brand);
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      button.secondary {
+        color: var(--figma-color-text);
+        background: var(--figma-color-bg-secondary);
+        border: 1px solid var(--figma-color-border);
+      }
+
+      button:disabled {
+        opacity: 0.5;
+        cursor: default;
+      }
+
+      .result {
+        min-height: 36px;
+        margin: 12px 0 0;
+        color: var(--figma-color-text-secondary);
+        font-size: 11px;
+      }
+
+      .visually-hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>CDB 页面 <span id="figma-plugin-version" class="status-detail">V 0.7.0</span></h1>
+    <p class="subtitle">在 Figma 中调整细节，完成后一次发送回 Codex。</p>
+
+    <div class="status">
+      <span id="status-dot" class="dot"></span>
+      <div class="status-copy">
+        <strong id="status-text">正在连接 Codex…</strong>
+        <span id="status-detail" class="status-detail">请保持对应的 Codex 任务打开</span>
+      </div>
+    </div>
+
+    <section class="pages" aria-label="CDB 页面">
+      <div class="pages-header">
+        <strong>页面</strong>
+        <span id="catalog-count">0 个</span>
+      </div>
+      <div class="page-list" id="catalog-list">
+        <div class="page-row"><span></span><span class="status-detail">等待 Codex 页面清单…</span></div>
+      </div>
+      <div class="page-actions">
+        <button class="secondary" id="locate-frame" disabled>定位 Frame</button>
+        <button class="secondary" id="import-current" disabled>导入当前</button>
+        <button class="secondary" id="import-selected" disabled>导入选中</button>
+        <button class="secondary" id="update-all" disabled>更新全部</button>
+      </div>
+    </section>
+
+    <div class="buttons">
+      <button id="seed-page" disabled hidden>用选中稿创建页面</button>
+      <button id="capture" disabled>发送修改给 Codex</button>
+    </div>
+
+    <p id="result" class="result">支持快速同步文字、颜色、字号、间距和圆角。</p>
+
+    <div class="visually-hidden" aria-hidden="true">
+      <span id="page-count">0</span>
+      <span id="asset-count">0</span>
+      <span id="feedback-count">0</span>
+      <span id="log"></span>
+    </div>
+
+    <script>
+      const FIGMA_PLUGIN_VERSION = "0.7.0";
+      const captureButton = document.getElementById("capture");
+      const seedPageButton = document.getElementById("seed-page");
+      const statusDot = document.getElementById("status-dot");
+      const statusText = document.getElementById("status-text");
+      const statusDetail = document.getElementById("status-detail");
+      const resultElement = document.getElementById("result");
+      const catalogList = document.getElementById("catalog-list");
+      const catalogCount = document.getElementById("catalog-count");
+      const locateFrameButton = document.getElementById("locate-frame");
+      const importCurrentButton = document.getElementById("import-current");
+      const importSelectedButton = document.getElementById("import-selected");
+      const updateAllButton = document.getElementById("update-all");
+      const pageCount = document.getElementById("page-count");
+      const assetCount = document.getElementById("asset-count");
+      const feedbackCount = document.getElementById("feedback-count");
+      const logElement = document.getElementById("log");
+
+      let socket = null;
+      let reconnectTimer = null;
+      let pairingTimer = null;
+      let shouldReconnect = false;
+      let localWorkspace = false;
+      let endpoint = "ws://localhost:9847/ws";
+      let token = "";
+      let unsentChanges = false;
+      let changedPageIds = [];
+      let sessionEnded = false;
+      let feedbackSaved = 0;
+      let activeTaskId = null;
+      const completedTasks = new Set();
+      const importedAssets = new Set();
+      const importedPages = new Set();
+      const selectedPages = new Set();
+      let catalogPages = [];
+      let activePageId = "";
+
+      locateFrameButton.addEventListener("click", () => {
+        if (!activePageId) return;
+        parent.postMessage(
+          { pluginMessage: { type: "page.locate", pageId: activePageId } },
+          "*",
+        );
+      });
+
+      importCurrentButton.addEventListener("click", () => {
+        if (activePageId) requestPageImport([activePageId]);
+      });
+      importSelectedButton.addEventListener("click", () => {
+        requestPageImport([...selectedPages]);
+      });
+      updateAllButton.addEventListener("click", () => {
+        requestPageImport(
+          catalogPages
+            .filter((page) => ["not_imported", "source_changed", "failed"].includes(page.state))
+            .map((page) => page.id),
+        );
+      });
+
+      seedPageButton.addEventListener("click", () => {
+        const page = catalogPages.find((candidate) => candidate.id === activePageId);
+        if (!page?.acceptsFigmaSeed) return;
+        seedPageButton.disabled = true;
+        resultElement.textContent = "正在把选中的 Figma 页面生成到 Codex…";
+        parent.postMessage(
+          {
+            pluginMessage: {
+              type: "page.seed.capture",
+              pageId: page.id,
+              sourceHash: page.sourceHash,
+              requestId: `figma-seed-${Date.now()}`,
+            },
+          },
+          "*",
+        );
+      });
+
+      captureButton.addEventListener("click", () => {
+        captureButton.disabled = true;
+        if (localWorkspace) {
+          captureButton.textContent = "正在发送…";
+          setStatus("connected", "正在读取 Figma 修改…");
+          statusDetail.textContent = "页面保持可见，不需要等待加载界面";
+          parent.postMessage(
+            { pluginMessage: { type: "review.capture" } },
+            "*",
+          );
+        } else {
+          captureButton.textContent = "Capturing design…";
+          parent.postMessage({ pluginMessage: { type: "design.capture" } }, "*");
+        }
+      });
+
+      window.onmessage = (event) => {
+        const message = event.data.pluginMessage;
+        if (!message) return;
+
+        if (message.type === "plugin.settings") {
+          endpoint = message.endpoint || endpoint;
+          token = message.token || "";
+          if (token) {
+            shouldReconnect = true;
+            connect();
+          } else {
+            shouldReconnect = true;
+            autoPair();
+          }
+          return;
+        }
+        if (message.type === "plugin.ready") {
+          for (const assetId of message.importedAssetIds || []) {
+            importedAssets.add(assetId);
+          }
+          for (const pageId of message.importedPageIds || []) {
+            importedPages.add(pageId);
+          }
+          unsentChanges = Boolean(message.unsentChanges);
+          changedPageIds = message.changedPageIds || [];
+          for (const pageId of message.changedPageIds || []) selectedPages.add(pageId);
+          appendLog(`Figma ready · ${message.pageName}`);
+          return;
+        }
+        if (message.type === "page.changes.status") {
+          unsentChanges = Boolean(message.unsentChanges);
+          changedPageIds = message.changedPageIds || [];
+          send({
+            type: "page.changes.status",
+            unsentChanges,
+            changedPageIds: message.changedPageIds || [],
+          });
+          if (localWorkspace && socket?.readyState === WebSocket.OPEN) {
+            captureButton.textContent = "发送修改给 Codex";
+            statusDetail.textContent = unsentChanges
+              ? "有尚未发送的修改"
+              : "当前修改已发送";
+          }
+          return;
+        }
+        if (message.type === "page.result") {
+          if (message.ok) {
+            importedPages.add(message.pageId);
+            pageCount.textContent = String(importedPages.size);
+            appendLog(
+              `${message.reused ? "Reused" : "Imported"} page ${message.pageId} · ${message.nodes} nodes`,
+            );
+          } else {
+            appendLog(
+              `Page import failed ${message.pageId}: ${message.error}` +
+                (message.rolledBack ? " · previous version kept" : ""),
+            );
+          }
+          send({ type: "page.import.result", result: message });
+          return;
+        }
+        if (message.type === "asset.result") {
+          if (message.ok) {
+            importedAssets.add(message.assetId);
+            assetCount.textContent = String(importedAssets.size);
+            appendLog(`Imported ${message.assetId} · ${message.elements} targets`);
+          } else {
+            appendLog(
+              `Import failed ${message.assetId}: ${message.error}` +
+                (message.rolledBack ? " · previous version kept" : ""),
+            );
+          }
+          return;
+        }
+        if (message.type === "feedback.emit") {
+          send({
+            type: "feedback.record",
+            requestId: message.requestId,
+            feedback: message.feedback,
+          });
+          return;
+        }
+        if (message.type === "page.changes.emit") {
+          const changeCount =
+            (message.changeSet?.changes?.length || 0) +
+            (message.changeSet?.annotations?.length || 0);
+          send({
+            type: "page.changes.record",
+            requestId: message.requestId,
+            changeSet: message.changeSet,
+          });
+          resultElement.textContent = `已找到 ${changeCount} 处修改，正在写入页面…`;
+          return;
+        }
+        if (message.type === "page.changes.empty") {
+          send({
+            type: "page.changes.empty",
+            requestId: message.requestId || null,
+          });
+          if (localWorkspace) {
+            captureButton.disabled = false;
+            captureButton.textContent = "发送修改给 Codex";
+            setStatus("connected", "没有新的修改");
+            statusDetail.textContent = "继续在 Figma 中调整即可";
+            resultElement.textContent = "当前设计与上次发送时一致。";
+          }
+          return;
+        }
+        if (message.type === "design.submit") {
+          activeTaskId = message.requestId;
+          captureButton.textContent = "Submitting…";
+          send({
+            type: "design.generate",
+            requestId: message.requestId,
+            design: message.design,
+          });
+          return;
+        }
+        if (message.type === "page.changes.complete") {
+          send({
+            type: "page.changes.complete",
+            requestId: message.requestId || null,
+            count: message.count || 0,
+          });
+          return;
+        }
+        if (message.type === "notice") {
+          appendLog(message.message);
+          return;
+        }
+        if (message.type === "plugin.error") {
+          appendLog(`Plugin error: ${message.error}`);
+          captureButton.disabled = false;
+          captureButton.textContent = "重新发送";
+          setStatus("error", "这次没有发送成功");
+          statusDetail.textContent = "可以直接重试，不会重复修改代码";
+          resultElement.textContent = message.error;
+          renderCatalogActions();
+        }
+      };
+
+      function connect() {
+        clearTimeout(reconnectTimer);
+        if (socket) {
+          socket.onclose = null;
+          socket.close();
+        }
+
+        const nextEndpoint = endpoint.trim();
+        const nextToken = token.trim();
+        if (!nextEndpoint || !nextToken) {
+          autoPair();
+          return;
+        }
+
+        parent.postMessage(
+          {
+            pluginMessage: {
+              type: "settings.save",
+              endpoint: nextEndpoint,
+              token: nextToken,
+            },
+          },
+          "*",
+        );
+        setStatus("", "正在连接 Codex…");
+
+        const separator = nextEndpoint.includes("?") ? "&" : "?";
+        socket = new WebSocket(`${nextEndpoint}${separator}token=${encodeURIComponent(nextToken)}`);
+        socket.onopen = () => {
+          clearTimeout(pairingTimer);
+          sessionEnded = false;
+          setStatus("connected", "已连接到 Codex");
+          statusDetail.textContent = "修改完成后点击下方按钮";
+          captureButton.disabled = false;
+          send({
+            type: "plugin.hello",
+            protocolVersion: 14,
+            pluginVersion: FIGMA_PLUGIN_VERSION,
+            importedAssetIds: [...importedAssets],
+            importedPageIds: [...importedPages],
+            unsentChanges,
+            changedPageIds,
+          });
+          appendLog("Connected to local bridge");
+        };
+        socket.onmessage = (event) => handleBridgeMessage(JSON.parse(event.data));
+        socket.onerror = () => {
+          setStatus("error", "暂时无法连接 Codex");
+          statusDetail.textContent = "正在自动重连";
+        };
+        socket.onclose = () => {
+          captureButton.disabled = true;
+          setStatus(
+            "",
+            sessionEnded ? "本次设计已结束" : "等待 Codex 页面…",
+          );
+          statusDetail.textContent = sessionEnded
+            ? "开始新设计后会自动连接"
+            : "打开对应的 Codex 设计任务后会自动连接";
+          if (shouldReconnect) {
+            pairingTimer = setTimeout(autoPair, 1500);
+          }
+        };
+      }
+
+      async function autoPair() {
+        clearTimeout(pairingTimer);
+        if (!shouldReconnect) return;
+        setStatus("", "正在寻找 Codex 页面…");
+        try {
+          const response = await fetch("http://localhost:9847/api/pair", {
+            cache: "no-store",
+          });
+          if (!response.ok) throw new Error("Workspace not ready");
+          const pairing = await response.json();
+          if (!pairing.token || !pairing.wsUrl) {
+            throw new Error("Invalid pairing response");
+          }
+          endpoint = pairing.wsUrl;
+          token = pairing.token;
+          connect();
+        } catch {
+          pairingTimer = setTimeout(autoPair, 1500);
+        }
+      }
+
+      function handleBridgeMessage(message) {
+        if (message.type === "plugin.ready") {
+          localWorkspace = Boolean(message.localWorkspace);
+          assetCount.textContent = String(message.assets || 0);
+          pageCount.textContent = String(message.pages || 0);
+          if (message.codexRunner?.runningTaskId) {
+            captureButton.disabled = true;
+            captureButton.textContent = "Codex 正在更新…";
+            setStatus("connected", "Codex 正在更新页面");
+          } else {
+            activeTaskId = null;
+            captureButton.disabled = false;
+            captureButton.textContent = localWorkspace
+              ? "发送修改给 Codex"
+              : "发送设计给 Codex";
+            setStatus(
+              "connected",
+              localWorkspace ? "已连接到 Codex 页面" : "已连接到 Codex",
+            );
+            statusDetail.textContent = localWorkspace
+              ? "修改完成后点击下方按钮"
+              : "选择一个设计画板后发送";
+          }
+          if (message.projectName) {
+            appendLog(`Project ready: ${message.projectName}`);
+          }
+          if (message.runtimeVersion) {
+            appendLog(`CDB runtime: ${message.runtimeVersion}`);
+          }
+          return;
+        }
+        if (message.type === "design.task") {
+          const task = message.task;
+          if (!task) return;
+          activeTaskId = task.taskId || activeTaskId;
+          if (task.state === "queued") {
+            captureButton.disabled = true;
+            captureButton.textContent = "等待 Codex…";
+            appendLog(`Queued Codex task ${task.taskId}`);
+          } else if (task.state === "running") {
+            captureButton.disabled = true;
+            captureButton.textContent = "Codex 正在更新…";
+            setStatus("connected", "Codex 正在更新页面");
+            appendLog(`Codex started ${task.taskId}`);
+          } else if (task.state === "completed") {
+            captureButton.disabled = false;
+            captureButton.textContent = "发送修改给 Codex";
+            setStatus("connected", "页面代码已更新");
+            if (!completedTasks.has(task.taskId)) {
+              completedTasks.add(task.taskId);
+              feedbackSaved += 1;
+              feedbackCount.textContent = String(feedbackSaved);
+            }
+            appendLog(`Code updated · ${task.lastMessagePath || task.taskId}`);
+          } else if (task.state === "failed") {
+            captureButton.disabled = false;
+            captureButton.textContent = "重新发送";
+            setStatus("error", "Codex 更新失败");
+            appendLog(`Codex failed: ${task.error || "Unknown error"}`);
+          }
+          return;
+        }
+        if (message.type === "asset.upsert") {
+          parent.postMessage(
+            { pluginMessage: { type: "asset.upsert", asset: message.asset } },
+            "*",
+          );
+          return;
+        }
+        if (message.type === "asset.remove") {
+          importedAssets.delete(message.assetId);
+          assetCount.textContent = String(importedAssets.size);
+          parent.postMessage(
+            { pluginMessage: { type: "asset.remove", assetId: message.assetId } },
+            "*",
+          );
+          return;
+        }
+        if (message.type === "asset.error") {
+          appendLog(`Rejected ${message.assetId}: ${message.error}`);
+          return;
+        }
+        if (message.type === "page.upsert") {
+          parent.postMessage(
+            { pluginMessage: { type: "page.upsert", page: message.page } },
+            "*",
+          );
+          return;
+        }
+        if (message.type === "page.catalog") {
+          catalogPages = Array.isArray(message.pages) ? message.pages : [];
+          if (!catalogPages.some((page) => page.id === activePageId)) {
+            activePageId = catalogPages[0]?.id || "";
+          }
+          renderCatalog();
+          return;
+        }
+        if (message.type === "page.import.request.result") {
+          resultElement.textContent = message.ok
+            ? `已请求导入 ${message.pageIds?.length || 0} 个页面。`
+            : message.error || "页面导入失败。";
+          return;
+        }
+        if (message.type === "page.changes.request") {
+          parent.postMessage(
+            {
+              pluginMessage: {
+                type: "review.capture",
+                requestId: message.requestId || null,
+              },
+            },
+            "*",
+          );
+          return;
+        }
+        if (message.type === "page.remove") {
+          importedPages.delete(message.pageId);
+          pageCount.textContent = String(importedPages.size);
+          parent.postMessage(
+            { pluginMessage: { type: "page.remove", pageId: message.pageId } },
+            "*",
+          );
+          return;
+        }
+        if (message.type === "page.error") {
+          appendLog(`Rejected page ${message.pageId}: ${message.error}`);
+          return;
+        }
+        if (message.type === "feedback.ack") {
+          appendLog(
+            `${message.state === "conflict" ? "Conflict" : "Saved"} feedback · ${message.path}`,
+          );
+          return;
+        }
+        if (message.type === "page.changes.ack") {
+          parent.postMessage(
+            {
+              pluginMessage: {
+                type: "page.changes.accepted",
+                pageId: message.pageId || null,
+                sourceHash: message.sourceHash || null,
+                changeSetId: message.changeSetId || null,
+              },
+            },
+            "*",
+          );
+          appendLog(
+            `${message.state === "conflict" ? "Conflict" : "Saved"} page changes · ${message.path}`,
+          );
+          const fastApply = message.fastApply || {};
+          const appliedCount = fastApply.appliedCount || 0;
+          const pendingCount = fastApply.pendingCount || 0;
+          const seconds = Math.max(
+            0.1,
+            (fastApply.durationMs || 0) / 1000,
+          ).toFixed(1);
+          captureButton.disabled = false;
+          unsentChanges = false;
+          captureButton.textContent = "继续发送修改";
+          if (appliedCount > 0 && pendingCount === 0) {
+            setStatus("connected", `已更新 ${appliedCount} 处修改`);
+            statusDetail.textContent = "Codex 页面代码已经保存";
+            resultElement.textContent = `${fastApply.changedFiles?.join("、") || "页面文件"} · ${seconds} 秒`;
+          } else if (appliedCount > 0) {
+            setStatus("connected", `已更新 ${appliedCount} 处修改`);
+            statusDetail.textContent = `另有 ${pendingCount} 处交给 Codex 处理`;
+            resultElement.textContent = "页面不会阻塞，可以继续设计。";
+          } else {
+            setStatus("connected", `已发送 ${pendingCount} 处修改`);
+            statusDetail.textContent = "这些结构修改将由 Codex 处理";
+            resultElement.textContent = "页面不会阻塞，可以继续设计。";
+          }
+          return;
+        }
+        if (message.type === "session.ended") {
+          sessionEnded = true;
+          captureButton.disabled = true;
+          captureButton.textContent = "本次设计已结束";
+          setStatus("", "本次设计已结束");
+          statusDetail.textContent = "开始新设计后会自动连接";
+          resultElement.textContent =
+            "如有尚未发送的修改，它们仍保留在当前 Figma 文件中。";
+          return;
+        }
+        if (message.type === "bridge.error") {
+          appendLog(`Bridge error: ${message.error}`);
+          captureButton.disabled = false;
+          captureButton.textContent = "重新发送";
+          setStatus("error", "这次没有发送成功");
+          statusDetail.textContent = "连接仍会自动恢复";
+          resultElement.textContent = message.error || "请直接重试。";
+        }
+      }
+
+      function send(value) {
+        if (!socket || socket.readyState !== WebSocket.OPEN) {
+          appendLog("Feedback not sent: bridge is disconnected");
+          return;
+        }
+        socket.send(JSON.stringify(value));
+      }
+
+      function requestPageImport(pageIds) {
+        const unique = [...new Set(pageIds)].filter(Boolean);
+        if (unique.length === 0) return;
+        resultElement.textContent = `正在导入 ${unique.length} 个页面…`;
+        send({ type: "page.import.request", pageIds: unique });
+      }
+
+      function renderCatalog() {
+        catalogCount.textContent = `${catalogPages.length} 个`;
+        catalogList.replaceChildren();
+        for (const page of catalogPages) {
+          const row = document.createElement("div");
+          row.className = `page-row${page.id === activePageId ? " active" : ""}`;
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.checked = selectedPages.has(page.id);
+          checkbox.addEventListener("click", (event) => {
+            event.stopPropagation();
+            if (checkbox.checked) selectedPages.add(page.id);
+            else selectedPages.delete(page.id);
+            renderCatalogActions();
+          });
+          const copy = document.createElement("span");
+          copy.className = "page-copy";
+          const name = document.createElement("strong");
+          name.textContent = page.name || page.id;
+          const route = document.createElement("span");
+          route.textContent = page.entry
+            ? `${page.entry} · ${page.route || "/"}`
+            : page.route || "/";
+          copy.append(name, route);
+          const state = document.createElement("span");
+          state.className = `page-state ${page.state || "not_imported"}`;
+          state.textContent = stateLabel(page.state);
+          state.title = stateDescription(page.state);
+          row.append(checkbox, copy, state);
+          row.addEventListener("click", () => {
+            activePageId = page.id;
+            renderCatalog();
+            if (page.state !== "not_imported") {
+              parent.postMessage(
+                { pluginMessage: { type: "page.locate", pageId: page.id } },
+                "*",
+              );
+            }
+          });
+          catalogList.append(row);
+        }
+        if (catalogPages.length === 0) {
+          const empty = document.createElement("div");
+          empty.className = "page-row";
+          empty.textContent = "当前项目没有可用页面";
+          catalogList.append(empty);
+        }
+        renderCatalogActions();
+      }
+
+      function renderCatalogActions() {
+        const activePage = catalogPages.find((page) => page.id === activePageId);
+        const canSeed =
+          localWorkspace &&
+          activePage?.acceptsFigmaSeed &&
+          activePage.state === "not_imported";
+        seedPageButton.hidden = !canSeed;
+        seedPageButton.disabled = !canSeed;
+        locateFrameButton.disabled =
+          !localWorkspace || !activePage || activePage.state === "not_imported";
+        importCurrentButton.disabled = !activePageId || !localWorkspace;
+        importSelectedButton.disabled = selectedPages.size === 0 || !localWorkspace;
+        updateAllButton.disabled =
+          !localWorkspace ||
+          !catalogPages.some((page) =>
+            ["not_imported", "source_changed", "failed"].includes(page.state),
+          );
+      }
+
+      function stateLabel(state) {
+        return {
+          not_imported: "未导入",
+          synced: "已同步",
+          source_changed: "源码更新",
+          figma_changed: "Figma 修改",
+          conflict: "两边均有修改",
+          failed: "失败",
+        }[state] || "未导入";
+      }
+
+      function stateDescription(state) {
+        return {
+          not_imported: "这个页面还没有写入 Figma",
+          synced: "源码与 Figma 处于同一同步版本",
+          source_changed: "源码在上次同步后发生了修改",
+          figma_changed: "Figma 在上次同步后发生了修改",
+          conflict: "源码和 Figma 在上次同步后都发生了修改，请先确认要保留哪一侧",
+          failed: "最近一次页面操作失败",
+        }[state] || "";
+      }
+
+      function setStatus(kind, text) {
+        statusDot.className = `dot ${kind}`;
+        statusText.textContent = text;
+      }
+
+      function appendLog(message) {
+        const time = new Date().toLocaleTimeString();
+        logElement.textContent = `${time}  ${message}\n${logElement.textContent}`.slice(
+          0,
+          5000,
+        );
+      }
+    </script>
+  </body>
+</html>

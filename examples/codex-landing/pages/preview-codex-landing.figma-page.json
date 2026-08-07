@@ -1,0 +1,1247 @@
+{
+  "protocolVersion": 3,
+  "pageId": "preview-codex-landing",
+  "name": "codex-landing · 当前预览",
+  "source": {
+    "file": "http://127.0.0.1:9241/"
+  },
+  "root": {
+    "id": "landing-root",
+    "type": "frame",
+    "name": "landing-root",
+    "sourceRef": {
+      "selector": "[data-codex-id=\"landing-root\"]"
+    },
+    "width": 1440,
+    "height": 900,
+    "x": 0,
+    "y": 0,
+    "opacity": 1,
+    "style": {
+      "fill": "#0B0C10"
+    },
+    "layout": {
+      "direction": "none",
+      "gap": 0,
+      "padding": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      },
+      "align": "start",
+      "justify": "start"
+    },
+    "children": [
+      {
+        "id": "nav",
+        "type": "frame",
+        "name": "nav",
+        "sourceRef": {
+          "selector": "[data-codex-id=\"nav\"]"
+        },
+        "width": 1280,
+        "height": 56,
+        "x": 80,
+        "y": 40,
+        "opacity": 1,
+        "style": {},
+        "layout": {
+          "direction": "none",
+          "gap": 0,
+          "padding": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "align": "start",
+          "justify": "start"
+        },
+        "children": [
+          {
+            "id": "brand",
+            "type": "frame",
+            "name": "brand",
+            "sourceRef": {
+              "selector": "[data-codex-id=\"brand\"]"
+            },
+            "width": 176,
+            "height": 40,
+            "x": 0,
+            "y": 8,
+            "opacity": 1,
+            "style": {},
+            "layout": {
+              "direction": "none",
+              "gap": 0,
+              "padding": {
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              },
+              "align": "start",
+              "justify": "start"
+            },
+            "children": [
+              {
+                "id": "brand-mark",
+                "type": "frame",
+                "name": "brand-mark",
+                "sourceRef": {
+                  "selector": "[data-codex-id=\"brand-mark\"]"
+                },
+                "width": 32,
+                "height": 32,
+                "x": 0,
+                "y": 4,
+                "opacity": 1,
+                "style": {},
+                "layout": {
+                  "direction": "none",
+                  "gap": 0,
+                  "padding": {
+                    "top": 0,
+                    "right": 0,
+                    "bottom": 0,
+                    "left": 0
+                  },
+                  "align": "start",
+                  "justify": "start"
+                },
+                "children": [
+                  {
+                    "id": "figma-8-533",
+                    "type": "frame",
+                    "name": "figma-8-533",
+                    "sourceRef": {
+                      "selector": "[data-codex-id=\"figma-8-533\"]"
+                    },
+                    "width": 28,
+                    "height": 28,
+                    "x": 2,
+                    "y": 2,
+                    "opacity": 1,
+                    "style": {},
+                    "layout": {
+                      "direction": "none",
+                      "gap": 0,
+                      "padding": {
+                        "top": 0,
+                        "right": 0,
+                        "bottom": 0,
+                        "left": 0
+                      },
+                      "align": "start",
+                      "justify": "start"
+                    },
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "id": "brand-name",
+                "type": "text",
+                "name": "brand-name",
+                "sourceRef": {
+                  "selector": "[data-codex-id=\"brand-name\"]"
+                },
+                "width": 132,
+                "height": 28,
+                "x": 44,
+                "y": 6,
+                "opacity": 1,
+                "style": {
+                  "fill": "#FFFFFF"
+                },
+                "text": "Codex Flow",
+                "font": {
+                  "family": "Inter",
+                  "style": "Bold",
+                  "size": 18,
+                  "lineHeight": 28,
+                  "letterSpacing": 0
+                },
+                "textAlign": "left"
+              }
+            ]
+          },
+          {
+            "id": "nav-actions",
+            "type": "frame",
+            "name": "nav-actions",
+            "sourceRef": {
+              "selector": "[data-codex-id=\"nav-actions\"]"
+            },
+            "width": 284,
+            "height": 44,
+            "x": 996,
+            "y": 6,
+            "opacity": 1,
+            "style": {},
+            "layout": {
+              "direction": "none",
+              "gap": 0,
+              "padding": {
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              },
+              "align": "start",
+              "justify": "start"
+            },
+            "children": [
+              {
+                "id": "nav-docs",
+                "type": "text",
+                "name": "nav-docs",
+                "sourceRef": {
+                  "selector": "[data-codex-id=\"nav-docs\"]"
+                },
+                "width": 74,
+                "height": 24,
+                "x": 28,
+                "y": 10,
+                "opacity": 1,
+                "style": {
+                  "fill": "#A9ACB8"
+                },
+                "text": "Workflow",
+                "font": {
+                  "family": "Inter",
+                  "style": "Regular",
+                  "size": 14,
+                  "lineHeight": 24,
+                  "letterSpacing": 0
+                },
+                "textAlign": "left"
+              },
+              {
+                "id": "nav-cta",
+                "type": "frame",
+                "name": "nav-cta",
+                "sourceRef": {
+                  "selector": "[data-codex-id=\"nav-cta\"]"
+                },
+                "width": 158,
+                "height": 44,
+                "x": 126,
+                "y": 0,
+                "opacity": 1,
+                "style": {
+                  "fill": "#181A22",
+                  "radius": 12
+                },
+                "layout": {
+                  "direction": "none",
+                  "gap": 0,
+                  "padding": {
+                    "top": 0,
+                    "right": 0,
+                    "bottom": 0,
+                    "left": 0
+                  },
+                  "align": "start",
+                  "justify": "start"
+                },
+                "children": [
+                  {
+                    "id": "nav-cta-label",
+                    "type": "text",
+                    "name": "nav-cta-label",
+                    "sourceRef": {
+                      "selector": "[data-codex-id=\"nav-cta-label\"]"
+                    },
+                    "width": 111.48,
+                    "height": 17,
+                    "x": 23.26,
+                    "y": 13.5,
+                    "opacity": 1,
+                    "style": {
+                      "fill": "#F7F7FB"
+                    },
+                    "text": "Open workspace",
+                    "font": {
+                      "family": "Inter",
+                      "style": "Regular",
+                      "size": 14,
+                      "lineHeight": 22,
+                      "letterSpacing": 0
+                    },
+                    "textAlign": "center"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "hero",
+        "type": "frame",
+        "name": "hero",
+        "sourceRef": {
+          "selector": "[data-codex-id=\"hero\"]"
+        },
+        "width": 1280,
+        "height": 600,
+        "x": 80,
+        "y": 160,
+        "opacity": 1,
+        "style": {},
+        "layout": {
+          "direction": "none",
+          "gap": 0,
+          "padding": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "align": "start",
+          "justify": "start"
+        },
+        "children": [
+          {
+            "id": "hero-copy",
+            "type": "frame",
+            "name": "hero-copy",
+            "sourceRef": {
+              "selector": "[data-codex-id=\"hero-copy\"]"
+            },
+            "width": 620,
+            "height": 480,
+            "x": 0,
+            "y": 60,
+            "opacity": 1,
+            "style": {},
+            "layout": {
+              "direction": "none",
+              "gap": 0,
+              "padding": {
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              },
+              "align": "start",
+              "justify": "start"
+            },
+            "children": [
+              {
+                "id": "hero-eyebrow",
+                "type": "text",
+                "name": "hero-eyebrow",
+                "sourceRef": {
+                  "selector": "[data-codex-id=\"hero-eyebrow\"]"
+                },
+                "width": 320,
+                "height": 20,
+                "x": 0,
+                "y": 0,
+                "opacity": 1,
+                "style": {
+                  "fill": "#8B72FF"
+                },
+                "text": "LOCAL DESIGN-TO-CODE LOOP",
+                "font": {
+                  "family": "Inter",
+                  "style": "Bold",
+                  "size": 13,
+                  "lineHeight": 20,
+                  "letterSpacing": 2
+                },
+                "textAlign": "left"
+              },
+              {
+                "id": "hero-title",
+                "type": "text",
+                "name": "hero-title",
+                "sourceRef": {
+                  "selector": "[data-codex-id=\"hero-title\"]"
+                },
+                "width": 620,
+                "height": 150,
+                "x": 0,
+                "y": 44,
+                "opacity": 1,
+                "style": {
+                  "fill": "#FFFFFF"
+                },
+                "text": "Codex builds it.\nFigma shapes it.",
+                "font": {
+                  "family": "Inter",
+                  "style": "Bold",
+                  "size": 72,
+                  "lineHeight": 74,
+                  "letterSpacing": -3
+                },
+                "textAlign": "left"
+              },
+              {
+                "id": "hero-body",
+                "type": "text",
+                "name": "hero-body",
+                "sourceRef": {
+                  "selector": "[data-codex-id=\"hero-body\"]"
+                },
+                "width": 580,
+                "height": 88,
+                "x": 0,
+                "y": 218,
+                "opacity": 1,
+                "style": {
+                  "fill": "#A9ACB8"
+                },
+                "text": "Generate production frontend code, review the visual structure in Figma, and submit one clean ChangeSet back to Codex—without spending Figma MCP quota.",
+                "font": {
+                  "family": "Inter",
+                  "style": "Regular",
+                  "size": 18,
+                  "lineHeight": 30,
+                  "letterSpacing": 0
+                },
+                "textAlign": "left"
+              },
+              {
+                "id": "hero-actions",
+                "type": "frame",
+                "name": "hero-actions",
+                "sourceRef": {
+                  "selector": "[data-codex-id=\"hero-actions\"]"
+                },
+                "width": 388,
+                "height": 48,
+                "x": 0,
+                "y": 330,
+                "opacity": 1,
+                "style": {},
+                "layout": {
+                  "direction": "none",
+                  "gap": 0,
+                  "padding": {
+                    "top": 0,
+                    "right": 0,
+                    "bottom": 0,
+                    "left": 0
+                  },
+                  "align": "start",
+                  "justify": "start"
+                },
+                "children": [
+                  {
+                    "id": "primary-cta",
+                    "type": "frame",
+                    "name": "primary-cta",
+                    "sourceRef": {
+                      "selector": "[data-codex-id=\"primary-cta\"]"
+                    },
+                    "width": 176,
+                    "height": 48,
+                    "x": 0,
+                    "y": 0,
+                    "opacity": 1,
+                    "style": {
+                      "fill": "#FF0059",
+                      "radius": 12
+                    },
+                    "layout": {
+                      "direction": "none",
+                      "gap": 0,
+                      "padding": {
+                        "top": 0,
+                        "right": 0,
+                        "bottom": 0,
+                        "left": 0
+                      },
+                      "align": "start",
+                      "justify": "start"
+                    },
+                    "children": [
+                      {
+                        "id": "primary-cta-label",
+                        "type": "text",
+                        "name": "primary-cta-label",
+                        "sourceRef": {
+                          "selector": "[data-codex-id=\"primary-cta-label\"]"
+                        },
+                        "width": 111.53,
+                        "height": 17,
+                        "x": 32.23,
+                        "y": 15.5,
+                        "opacity": 1,
+                        "style": {
+                          "fill": "#0D0D12"
+                        },
+                        "text": "Generate a page",
+                        "font": {
+                          "family": "Inter",
+                          "style": "Bold",
+                          "size": 14,
+                          "lineHeight": 22,
+                          "letterSpacing": 0
+                        },
+                        "textAlign": "center"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "secondary-cta",
+                    "type": "frame",
+                    "name": "secondary-cta",
+                    "sourceRef": {
+                      "selector": "[data-codex-id=\"secondary-cta\"]"
+                    },
+                    "width": 200,
+                    "height": 48,
+                    "x": 188,
+                    "y": 0,
+                    "opacity": 1,
+                    "style": {
+                      "radius": 12
+                    },
+                    "layout": {
+                      "direction": "none",
+                      "gap": 0,
+                      "padding": {
+                        "top": 0,
+                        "right": 0,
+                        "bottom": 0,
+                        "left": 0
+                      },
+                      "align": "start",
+                      "justify": "start"
+                    },
+                    "children": [
+                      {
+                        "id": "secondary-cta-label",
+                        "type": "text",
+                        "name": "secondary-cta-label",
+                        "sourceRef": {
+                          "selector": "[data-codex-id=\"secondary-cta-label\"]"
+                        },
+                        "width": 116.58,
+                        "height": 17,
+                        "x": 41.71,
+                        "y": 15.5,
+                        "opacity": 1,
+                        "style": {
+                          "fill": "#F7F7FB"
+                        },
+                        "text": "View the protocol",
+                        "font": {
+                          "family": "Inter",
+                          "style": "Regular",
+                          "size": 14,
+                          "lineHeight": 22,
+                          "letterSpacing": 0
+                        },
+                        "textAlign": "center"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "hero-proof",
+                "type": "text",
+                "name": "hero-proof",
+                "sourceRef": {
+                  "selector": "[data-codex-id=\"hero-proof\"]"
+                },
+                "width": 480,
+                "height": 22,
+                "x": 0,
+                "y": 402,
+                "opacity": 1,
+                "style": {
+                  "fill": "#6F7280"
+                },
+                "text": "Local WebSocket · Stable node IDs · Review checkpoints",
+                "font": {
+                  "family": "Inter",
+                  "style": "Regular",
+                  "size": 13,
+                  "lineHeight": 22,
+                  "letterSpacing": 0
+                },
+                "textAlign": "left"
+              }
+            ]
+          },
+          {
+            "id": "workflow-card",
+            "type": "frame",
+            "name": "workflow-card",
+            "sourceRef": {
+              "selector": "[data-codex-id=\"workflow-card\"]"
+            },
+            "width": 600,
+            "height": 520,
+            "x": 680,
+            "y": 40,
+            "opacity": 1,
+            "style": {
+              "fill": "#171923",
+              "radius": 32
+            },
+            "layout": {
+              "direction": "none",
+              "gap": 0,
+              "padding": {
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              },
+              "align": "start",
+              "justify": "start"
+            },
+            "children": [
+              {
+                "id": "card-heading",
+                "type": "frame",
+                "name": "card-heading",
+                "sourceRef": {
+                  "selector": "[data-codex-id=\"card-heading\"]"
+                },
+                "width": 300,
+                "height": 24,
+                "x": 28,
+                "y": 28,
+                "opacity": 1,
+                "style": {},
+                "layout": {
+                  "direction": "none",
+                  "gap": 0,
+                  "padding": {
+                    "top": 0,
+                    "right": 0,
+                    "bottom": 0,
+                    "left": 0
+                  },
+                  "align": "start",
+                  "justify": "start"
+                },
+                "children": [
+                  {
+                    "id": "span",
+                    "type": "frame",
+                    "name": "span",
+                    "sourceRef": null,
+                    "width": 9,
+                    "height": 9,
+                    "x": 0,
+                    "y": 7.5,
+                    "opacity": 1,
+                    "style": {
+                      "fill": "#E9E9EF",
+                      "radius": 50
+                    },
+                    "layout": {
+                      "direction": "none",
+                      "gap": 0,
+                      "padding": {
+                        "top": 0,
+                        "right": 0,
+                        "bottom": 0,
+                        "left": 0
+                      },
+                      "align": "start",
+                      "justify": "start"
+                    },
+                    "children": []
+                  },
+                  {
+                    "id": "card-title",
+                    "type": "text",
+                    "name": "card-title",
+                    "sourceRef": {
+                      "selector": "[data-codex-id=\"card-title\"]"
+                    },
+                    "width": 108.66,
+                    "height": 24,
+                    "x": 19,
+                    "y": 0,
+                    "opacity": 1,
+                    "style": {
+                      "fill": "#E9E9EF"
+                    },
+                    "text": "Frontend bridge",
+                    "font": {
+                      "family": "Inter",
+                      "style": "Bold",
+                      "size": 14,
+                      "lineHeight": 24,
+                      "letterSpacing": 0
+                    },
+                    "textAlign": "left"
+                  },
+                  {
+                    "id": "card-status",
+                    "type": "text",
+                    "name": "card-status",
+                    "sourceRef": {
+                      "selector": "[data-codex-id=\"card-status\"]"
+                    },
+                    "width": 88.8,
+                    "height": 24,
+                    "x": 211.2,
+                    "y": 0,
+                    "opacity": 1,
+                    "style": {
+                      "fill": "#E9E9EF"
+                    },
+                    "text": "CONNECTED",
+                    "font": {
+                      "family": "Inter",
+                      "style": "Bold",
+                      "size": 14,
+                      "lineHeight": 24,
+                      "letterSpacing": 0
+                    },
+                    "textAlign": "left"
+                  }
+                ]
+              },
+              {
+                "id": "code-panel",
+                "type": "frame",
+                "name": "code-panel",
+                "sourceRef": {
+                  "selector": "[data-codex-id=\"code-panel\"]"
+                },
+                "width": 544,
+                "height": 238,
+                "x": 28,
+                "y": 70,
+                "opacity": 1,
+                "style": {
+                  "fill": "#0C0D12",
+                  "radius": 18
+                },
+                "layout": {
+                  "direction": "none",
+                  "gap": 0,
+                  "padding": {
+                    "top": 0,
+                    "right": 0,
+                    "bottom": 0,
+                    "left": 0
+                  },
+                  "align": "start",
+                  "justify": "start"
+                },
+                "children": [
+                  {
+                    "id": "workflow-steps",
+                    "type": "frame",
+                    "name": "workflow-steps",
+                    "sourceRef": {
+                      "selector": "[data-codex-id=\"workflow-steps\"]"
+                    },
+                    "width": 500,
+                    "height": 194,
+                    "x": 22,
+                    "y": 22,
+                    "opacity": 1,
+                    "style": {},
+                    "layout": {
+                      "direction": "none",
+                      "gap": 0,
+                      "padding": {
+                        "top": 0,
+                        "right": 0,
+                        "bottom": 0,
+                        "left": 0
+                      },
+                      "align": "start",
+                      "justify": "start"
+                    },
+                    "children": [
+                      {
+                        "id": "p",
+                        "type": "frame",
+                        "name": "p",
+                        "sourceRef": null,
+                        "width": 500,
+                        "height": 44,
+                        "x": 0,
+                        "y": 0,
+                        "opacity": 1,
+                        "style": {},
+                        "layout": {
+                          "direction": "none",
+                          "gap": 0,
+                          "padding": {
+                            "top": 0,
+                            "right": 0,
+                            "bottom": 0,
+                            "left": 0
+                          },
+                          "align": "start",
+                          "justify": "start"
+                        },
+                        "children": [
+                          {
+                            "id": "span-1",
+                            "type": "text",
+                            "name": "span-1",
+                            "sourceRef": null,
+                            "width": 32,
+                            "height": 44,
+                            "x": 0,
+                            "y": 0,
+                            "opacity": 1,
+                            "style": {
+                              "fill": "#878B99"
+                            },
+                            "text": "01",
+                            "font": {
+                              "family": "Inter",
+                              "style": "Regular",
+                              "size": 14,
+                              "lineHeight": 44,
+                              "letterSpacing": 0
+                            },
+                            "textAlign": "left"
+                          },
+                          {
+                            "id": "p-text-1",
+                            "type": "text",
+                            "name": "p text",
+                            "sourceRef": null,
+                            "width": 204.14,
+                            "height": 17,
+                            "x": 32,
+                            "y": 13.5,
+                            "opacity": 1,
+                            "style": {
+                              "fill": "#878B99"
+                            },
+                            "text": "Codex generates React + CSS",
+                            "font": {
+                              "family": "Inter",
+                              "style": "Regular",
+                              "size": 14,
+                              "lineHeight": 44,
+                              "letterSpacing": 0
+                            },
+                            "textAlign": "left"
+                          }
+                        ]
+                      },
+                      {
+                        "id": "p-2",
+                        "type": "frame",
+                        "name": "p-2",
+                        "sourceRef": null,
+                        "width": 500,
+                        "height": 44,
+                        "x": 0,
+                        "y": 44,
+                        "opacity": 1,
+                        "style": {},
+                        "layout": {
+                          "direction": "none",
+                          "gap": 0,
+                          "padding": {
+                            "top": 0,
+                            "right": 0,
+                            "bottom": 0,
+                            "left": 0
+                          },
+                          "align": "start",
+                          "justify": "start"
+                        },
+                        "children": [
+                          {
+                            "id": "span-3",
+                            "type": "text",
+                            "name": "span-3",
+                            "sourceRef": null,
+                            "width": 32,
+                            "height": 44,
+                            "x": 0,
+                            "y": 0,
+                            "opacity": 1,
+                            "style": {
+                              "fill": "#878B99"
+                            },
+                            "text": "02",
+                            "font": {
+                              "family": "Inter",
+                              "style": "Regular",
+                              "size": 14,
+                              "lineHeight": 44,
+                              "letterSpacing": 0
+                            },
+                            "textAlign": "left"
+                          },
+                          {
+                            "id": "p-4",
+                            "type": "text",
+                            "name": "p text",
+                            "sourceRef": null,
+                            "width": 201.97,
+                            "height": 17,
+                            "x": 32,
+                            "y": 13.5,
+                            "opacity": 1,
+                            "style": {
+                              "fill": "#878B99"
+                            },
+                            "text": "Page manifest syncs to Figma",
+                            "font": {
+                              "family": "Inter",
+                              "style": "Regular",
+                              "size": 14,
+                              "lineHeight": 44,
+                              "letterSpacing": 0
+                            },
+                            "textAlign": "left"
+                          }
+                        ]
+                      },
+                      {
+                        "id": "p-5",
+                        "type": "frame",
+                        "name": "p-5",
+                        "sourceRef": null,
+                        "width": 500,
+                        "height": 44,
+                        "x": 0,
+                        "y": 88,
+                        "opacity": 1,
+                        "style": {},
+                        "layout": {
+                          "direction": "none",
+                          "gap": 0,
+                          "padding": {
+                            "top": 0,
+                            "right": 0,
+                            "bottom": 0,
+                            "left": 0
+                          },
+                          "align": "start",
+                          "justify": "start"
+                        },
+                        "children": [
+                          {
+                            "id": "span-6",
+                            "type": "text",
+                            "name": "span-6",
+                            "sourceRef": null,
+                            "width": 32,
+                            "height": 44,
+                            "x": 0,
+                            "y": 0,
+                            "opacity": 1,
+                            "style": {
+                              "fill": "#878B99"
+                            },
+                            "text": "03",
+                            "font": {
+                              "family": "Inter",
+                              "style": "Regular",
+                              "size": 14,
+                              "lineHeight": 44,
+                              "letterSpacing": 0
+                            },
+                            "textAlign": "left"
+                          },
+                          {
+                            "id": "p-7",
+                            "type": "text",
+                            "name": "p text",
+                            "sourceRef": null,
+                            "width": 235.88,
+                            "height": 17,
+                            "x": 32,
+                            "y": 13.5,
+                            "opacity": 1,
+                            "style": {
+                              "fill": "#878B99"
+                            },
+                            "text": "Designer edits the live composition",
+                            "font": {
+                              "family": "Inter",
+                              "style": "Regular",
+                              "size": 14,
+                              "lineHeight": 44,
+                              "letterSpacing": 0
+                            },
+                            "textAlign": "left"
+                          }
+                        ]
+                      },
+                      {
+                        "id": "p-8",
+                        "type": "frame",
+                        "name": "p-8",
+                        "sourceRef": null,
+                        "width": 500,
+                        "height": 44,
+                        "x": 0,
+                        "y": 132,
+                        "opacity": 1,
+                        "style": {},
+                        "layout": {
+                          "direction": "none",
+                          "gap": 0,
+                          "padding": {
+                            "top": 0,
+                            "right": 0,
+                            "bottom": 0,
+                            "left": 0
+                          },
+                          "align": "start",
+                          "justify": "start"
+                        },
+                        "children": [
+                          {
+                            "id": "span-9",
+                            "type": "text",
+                            "name": "span-9",
+                            "sourceRef": null,
+                            "width": 32,
+                            "height": 44,
+                            "x": 0,
+                            "y": 0,
+                            "opacity": 1,
+                            "style": {
+                              "fill": "#878B99"
+                            },
+                            "text": "04",
+                            "font": {
+                              "family": "Inter",
+                              "style": "Regular",
+                              "size": 14,
+                              "lineHeight": 44,
+                              "letterSpacing": 0
+                            },
+                            "textAlign": "left"
+                          },
+                          {
+                            "id": "p-10",
+                            "type": "text",
+                            "name": "p text",
+                            "sourceRef": null,
+                            "width": 187.97,
+                            "height": 17,
+                            "x": 32,
+                            "y": 13.5,
+                            "opacity": 1,
+                            "style": {
+                              "fill": "#878B99"
+                            },
+                            "text": "Submit one final ChangeSet",
+                            "font": {
+                              "family": "Inter",
+                              "style": "Regular",
+                              "size": 14,
+                              "lineHeight": 44,
+                              "letterSpacing": 0
+                            },
+                            "textAlign": "left"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "change-card",
+                "type": "frame",
+                "name": "change-card",
+                "sourceRef": {
+                  "selector": "[data-codex-id=\"change-card\"]"
+                },
+                "width": 544,
+                "height": 78,
+                "x": 28,
+                "y": 326,
+                "opacity": 1,
+                "style": {
+                  "fill": "#1D1F2A",
+                  "radius": 16
+                },
+                "layout": {
+                  "direction": "none",
+                  "gap": 0,
+                  "padding": {
+                    "top": 0,
+                    "right": 0,
+                    "bottom": 0,
+                    "left": 0
+                  },
+                  "align": "start",
+                  "justify": "start"
+                },
+                "children": [
+                  {
+                    "id": "change-property",
+                    "type": "frame",
+                    "name": "change-property",
+                    "sourceRef": {
+                      "selector": "[data-codex-id=\"change-property\"]"
+                    },
+                    "width": 180,
+                    "height": 42,
+                    "x": 20,
+                    "y": 18,
+                    "opacity": 1,
+                    "style": {},
+                    "layout": {
+                      "direction": "none",
+                      "gap": 0,
+                      "padding": {
+                        "top": 0,
+                        "right": 0,
+                        "bottom": 0,
+                        "left": 0
+                      },
+                      "align": "start",
+                      "justify": "start"
+                    },
+                    "children": [
+                      {
+                        "id": "span-11",
+                        "type": "text",
+                        "name": "span-11",
+                        "sourceRef": null,
+                        "width": 180,
+                        "height": 20,
+                        "x": 0,
+                        "y": 0,
+                        "opacity": 1,
+                        "style": {
+                          "fill": "#E9E9EF"
+                        },
+                        "text": "hero-title",
+                        "font": {
+                          "family": "Inter",
+                          "style": "Regular",
+                          "size": 13,
+                          "lineHeight": 20,
+                          "letterSpacing": 0
+                        },
+                        "textAlign": "left"
+                      },
+                      {
+                        "id": "span-12",
+                        "type": "text",
+                        "name": "span-12",
+                        "sourceRef": null,
+                        "width": 180,
+                        "height": 20,
+                        "x": 0,
+                        "y": 20,
+                        "opacity": 1,
+                        "style": {
+                          "fill": "#E9E9EF"
+                        },
+                        "text": "fontSize",
+                        "font": {
+                          "family": "Inter",
+                          "style": "Regular",
+                          "size": 13,
+                          "lineHeight": 20,
+                          "letterSpacing": 0
+                        },
+                        "textAlign": "left"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "change-value",
+                    "type": "text",
+                    "name": "change-value",
+                    "sourceRef": {
+                      "selector": "[data-codex-id=\"change-value\"]"
+                    },
+                    "width": 88,
+                    "height": 24,
+                    "x": 436,
+                    "y": 27,
+                    "opacity": 1,
+                    "style": {
+                      "fill": "#9E8CFF"
+                    },
+                    "text": "56 → 64",
+                    "font": {
+                      "family": "Inter",
+                      "style": "Bold",
+                      "size": 14,
+                      "lineHeight": 24,
+                      "letterSpacing": 0
+                    },
+                    "textAlign": "right"
+                  }
+                ]
+              },
+              {
+                "id": "workflow-spark",
+                "type": "frame",
+                "name": "workflow-spark",
+                "sourceRef": {
+                  "selector": "[data-codex-id=\"workflow-spark\"]"
+                },
+                "width": 72,
+                "height": 72,
+                "x": 28,
+                "y": 422,
+                "opacity": 1,
+                "style": {},
+                "layout": {
+                  "direction": "none",
+                  "gap": 0,
+                  "padding": {
+                    "top": 0,
+                    "right": 0,
+                    "bottom": 0,
+                    "left": 0
+                  },
+                  "align": "start",
+                  "justify": "start"
+                },
+                "children": [
+                  {
+                    "id": "figma-8-558",
+                    "type": "frame",
+                    "name": "figma-8-558",
+                    "sourceRef": {
+                      "selector": "[data-codex-id=\"figma-8-558\"]"
+                    },
+                    "width": 63,
+                    "height": 63,
+                    "x": 4.5,
+                    "y": 4.5,
+                    "opacity": 1,
+                    "style": {},
+                    "layout": {
+                      "direction": "none",
+                      "gap": 0,
+                      "padding": {
+                        "top": 0,
+                        "right": 0,
+                        "bottom": 0,
+                        "left": 0
+                      },
+                      "align": "start",
+                      "justify": "start"
+                    },
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

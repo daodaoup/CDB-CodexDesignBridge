@@ -1,0 +1,27 @@
+{
+  "name": "codex-design-bridge",
+  "version": "0.7.0+codex.20260806151451",
+  "description": "Move single-page designs seamlessly between Codex frontend source and editable Figma frames in either direction.",
+  "author": {
+    "name": "Local developer"
+  },
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "CDB",
+    "shortDescription": "Codex and Figma single-page design round trips.",
+    "longDescription": "Open or resume the current CDB workspace, create a page from a description, or start with an existing Figma frame. CDB preserves stable element mappings and applies supported visual and structural changes transactionally without using the official Figma connector.",
+    "developerName": "Local developer",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Write",
+      "MCP Apps UI"
+    ],
+    "defaultPrompt": "\u6253\u5f00 CDB",
+    "brandColor": "#6D5EF7",
+    "composerIcon": "./assets/icon.png",
+    "logo": "./assets/icon.png",
+    "logoDark": "./assets/icon.png"
+  }
+}

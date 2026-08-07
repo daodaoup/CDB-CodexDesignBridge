@@ -1,0 +1,567 @@
+{
+  "pageId": "codex-landing",
+  "name": "Codex Flow Landing",
+  "source": {
+    "file": "examples/codex-landing/index.html",
+    "component": "CodexLanding"
+  },
+  "root": {
+    "id": "landing-root",
+    "type": "frame",
+    "name": "Codex Flow Landing",
+    "width": 1440,
+    "height": 900,
+    "style": {
+      "fill": "#0B0C10"
+    },
+    "layout": {
+      "direction": "none"
+    },
+    "sourceRef": {
+      "file": "examples/codex-landing/index.html",
+      "selector": "[data-codex-id='landing-root']"
+    },
+    "children": [
+      {
+        "id": "nav",
+        "type": "frame",
+        "name": "Navigation",
+        "width": 1280,
+        "height": 56,
+        "x": 80,
+        "y": 40,
+        "layout": {
+          "direction": "horizontal",
+          "gap": 24,
+          "align": "center",
+          "justify": "space-between"
+        },
+        "sourceRef": {
+          "file": "examples/codex-landing/index.html",
+          "selector": "[data-codex-id='nav']"
+        },
+        "children": [
+          {
+            "id": "brand",
+            "type": "frame",
+            "name": "Brand",
+            "width": 176,
+            "height": 40,
+            "layout": {
+              "direction": "horizontal",
+              "gap": 12,
+              "align": "center"
+            },
+            "sourceRef": {
+              "file": "examples/codex-landing/index.html",
+              "selector": "[data-codex-id='brand']"
+            },
+            "children": [
+              {
+                "id": "brand-mark",
+                "type": "svg",
+                "name": "Brand mark",
+                "width": 32,
+                "height": 32,
+                "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 32 32\"><path id=\"brand-spark\" d=\"M16 2 20.25 11.75 30 16l-9.75 4.25L16 30l-4.25-9.75L2 16l9.75-4.25L16 2Z\" fill=\"#8B72FF\"/></svg>",
+                "sourceRef": {
+                  "file": "examples/codex-landing/index.html",
+                  "selector": "[data-codex-id='brand-mark']"
+                }
+              },
+              {
+                "id": "brand-name",
+                "type": "text",
+                "name": "Brand name",
+                "width": 132,
+                "height": 28,
+                "text": "Codex Flow",
+                "font": {
+                  "family": "Inter",
+                  "style": "Bold",
+                  "size": 18,
+                  "lineHeight": 28
+                },
+                "style": {
+                  "fill": "#FFFFFF"
+                },
+                "sourceRef": {
+                  "file": "examples/codex-landing/index.html",
+                  "selector": "[data-codex-id='brand-name']"
+                }
+              }
+            ]
+          },
+          {
+            "id": "nav-actions",
+            "type": "frame",
+            "name": "Navigation actions",
+            "width": 284,
+            "height": 44,
+            "layout": {
+              "direction": "horizontal",
+              "gap": 24,
+              "align": "center",
+              "justify": "end"
+            },
+            "sourceRef": {
+              "file": "examples/codex-landing/index.html",
+              "selector": "[data-codex-id='nav-actions']"
+            },
+            "children": [
+              {
+                "id": "nav-docs",
+                "type": "text",
+                "name": "Workflow link",
+                "width": 74,
+                "height": 24,
+                "text": "Workflow",
+                "font": {
+                  "family": "Inter",
+                  "style": "Regular",
+                  "size": 14,
+                  "lineHeight": 24
+                },
+                "style": {
+                  "fill": "#A9ACB8"
+                },
+                "sourceRef": {
+                  "file": "examples/codex-landing/index.html",
+                  "selector": "[data-codex-id='nav-docs']"
+                }
+              },
+              {
+                "id": "nav-cta",
+                "type": "frame",
+                "name": "Open workspace button",
+                "width": 158,
+                "height": 44,
+                "style": {
+                  "fill": "#181A22",
+                  "stroke": "#2B2E3A",
+                  "strokeWidth": 1,
+                  "radius": 12
+                },
+                "layout": {
+                  "direction": "horizontal",
+                  "align": "center",
+                  "justify": "center"
+                },
+                "sourceRef": {
+                  "file": "examples/codex-landing/index.html",
+                  "selector": "[data-codex-id='nav-cta']"
+                },
+                "children": [
+                  {
+                    "id": "nav-cta-label",
+                    "type": "text",
+                    "name": "Open workspace label",
+                    "width": 118,
+                    "height": 22,
+                    "text": "Open workspace",
+                    "textAlign": "center",
+                    "font": {
+                      "family": "Inter",
+                      "style": "Regular",
+                      "size": 14,
+                      "lineHeight": 22
+                    },
+                    "style": {
+                      "fill": "#F7F7FB"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "hero",
+        "type": "frame",
+        "name": "Hero",
+        "width": 1280,
+        "height": 600,
+        "x": 80,
+        "y": 160,
+        "layout": {
+          "direction": "horizontal",
+          "gap": 60,
+          "align": "center"
+        },
+        "sourceRef": {
+          "file": "examples/codex-landing/index.html",
+          "selector": "[data-codex-id='hero']"
+        },
+        "children": [
+          {
+            "id": "hero-copy",
+            "type": "frame",
+            "name": "Hero copy",
+            "width": 620,
+            "height": 480,
+            "layout": {
+              "direction": "vertical",
+              "gap": 24,
+              "align": "start"
+            },
+            "sourceRef": {
+              "file": "examples/codex-landing/index.html",
+              "selector": "[data-codex-id='hero-copy']"
+            },
+            "children": [
+              {
+                "id": "hero-eyebrow",
+                "type": "text",
+                "name": "Hero eyebrow",
+                "width": 320,
+                "height": 20,
+                "text": "LOCAL DESIGN-TO-CODE LOOP",
+                "font": {
+                  "family": "Inter",
+                  "style": "Bold",
+                  "size": 13,
+                  "lineHeight": 20,
+                  "letterSpacing": 2
+                },
+                "style": {
+                  "fill": "#8B72FF"
+                },
+                "sourceRef": {
+                  "file": "examples/codex-landing/index.html",
+                  "selector": "[data-codex-id='hero-eyebrow']"
+                }
+              },
+              {
+                "id": "hero-title",
+                "type": "text",
+                "name": "Hero title",
+                "width": 620,
+                "height": 150,
+                "text": "Codex builds it.\nFigma shapes it.",
+                "font": {
+                  "family": "Inter",
+                  "style": "Bold",
+                  "size": 72,
+                  "lineHeight": 74,
+                  "letterSpacing": -3
+                },
+                "style": {
+                  "fill": "#FFFFFF"
+                },
+                "sourceRef": {
+                  "file": "examples/codex-landing/index.html",
+                  "selector": "[data-codex-id='hero-title']"
+                }
+              },
+              {
+                "id": "hero-body",
+                "type": "text",
+                "name": "Hero body",
+                "width": 580,
+                "height": 88,
+                "text": "Generate production frontend code, review the visual structure in Figma, and submit one clean ChangeSet back to Codex—without spending Figma MCP quota.",
+                "font": {
+                  "family": "Inter",
+                  "style": "Regular",
+                  "size": 18,
+                  "lineHeight": 30
+                },
+                "style": {
+                  "fill": "#A9ACB8"
+                },
+                "sourceRef": {
+                  "file": "examples/codex-landing/index.html",
+                  "selector": "[data-codex-id='hero-body']"
+                }
+              },
+              {
+                "id": "hero-actions",
+                "type": "frame",
+                "name": "Hero actions",
+                "width": 388,
+                "height": 48,
+                "layout": {
+                  "direction": "horizontal",
+                  "gap": 12,
+                  "align": "center"
+                },
+                "sourceRef": {
+                  "file": "examples/codex-landing/index.html",
+                  "selector": "[data-codex-id='hero-actions']"
+                },
+                "children": [
+                  {
+                    "id": "primary-cta",
+                    "type": "frame",
+                    "name": "Generate page button",
+                    "width": 176,
+                    "height": 48,
+                    "style": {
+                      "fill": "#9E8CFF",
+                      "radius": 12
+                    },
+                    "layout": {
+                      "direction": "horizontal",
+                      "align": "center",
+                      "justify": "center"
+                    },
+                    "sourceRef": {
+                      "file": "examples/codex-landing/index.html",
+                      "selector": "[data-codex-id='primary-cta']"
+                    },
+                    "children": [
+                      {
+                        "id": "primary-cta-label",
+                        "type": "text",
+                        "name": "Generate page label",
+                        "width": 136,
+                        "height": 22,
+                        "text": "Generate a page",
+                        "textAlign": "center",
+                        "font": {
+                          "family": "Inter",
+                          "style": "Bold",
+                          "size": 14,
+                          "lineHeight": 22
+                        },
+                        "style": {
+                          "fill": "#0D0D12"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "secondary-cta",
+                    "type": "frame",
+                    "name": "Protocol button",
+                    "width": 200,
+                    "height": 48,
+                    "style": {
+                      "stroke": "#343744",
+                      "strokeWidth": 1,
+                      "radius": 12
+                    },
+                    "layout": {
+                      "direction": "horizontal",
+                      "align": "center",
+                      "justify": "center"
+                    },
+                    "sourceRef": {
+                      "file": "examples/codex-landing/index.html",
+                      "selector": "[data-codex-id='secondary-cta']"
+                    },
+                    "children": [
+                      {
+                        "id": "secondary-cta-label",
+                        "type": "text",
+                        "name": "Protocol label",
+                        "width": 160,
+                        "height": 22,
+                        "text": "View the protocol",
+                        "textAlign": "center",
+                        "font": {
+                          "family": "Inter",
+                          "style": "Regular",
+                          "size": 14,
+                          "lineHeight": 22
+                        },
+                        "style": {
+                          "fill": "#F7F7FB"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "hero-proof",
+                "type": "text",
+                "name": "Hero proof",
+                "width": 480,
+                "height": 22,
+                "text": "Local WebSocket · Stable node IDs · Review checkpoints",
+                "font": {
+                  "family": "Inter",
+                  "style": "Regular",
+                  "size": 13,
+                  "lineHeight": 22
+                },
+                "style": {
+                  "fill": "#6F7280"
+                },
+                "sourceRef": {
+                  "file": "examples/codex-landing/index.html",
+                  "selector": "[data-codex-id='hero-proof']"
+                }
+              }
+            ]
+          },
+          {
+            "id": "workflow-card",
+            "type": "frame",
+            "name": "Workflow card",
+            "width": 600,
+            "height": 520,
+            "style": {
+              "fill": "#171923",
+              "stroke": "#2B2D39",
+              "strokeWidth": 1,
+              "radius": 32
+            },
+            "layout": {
+              "direction": "vertical",
+              "gap": 18,
+              "padding": 28
+            },
+            "sourceRef": {
+              "file": "examples/codex-landing/index.html",
+              "selector": "[data-codex-id='workflow-card']"
+            },
+            "children": [
+              {
+                "id": "card-title",
+                "type": "text",
+                "name": "Card title",
+                "width": 300,
+                "height": 24,
+                "text": "●  Frontend bridge                         CONNECTED",
+                "font": {
+                  "family": "Inter",
+                  "style": "Bold",
+                  "size": 14,
+                  "lineHeight": 24
+                },
+                "style": {
+                  "fill": "#E9E9EF"
+                },
+                "sourceRef": {
+                  "file": "examples/codex-landing/index.html",
+                  "selector": "[data-codex-id='card-title']"
+                }
+              },
+              {
+                "id": "code-panel",
+                "type": "frame",
+                "name": "Workflow steps",
+                "width": 544,
+                "height": 238,
+                "style": {
+                  "fill": "#0C0D12",
+                  "stroke": "#252731",
+                  "strokeWidth": 1,
+                  "radius": 18
+                },
+                "layout": {
+                  "direction": "vertical",
+                  "gap": 8,
+                  "padding": 22
+                },
+                "sourceRef": {
+                  "file": "examples/codex-landing/index.html",
+                  "selector": "[data-codex-id='code-panel']"
+                },
+                "children": [
+                  {
+                    "id": "workflow-steps",
+                    "type": "text",
+                    "name": "Workflow steps",
+                    "width": 500,
+                    "height": 194,
+                    "text": "01   Codex generates React + CSS\n02   Page manifest syncs to Figma\n03   Designer edits the live composition\n04   Submit one final ChangeSet",
+                    "font": {
+                      "family": "Inter",
+                      "style": "Regular",
+                      "size": 14,
+                      "lineHeight": 44
+                    },
+                    "style": {
+                      "fill": "#878B99"
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "change-card",
+                "type": "frame",
+                "name": "Change preview",
+                "width": 544,
+                "height": 78,
+                "style": {
+                  "fill": "#1D1F2A",
+                  "stroke": "#313440",
+                  "strokeWidth": 1,
+                  "radius": 16
+                },
+                "layout": {
+                  "direction": "horizontal",
+                  "padding": {
+                    "top": 18,
+                    "right": 20,
+                    "bottom": 18,
+                    "left": 20
+                  },
+                  "align": "center",
+                  "justify": "space-between"
+                },
+                "sourceRef": {
+                  "file": "examples/codex-landing/index.html",
+                  "selector": "[data-codex-id='change-card']"
+                },
+                "children": [
+                  {
+                    "id": "change-property",
+                    "type": "text",
+                    "name": "Changed property",
+                    "width": 180,
+                    "height": 42,
+                    "text": "hero-title\nfontSize",
+                    "font": {
+                      "family": "Inter",
+                      "style": "Regular",
+                      "size": 13,
+                      "lineHeight": 20
+                    },
+                    "style": {
+                      "fill": "#E9E9EF"
+                    }
+                  },
+                  {
+                    "id": "change-value",
+                    "type": "text",
+                    "name": "Change value",
+                    "width": 88,
+                    "height": 24,
+                    "text": "56 → 64",
+                    "textAlign": "right",
+                    "font": {
+                      "family": "Inter",
+                      "style": "Bold",
+                      "size": 14,
+                      "lineHeight": 24
+                    },
+                    "style": {
+                      "fill": "#9E8CFF"
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "workflow-spark",
+                "type": "svg",
+                "name": "Workflow spark",
+                "width": 72,
+                "height": 72,
+                "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 48 48\"><path id=\"workflow-spark-path\" d=\"M24 3 29.7 18.3 45 24l-15.3 5.7L24 45l-5.7-15.3L3 24l15.3-5.7L24 3Z\" fill=\"#7C5CFC\" opacity=\"0.22\"/></svg>",
+                "sourceRef": {
+                  "file": "examples/codex-landing/index.html",
+                  "selector": "[data-codex-id='workflow-spark']"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

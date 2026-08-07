@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "design_workspace": {
+      "command": "node",
+      "args": [
+        "./mcp/server.mjs"
+      ],
+      "cwd": "."
+    }
+  }
+}
