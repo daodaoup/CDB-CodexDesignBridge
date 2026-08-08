@@ -653,7 +653,10 @@ async function reconcilePageNode({
     if (!("children" in node)) {
       throw new Error(`Page frame ${definition.id} is not editable.`);
     }
-    node.clipsContent = definition.clipsContent;
+    node.clipsContent =
+      typeof definition.clipsContent === "boolean"
+        ? definition.clipsContent
+        : true;
     applyFrameLayout(node, definition.layout);
     applyNodeStyle(node, definition.style, { clearFill: true });
     const existingById = new Map(
@@ -770,7 +773,10 @@ async function createPageNode({
   setPageNodeData(node, page, definition, isRoot);
 
   if (definition.type === "frame") {
-    node.clipsContent = definition.clipsContent;
+    node.clipsContent =
+      typeof definition.clipsContent === "boolean"
+        ? definition.clipsContent
+        : true;
     applyFrameLayout(node, definition.layout);
     applyNodeStyle(node, definition.style, { clearFill: true });
     for (const childDefinition of definition.children) {

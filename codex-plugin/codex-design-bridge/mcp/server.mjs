@@ -244,12 +244,6 @@ const tools = [
           type: "string",
           description: "Optional already-verified local frontend URL.",
         },
-        forceHandoff: {
-          type: "boolean",
-          description:
-            "Take over an old workspace after the user explicitly confirmed unsent Figma changes may remain in Figma.",
-          default: false,
-        },
       },
       required: ["projectDir"],
       additionalProperties: false,
@@ -931,7 +925,7 @@ function publicPreflightReport(report) {
   };
 }
 
-async function openWorkspace({ projectDir, previewUrl, forceHandoff = false }) {
+async function openWorkspace({ projectDir, previewUrl }) {
   const startedAt = Date.now();
   const project = await normalizeProjectDir(projectDir);
   const report = await preflightDesignProject(project);
@@ -958,24 +952,6 @@ async function openWorkspace({ projectDir, previewUrl, forceHandoff = false }) {
   }
 
   if (activeProject && activeProject !== project) {
-    const oldState = states.get(activeProject);
-    const oldBridge = figmaBridges.get(activeProject);
-    const unsentChanges = Boolean(
-      oldBridge?.status().unsentChanges || oldState?.unsentChanges,
-    );
-    if (unsentChanges && !forceHandoff) {
-      state = {
-        ...state,
-        phase: "handoff_confirmation_required",
-        sessionActive: false,
-        needsHandoffConfirmation: true,
-        message: "旧工作台的 Figma 中还有尚未发送的修改。",
-        lease: { owned: false },
-        updatedAt: new Date().toISOString(),
-      };
-      states.set(project, state);
-      return publicState(state);
-    }
     await shutdownWorkspaceResources(activeProject, {
       force: true,
       handoff: true,
@@ -985,19 +961,14 @@ async function openWorkspace({ projectDir, previewUrl, forceHandoff = false }) {
 
   const leaseResult = await leaseManager.acquire({
     projectKey: report.projectKey,
-    force: forceHandoff,
   });
   if (!leaseResult.acquired) {
     state = {
       ...state,
-      phase: leaseResult.confirmationRequired
-        ? "handoff_confirmation_required"
-        : "workspace_degraded",
+      phase: "workspace_degraded",
       sessionActive: false,
-      needsHandoffConfirmation: Boolean(leaseResult.confirmationRequired),
-      message: leaseResult.confirmationRequired
-        ? "旧工作台的 Figma 中还有尚未发送的修改。"
-        : "旧 CDB 工作台暂时无法接管，请稍后重试。",
+      needsHandoffConfirmation: false,
+      message: "旧 CDB 工作台暂时无法接管，请稍后重试。",
       lease: {
         owned: false,
         reason: leaseResult.reason || "busy",

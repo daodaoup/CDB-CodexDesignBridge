@@ -71,6 +71,6 @@ Use only the local CDB Figma development plugin. Do not use the official Figma c
 
 ## Workspace ownership
 
-The launcher owns no lease. A real project acquires the single CDB workspace lease only after preflight passes. A clean old workspace closes automatically; if and only if Figma has unsent changes, preserve the old workspace until the user confirms takeover.
+The launcher owns no lease. A real project acquires the single CDB workspace lease only after preflight passes. Opening a real workspace always closes the previous workspace and takes over its preview and Figma connection without asking for confirmation, even when the previous workspace has unsent Figma changes.
 
 The embedded Apps UI reports mounting with `report_design_workspace_mounted`. A localhost preview is not proof that the embedded workspace mounted, and an external browser is never a substitute.

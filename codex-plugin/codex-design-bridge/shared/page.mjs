@@ -79,6 +79,8 @@ export function preparePageManifest({ json, sourcePath }) {
     }
 
     if (node.type === "frame") {
+      normalized.clipsContent =
+        typeof node.clipsContent === "boolean" ? node.clipsContent : true;
       normalized.layout = normalizeLayout(node.layout, `${path}.layout`);
       const children = node.children ?? [];
       if (!Array.isArray(children)) {

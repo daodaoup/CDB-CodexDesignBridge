@@ -32,7 +32,7 @@ export class WorkspaceLeaseManager {
     this.preparingHandoff = false;
   }
 
-  async acquire({ projectKey, force = false }) {
+  async acquire({ projectKey }) {
     if (!projectKey) throw new Error("工作台 lease 缺少项目身份。");
     await this.startControlServer();
     const current = await this.readLease();
@@ -51,7 +51,7 @@ export class WorkspaceLeaseManager {
         this.leaseRoot,
       );
       if (health?.ok) {
-        const prepared = await requestControl(
+        await requestControl(
           current,
           "/handoff/prepare",
           {
@@ -60,26 +60,12 @@ export class WorkspaceLeaseManager {
           },
           this.leaseRoot,
         );
-        if (prepared?.unsentChanges && !force) {
-          await requestControl(
-            current,
-            "/handoff/cancel",
-            { method: "POST" },
-            this.leaseRoot,
-          );
-          return {
-            acquired: false,
-            confirmationRequired: true,
-            reason: "unsent_figma_changes",
-            owner: publicLease(current),
-          };
-        }
         await requestControl(
           current,
           "/shutdown",
           {
             method: "POST",
-            body: { force: Boolean(force) },
+            body: { force: true },
           },
           this.leaseRoot,
         );
@@ -193,17 +179,7 @@ export class WorkspaceLeaseManager {
       return;
     }
     if (request.method === "POST" && url.pathname === "/shutdown") {
-      const body = await readJsonBody(request);
-      const status = this.getStatus();
-      if (status.unsentChanges && !body.force) {
-        sendJson(response, 409, {
-          ok: false,
-          unsentChanges: true,
-          error: "confirmation_required",
-        });
-        return;
-      }
-      await this.onShutdown({ force: Boolean(body.force), handoff: true });
+      await this.onShutdown({ force: true, handoff: true });
       await this.release();
       sendJson(response, 200, { ok: true });
       return;
@@ -365,17 +341,6 @@ async function requestControl(lease, route, { method, body } = {}, leaseRoot) {
     return null;
   } finally {
     clearTimeout(timer);
-  }
-}
-
-async function readJsonBody(request) {
-  const chunks = [];
-  for await (const chunk of request) chunks.push(chunk);
-  if (chunks.length === 0) return {};
-  try {
-    return JSON.parse(Buffer.concat(chunks).toString("utf8"));
-  } catch {
-    return {};
   }
 }
 

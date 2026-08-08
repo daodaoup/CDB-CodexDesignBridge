@@ -14,6 +14,7 @@ test("prepares a hybrid page manifest with stable node ids and safe SVG", () => 
   assert.equal(prepared.pageId, "landing-page");
   assert.deepEqual(prepared.nodeIds, ["landing-root", "hero-copy", "hero-icon"]);
   assert.equal(prepared.root.layout.direction, "vertical");
+  assert.equal(prepared.root.clipsContent, false);
   assert.deepEqual(prepared.root.layout.padding, {
     top: 40,
     right: 40,
@@ -42,6 +43,7 @@ test("prepares a hybrid page manifest with stable node ids and safe SVG", () => 
   });
   assert.deepEqual(pluginPrepared.root.style.strokeWidths, prepared.root.style.strokeWidths);
   assert.deepEqual(pluginPrepared.root.style.effects, prepared.root.style.effects);
+  assert.equal(pluginPrepared.root.clipsContent, false);
 });
 
 test("rejects duplicate ids, unsafe SVG, and unsupported colors", () => {
@@ -110,6 +112,7 @@ function samplePage() {
       type: "frame",
       width: 1440,
       height: 900,
+      clipsContent: false,
       layout: {
         direction: "vertical",
         gap: 24,

@@ -33,7 +33,7 @@ test("a clean workspace yields its lease to the next workspace", async (t) => {
   assert.ok(lease.controlSecretRef);
 });
 
-test("unsent Figma changes require confirmation before takeover", async (t) => {
+test("unsent Figma changes do not block takeover", async (t) => {
   const leaseRoot = await mkdtemp(path.join(os.tmpdir(), "cdb-lease-unsent-"));
   let forcedShutdown = false;
   const first = manager(leaseRoot, {
@@ -47,13 +47,7 @@ test("unsent Figma changes require confirmation before takeover", async (t) => {
   });
 
   await first.acquire({ projectKey: "project-a" });
-  const blocked = await second.acquire({ projectKey: "project-b" });
-  assert.equal(blocked.acquired, false);
-  assert.equal(blocked.confirmationRequired, true);
-  assert.equal(blocked.reason, "unsent_figma_changes");
-  assert.equal(first.status().owned, true);
-
-  const acquired = await second.acquire({ projectKey: "project-b", force: true });
+  const acquired = await second.acquire({ projectKey: "project-b" });
   assert.equal(acquired.acquired, true);
   assert.equal(forcedShutdown, true);
   assert.equal(first.status().owned, false);

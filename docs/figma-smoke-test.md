@@ -88,8 +88,8 @@
 - [ ] 启动器不抢占任务 A 的真实工作台。
 - [ ] 任务 B 预检通过、准备完成后才请求接管。
 - [ ] 任务 A 干净时自动收到优雅关闭；preview/Figma 释放，B 成为唯一 owner。
-- [ ] A 有未发送 Figma 修改时 B 停在确认状态；取消后 A 继续，B 不占连接。
-- [ ] 确认接管后 A 的未发送修改仍留在 Figma，B 获取 lease。
+- [ ] A 有未发送 Figma 修改时，B 仍直接关闭 A 并获取 lease，不出现接管确认。
+- [ ] A 的未发送修改不写回源码，B 成为唯一的 preview/Figma owner。
 - [ ] 杀死旧 owner 后，有效 TTL 内不强抢；过期后可恢复。
 - [ ] lease JSON 不含 control secret；control endpoint 只监听 loopback，错误 secret 返回未授权。
 
