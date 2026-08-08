@@ -1,6 +1,6 @@
 {
   "name": "codex-design-bridge",
-  "version": "0.7.0+codex.20260807165346",
+  "version": "0.7.0+codex.20260808005823",
   "description": "Move single-page designs seamlessly between Codex frontend source and editable Figma frames in either direction.",
   "author": {
     "name": "Local developer"

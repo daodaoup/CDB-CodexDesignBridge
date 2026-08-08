@@ -24,7 +24,10 @@ export class LocalFigmaBridge {
       port = DEFAULT_PORT,
       onFastApply = null,
       onImportPages = null,
+      onResetWorkspace = null,
       runtimeVersion = "",
+      projectName = "",
+      projectKey = "",
     } = {},
   ) {
     this.projectDir = path.resolve(projectDir);
@@ -34,7 +37,11 @@ export class LocalFigmaBridge {
       typeof onFastApply === "function" ? onFastApply : null;
     this.onImportPages =
       typeof onImportPages === "function" ? onImportPages : null;
+    this.onResetWorkspace =
+      typeof onResetWorkspace === "function" ? onResetWorkspace : null;
     this.runtimeVersion = String(runtimeVersion || "");
+    this.projectName = String(projectName || path.basename(this.projectDir));
+    this.projectKey = String(projectKey || "");
     this.httpServer = null;
     this.webSocketServer = null;
     this.clients = new Set();
@@ -131,11 +138,18 @@ export class LocalFigmaBridge {
       lastConnectedAt: this.lastConnectedAt,
       lastError: this.lastError,
       runtimeVersion: this.runtimeVersion,
+      projectName: this.projectName,
+      projectKey: this.projectKey,
       figmaPluginVersions,
       wsUrl: `ws://localhost:${this.port}/ws`,
       port: this.port,
       pageStates: this.catalogEntries(),
     };
+  }
+
+  setWorkspaceIdentity({ projectName = "", projectKey = "" } = {}) {
+    this.projectName = String(projectName || path.basename(this.projectDir));
+    this.projectKey = String(projectKey || "");
   }
 
   setPageCatalog(pages) {
@@ -294,7 +308,8 @@ export class LocalFigmaBridge {
         figmaPluginVersion: client.pluginVersion,
         assets: 0,
         pages: this.pageCatalog.size,
-        projectName: path.basename(this.projectDir),
+        projectName: this.projectName,
+        projectKey: this.projectKey,
         localWorkspace: true,
       });
       for (const page of this.pages.values()) {
@@ -314,6 +329,44 @@ export class LocalFigmaBridge {
           pageId,
           current?.state === "source_changed" ? "conflict" : "figma_changed",
         );
+      }
+      return;
+    }
+    if (message.type === "workspace.reset.request") {
+      if (!this.onResetWorkspace) {
+        sendSocket(client.webSocket, {
+          type: "workspace.reset.result",
+          ok: false,
+          error: "当前工作台不支持从 Figma 重置。",
+        });
+        return;
+      }
+      try {
+        await this.onResetWorkspace();
+        for (const resolveImport of this.pendingImports.values()) {
+          resolveImport({ ok: false, error: "Figma 页面关联已清空。" });
+        }
+        this.pendingImports.clear();
+        this.pendingChangeCapture?.resolve({
+          empty: true,
+          changeCount: 0,
+          snapshotPath: "",
+          relativePath: "",
+        });
+        this.pendingChangeCapture = null;
+        this.pages.clear();
+        this.pageCatalog.clear();
+        this.unsentChanges = false;
+        sendSocket(client.webSocket, {
+          type: "workspace.reset.result",
+          ok: true,
+        });
+      } catch (error) {
+        sendSocket(client.webSocket, {
+          type: "workspace.reset.result",
+          ok: false,
+          error: error instanceof Error ? error.message : String(error),
+        });
       }
       return;
     }
@@ -496,6 +549,8 @@ export class LocalFigmaBridge {
           ok: true,
           token: this.token,
           wsUrl: `ws://localhost:${this.port}/ws`,
+          projectName: this.projectName,
+          projectKey: this.projectKey,
         },
         corsHeaders(request),
       );

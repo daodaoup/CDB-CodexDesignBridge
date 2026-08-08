@@ -281,6 +281,62 @@ test("captures computed SVG paint, gradients, shadows, rotation, and safe text w
   assert.ok(version.width > 23, `expected padded text width, received ${version.width}`);
 });
 
+test("captures CSS border triangles and pseudo-element icon details", async (t) => {
+  const root = await mkdtemp(path.join(os.tmpdir(), "bridge-css-icon-capture-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  await writeFile(
+    path.join(root, "index.html"),
+    [
+      "<!doctype html>",
+      "<style>",
+      "  main { width: 320px; height: 240px; background: #111528; }",
+      "  .play { width: 0; height: 0; color: rgb(250, 250, 255); border-top: 6px solid transparent; border-bottom: 6px solid transparent; border-left: 9px solid currentColor; }",
+      "  .queue, .queue::before, .queue::after { width: 15px; height: 2px; border-radius: 2px; background: rgb(174, 180, 205); }",
+      "  .queue { position: relative; display: block; margin-top: 30px; }",
+      "  .queue::before, .queue::after { content: ''; position: absolute; left: 0; }",
+      "  .queue::before { top: -5px; width: 11px; }",
+      "  .queue::after { top: 5px; width: 8px; }",
+      "  .pause { position: relative; display: block; width: 3px; height: 13px; margin-top: 30px; color: rgb(250, 250, 255); border-radius: 2px; background: currentColor; }",
+      "  .pause::after { content: ''; position: absolute; left: 7px; top: 0; width: 3px; height: 13px; border-radius: 2px; background: currentColor; }",
+      "</style>",
+      '<main data-codex-root data-codex-id="icon-root">',
+      '  <span class="play" data-codex-id="play-icon"></span>',
+      '  <span class="queue" data-codex-id="queue-icon"></span>',
+      '  <span class="pause" data-codex-id="pause-icon"></span>',
+      "</main>",
+    ].join("\n"),
+    "utf8",
+  );
+
+  const preview = await startProjectPreview({ rootDirectory: root });
+  t.after(() => preview.stop());
+  const captured = await captureLocalPreview({
+    previewUrl: preview.url,
+    projectDir: root,
+  });
+  const play = findNode(captured.manifest.root, "play-icon");
+  const queue = findNode(captured.manifest.root, "queue-icon");
+  const pause = findNode(captured.manifest.root, "pause-icon");
+
+  assert.equal(play.type, "frame");
+  assert.equal(play.style.stroke, undefined);
+  assert.equal(play.children[0].type, "svg");
+  assert.match(play.children[0].svg, /<path/);
+  assert.match(play.children[0].svg, /#FAFAFF/);
+  assert.deepEqual(
+    queue.children.map((node) => [node.id, node.width, node.y]),
+    [
+      ["queue-icon-before", 11, -5],
+      ["queue-icon-after", 8, 5],
+    ],
+  );
+  assert.equal(queue.clipsContent, false);
+  assert.equal(queue.children[0].style.fill, "#AEB4CD");
+  assert.equal(pause.children[0].id, "pause-icon-after");
+  assert.equal(pause.children[0].x, 7);
+  assert.equal(pause.children[0].style.fill, "#FAFAFF");
+});
+
 test("expands a same-origin external SVG into one editable complex SVG node", async (t) => {
   const root = await mkdtemp(path.join(os.tmpdir(), "bridge-external-svg-"));
   t.after(() => rm(root, { recursive: true, force: true }));

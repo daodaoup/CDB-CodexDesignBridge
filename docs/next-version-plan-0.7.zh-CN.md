@@ -19,7 +19,7 @@
 | Image/SVG | 同源小型位图作为可编辑图片填充；安全 SVG 保持可编辑 | 捕获、导入与安全校验回归 |
 | 三方版本身份 | CDB 运行时保留完整候选，工作台显示正式版本，Figma 插件单独上报并校验 `0.7.0` | Protocol 14 构建错配拒绝与状态暴露回归 |
 
-自动化基线：`npm.cmd run check` 通过；100 项测试中 94 项通过、6 项 macOS 专用测试在 Windows 跳过、0 失败。真实 Figma Desktop 与 macOS 仍是发布门禁，不以自动化替代。
+自动化基线：`npm.cmd run check` 通过；102 项测试中 96 项通过、6 项 macOS 专用测试在 Windows 跳过、0 失败。真实 Figma Desktop 与 macOS 仍是发布门禁，不以自动化替代。
 
 ## 1. 产品结论
 

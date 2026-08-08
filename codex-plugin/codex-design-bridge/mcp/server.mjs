@@ -1272,6 +1272,45 @@ async function endDesignSession(projectDir, force = false) {
   return publicState(states.get(project) || state);
 }
 
+async function clearFigmaLinksForWorkspace(projectDir) {
+  const project = await normalizeProjectDir(projectDir);
+  const state = states.get(project) || (await getWorkspace(project));
+  const updated = {
+    ...state,
+    pages: state.pages.map((page) => ({
+      ...page,
+      figmaReady: false,
+      syncState: "not_imported",
+      lastSentAt: "",
+      nodeCount: 0,
+    })),
+    phase: state.previewUrl ? "ready" : state.phase,
+    sessionActive: true,
+    figmaUrl: "",
+    figmaReady: false,
+    figmaConnected: true,
+    bridgeReady: true,
+    unsentChanges: false,
+    needsEndConfirmation: false,
+    needsHandoffConfirmation: false,
+    connectionIssue: "",
+    changeCount: 0,
+    appliedChangeCount: 0,
+    pendingChangeCount: 0,
+    changedFiles: [],
+    summary: "Figma 页面关联与传输记录已清空。",
+    importSummary: null,
+    designSnapshotPath: "",
+    undoAvailable: false,
+    lastTransactionId: "",
+    message: "Figma 关联数据已清空；Codex 项目与预览仍保持打开。",
+    updatedAt: new Date().toISOString(),
+  };
+  states.set(project, updated);
+  await writeBinding(project, updated);
+  return publicState(updated);
+}
+
 async function shutdownWorkspaceResources(
   project,
   { handoff = false, releaseLease = false } = {},
@@ -1930,8 +1969,14 @@ async function captureLocalFigmaChanges(projectDir) {
 }
 
 async function ensureLocalFigmaBridge(projectDir) {
+  const workspace = states.get(projectDir);
+  const identity = {
+    projectName: workspace?.projectName || path.basename(projectDir),
+    projectKey: workspace?.preflightReport?.projectKey || "",
+  };
   const existing = figmaBridges.get(projectDir);
   if (existing) {
+    existing.setWorkspaceIdentity(identity);
     existing.setPageCatalog(states.get(projectDir)?.pages || []);
     return existing;
   }
@@ -1942,9 +1987,11 @@ async function ensureLocalFigmaBridge(projectDir) {
   const bridge = new LocalFigmaBridge(projectDir, {
     port: Number.isFinite(configuredPort) ? configuredPort : 9847,
     runtimeVersion: PLUGIN_VERSION,
+    ...identity,
     onFastApply: (result) => recordFastApply(projectDir, result),
     onImportPages: (pageIds) =>
       sendPreviewToLocalFigma(projectDir, pageIds),
+    onResetWorkspace: () => clearFigmaLinksForWorkspace(projectDir),
   });
   try {
     await bridge.start();

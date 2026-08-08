@@ -30,15 +30,18 @@ test("development manifest and UI use Figma-compatible localhost URLs", async ()
   assert.match(ui, /发送修改给 Codex/);
   assert.match(ui, /http:\/\/localhost:9847\/api\/pair/);
   assert.match(ui, /ws:\/\/localhost:9847\/ws/);
-  assert.equal(ui.match(/<button\b/g)?.length, 6);
+  assert.equal(ui.match(/<button\b/g)?.length, 3);
   assert.match(ui, /用选中稿创建页面/);
-  assert.match(ui, /CDB 页面/);
+  assert.match(ui, /id="reset-workspace"/);
+  assert.match(ui, /Codex 项目、源码和 Figma 画布内容都会保持原样/);
+  assert.doesNotMatch(ui, /<h1\b/);
+  assert.doesNotMatch(ui, /在 Figma 中调整细节/);
   assert.match(ui, new RegExp(`FIGMA_PLUGIN_VERSION = "${formalVersion}"`));
-  assert.match(ui, new RegExp(`V ${formalVersion}`));
-  assert.match(ui, /定位 Frame/);
-  assert.match(ui, /导入当前/);
-  assert.match(ui, /导入选中/);
-  assert.match(ui, /更新全部/);
+  assert.match(ui, /当前唯一活动工作台/);
+  assert.doesNotMatch(ui, /定位 Frame/);
+  assert.doesNotMatch(ui, /导入当前/);
+  assert.doesNotMatch(ui, /导入选中/);
+  assert.doesNotMatch(ui, /更新全部/);
   assert.match(ui, /两边均有修改/);
   assert.match(ui, /源码和 Figma 在上次同步后都发生了修改/);
   assert.doesNotMatch(ui, /Connection token|Bridge WebSocket|<details/);
@@ -67,10 +70,7 @@ test("plugin UI auto-connects and reports a fast update without settings UI", as
       "result",
       "catalog-list",
       "catalog-count",
-      "locate-frame",
-      "import-current",
-      "import-selected",
-      "update-all",
+      "reset-workspace",
       "page-count",
       "asset-count",
       "feedback-count",
@@ -96,11 +96,14 @@ test("plugin UI auto-connects and reports a fast update without settings UI", as
     }
   }
 
-  const window = {};
+  const window = { confirm: () => true };
   vm.runInNewContext(script, {
     document: {
       getElementById(id) {
         return elements.get(id);
+      },
+      createElement() {
+        return new MockElement();
       },
     },
     window,
@@ -133,7 +136,7 @@ test("plugin UI auto-connects and reports a fast update without settings UI", as
   );
   sockets[0].readyState = MockWebSocket.OPEN;
   sockets[0].onopen();
-  assert.equal(elements.get("status-text").textContent, "已连接到 Codex");
+  assert.equal(elements.get("status-text").textContent, "已连接 · Codex");
   assert.equal(
     JSON.parse(sockets[0].lastSent).type,
     "plugin.hello",
@@ -151,6 +154,7 @@ test("plugin UI auto-connects and reports a fast update without settings UI", as
   });
   assert.equal(elements.get("capture").disabled, false);
   assert.equal(elements.get("capture").textContent, "发送设计给 Codex");
+  assert.equal(elements.get("status-text").textContent, "已连接 · frontend");
   elements.get("capture").dispatch("click");
   assert.ok(
     parentMessages.some(
@@ -168,6 +172,20 @@ test("plugin UI auto-connects and reports a fast update without settings UI", as
     elements.get("capture").textContent,
     "发送修改给 Codex",
   );
+  sockets[0].onmessage({
+    data: JSON.stringify({
+      type: "page.catalog",
+      pages: [{
+        id: "preview-page",
+        name: "Preview",
+        entry: "index.html",
+        route: "/",
+        state: "synced",
+      }],
+    }),
+  });
+  assert.equal(elements.get("catalog-count").textContent, "frontend · 1 个");
+  assert.equal(elements.get("catalog-list").children.length, 1);
   elements.get("capture").dispatch("click");
   assert.ok(
     parentMessages.some(
@@ -213,6 +231,29 @@ test("plugin UI auto-connects and reports a fast update without settings UI", as
   assert.equal(elements.get("status-text").textContent, "已更新 2 处修改");
   assert.equal(elements.get("status-detail").textContent, "Codex 页面代码已经保存");
   assert.match(elements.get("result").textContent, /src\/App\.css · 0\.2 秒/);
+  elements.get("reset-workspace").dispatch("click");
+  assert.equal(JSON.parse(sockets[0].lastSent).type, "workspace.reset.request");
+  sockets[0].onmessage({
+    data: JSON.stringify({ type: "workspace.reset.result", ok: true }),
+  });
+  assert.ok(
+    parentMessages.some(
+      (message) => message.pluginMessage?.type === "workspace.reset",
+    ),
+  );
+  window.onmessage({
+    data: { pluginMessage: { type: "workspace.reset.complete" } },
+  });
+  assert.equal(elements.get("catalog-count").textContent, "frontend · 0 个");
+  assert.equal(elements.get("catalog-list").children.length, 1);
+  assert.match(
+    elements.get("catalog-list").children[0].textContent,
+    /当前项目没有可用页面/,
+  );
+  assert.equal(elements.get("status-text").textContent, "已连接 · frontend");
+  assert.match(elements.get("status-detail").textContent, /Codex 项目仍保持打开/);
+  assert.equal(elements.get("capture").disabled, true);
+  assert.equal(elements.get("reset-workspace").disabled, true);
 });
 
 test("Figma plugin handles SVG feedback and hybrid page ChangeSets without destructive refreshes", async () => {
@@ -2045,6 +2086,24 @@ test("Figma plugin handles SVG feedback and hybrid page ChangeSets without destr
   assert.equal(failedResult.ok, false);
   assert.match(failedResult.error, /Synthetic import failure/);
   assert.equal(findImportedPageRoot(failedPage), null);
+
+  const preservedRoot = figma.root.findOne(
+    (node) => node.getPluginData("figmaSyncRole") === "page-root",
+  );
+  assert.ok(preservedRoot);
+  figma.ui.onmessage({ type: "workspace.reset" });
+  await waitFor(() =>
+    messages.some((message) => message.type === "workspace.reset.complete"),
+  );
+  assert.equal(preservedRoot.removed, false);
+  assert.equal(preservedRoot.getPluginData("figmaSyncRole"), "");
+  assert.equal(preservedRoot.getPluginData("figmaSyncPageId"), "");
+  assert.equal(
+    figma.root.findAll(
+      (node) => node.getPluginData("figmaSyncRole") === "page-root",
+    ).length,
+    0,
+  );
 });
 
 test("Figma plugin seeds an empty Codex page from one selected frame", async () => {
@@ -2603,7 +2662,16 @@ class MockElement {
     this.textContent = "";
     this.className = "";
     this.disabled = false;
+    this.children = [];
     this.listeners = new Map();
+  }
+
+  append(...children) {
+    this.children.push(...children);
+  }
+
+  replaceChildren(...children) {
+    this.children = [...children];
   }
 
   addEventListener(type, callback) {

@@ -172,7 +172,7 @@ test("publishes the design workspace as an MCP Apps resource", async (t) => {
   assert.match(resource.contents[0].text, /import_html_project/);
   assert.match(resource.contents[0].text, /collectDroppedFiles/);
   assert.match(resource.contents[0].text, /id="sendAllButton"/);
-  assert.match(resource.contents[0].text, /id="primaryButtonLabel">当前页面</);
+  assert.match(resource.contents[0].text, /id="primaryButtonLabel">当前页面/);
   assert.match(resource.contents[0].text, /全部发送到 Figma/);
   assert.match(resource.contents[0].text, /id="receiveButton"/);
   assert.match(resource.contents[0].text, /让 Codex 处理/);
@@ -240,7 +240,7 @@ test("publishes the design workspace as an MCP Apps resource", async (t) => {
   assert.match(resource.contents[0].text, /new URL\(pagePath, `\$\{base\.origin\}\/`\)/);
   assert.match(
     resource.contents[0].text,
-    /function canUseLivePreview\(\)\s*\{[\s\S]*?return false;/,
+    /function canUseLivePreview\(\)[\s\S]*?return false;/,
   );
   assert.match(resource.contents[0].text, /mode: requestedMode/);
   assert.match(resource.contents[0].text, /\? "inline" : "fullscreen"/);
@@ -699,6 +699,79 @@ test("ends cleanly and confirms only when Figma has unsent changes", async (t) =
   assert.equal(ended.structuredContent.workspace.previewUrl, "");
   assert.equal(ended.structuredContent.workspace.needsEndConfirmation, false);
   assert.equal(ended.structuredContent.workspace.summary, "本次设计已结束。");
+});
+
+test("clears Figma links without closing the active Codex project", async (t) => {
+  const projectDir = await mkdtemp(
+    path.join(os.tmpdir(), "design-workspace-reset-"),
+  );
+  const sourcePath = path.join(projectDir, "index.html");
+  const source =
+    '<!doctype html><title>Reset lifecycle</title><main data-codex-root data-codex-id="reset-root"><h1 data-codex-id="reset-title">Keep me</h1></main>';
+  await writeFile(sourcePath, source, "utf8");
+  const bridgePort = await getFreePort();
+  const client = startClient({
+    CODEX_DESIGN_BRIDGE_PORT: String(bridgePort),
+  });
+  t.after(async () => {
+    await client.close();
+    await rm(projectDir, { recursive: true, force: true });
+  });
+
+  await client.request("initialize", {
+    protocolVersion: "2025-06-18",
+    capabilities: {},
+    clientInfo: { name: "test", version: "1.0.0" },
+  });
+  const opened = await client.request("tools/call", {
+    name: "open_design_workspace",
+    arguments: { projectDir },
+  });
+  assert.equal(opened.structuredContent.workspace.sessionActive, true);
+  assert.equal(opened.structuredContent.workspace.pages.length, 1);
+  const activePageId = opened.structuredContent.workspace.activePageId;
+  const previewUrl = opened.structuredContent.workspace.previewUrl;
+
+  const pairing = await fetch(`http://localhost:${bridgePort}/api/pair`, {
+    headers: { origin: "https://www.figma.com" },
+  }).then((response) => response.json());
+  const socket = new WebSocket(`${pairing.wsUrl}?token=${pairing.token}`, {
+    origin: "https://www.figma.com",
+  });
+  await new Promise((resolve, reject) => {
+    socket.once("open", resolve);
+    socket.once("error", reject);
+  });
+  const pluginReady = waitForSocketMessage(socket, "plugin.ready");
+  socket.send(JSON.stringify({
+    type: "plugin.hello",
+    protocolVersion: 14,
+    pluginVersion: manifestVersion().split("+")[0],
+    importedAssetIds: [],
+    importedPageIds: [],
+    unsentChanges: true,
+  }));
+  await pluginReady;
+
+  const resetResult = waitForSocketMessage(socket, "workspace.reset.result");
+  socket.send(JSON.stringify({ type: "workspace.reset.request" }));
+  assert.equal((await resetResult).ok, true);
+
+  const reset = await client.request("tools/call", {
+    name: "get_design_workspace_state",
+    arguments: { projectDir },
+  });
+  assert.equal(reset.structuredContent.workspace.phase, "ready");
+  assert.equal(reset.structuredContent.workspace.sessionActive, true);
+  assert.equal(reset.structuredContent.workspace.pages.length, 1);
+  assert.equal(reset.structuredContent.workspace.pages[0].syncState, "not_imported");
+  assert.equal(reset.structuredContent.workspace.pages[0].figmaReady, false);
+  assert.equal(reset.structuredContent.workspace.activePageId, activePageId);
+  assert.equal(reset.structuredContent.workspace.previewUrl, previewUrl);
+  assert.equal(reset.structuredContent.workspace.figmaConnected, true);
+  assert.equal(reset.structuredContent.workspace.unsentChanges, false);
+  assert.equal(await readFile(sourcePath, "utf8"), source);
+  assert.equal(socket.readyState, WebSocket.OPEN);
 });
 
 test("opens a static frontend without showing a desktop process", async (t) => {

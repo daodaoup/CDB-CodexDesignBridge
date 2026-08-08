@@ -458,6 +458,165 @@ export const CAPTURE_PAGE_SCRIPT = String.raw`
     return result;
   }
 
+  function cssPixels(value) {
+    const parsed = Number.parseFloat(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+
+  function borderMetrics(style) {
+    return {
+      top: cssPixels(style.borderTopWidth),
+      right: cssPixels(style.borderRightWidth),
+      bottom: cssPixels(style.borderBottomWidth),
+      left: cssPixels(style.borderLeftWidth),
+    };
+  }
+
+  function cssBoxSize(style) {
+    const borders = borderMetrics(style);
+    const declaredWidth = cssPixels(style.width);
+    const declaredHeight = cssPixels(style.height);
+    const borderBox = String(style.boxSizing || "").toLowerCase() === "border-box";
+    return {
+      width: borderBox
+        ? declaredWidth
+        : declaredWidth + borders.left + borders.right,
+      height: borderBox
+        ? declaredHeight
+        : declaredHeight + borders.top + borders.bottom,
+    };
+  }
+
+  function borderTriangle(style) {
+    const borders = borderMetrics(style);
+    const declaredWidth = cssPixels(style.width);
+    const declaredHeight = cssPixels(style.height);
+    const borderBox = String(style.boxSizing || "").toLowerCase() === "border-box";
+    const hasEmptyContentBox =
+      (declaredWidth <= 0.5 && declaredHeight <= 0.5) ||
+      (borderBox &&
+        declaredWidth <= borders.left + borders.right + 0.5 &&
+        declaredHeight <= borders.top + borders.bottom + 0.5);
+    if (!hasEmptyContentBox) return null;
+    const sides = ["top", "right", "bottom", "left"];
+    const colors = Object.fromEntries(
+      sides.map((side) => {
+        const property =
+          "border" + side[0].toUpperCase() + side.slice(1) + "Color";
+        return [side, rgbaToHex(style[property], true)];
+      })
+    );
+    const opaqueSides = sides.filter(
+      (side) =>
+        borders[side] > 0 &&
+        colors[side] &&
+        !colors[side].endsWith("00")
+    );
+    if (opaqueSides.length !== 1) return null;
+    const side = opaqueSides[0];
+    const width = borders.left + borders.right;
+    const height = borders.top + borders.bottom;
+    if (width <= 0.5 || height <= 0.5) return null;
+    const paths = {
+      left: "M0 0L" + round(width) + " " + round(height / 2) + "L0 " + round(height) + "Z",
+      right: "M" + round(width) + " 0L0 " + round(height / 2) + "L" + round(width) + " " + round(height) + "Z",
+      top: "M0 0L" + round(width / 2) + " " + round(height) + "L" + round(width) + " 0Z",
+      bottom: "M0 " + round(height) + "L" + round(width / 2) + " 0L" + round(width) + " " + round(height) + "Z",
+    };
+    return {
+      width,
+      height,
+      svg:
+        '<svg xmlns="http://www.w3.org/2000/svg" width="' + round(width) +
+        '" height="' + round(height) + '" viewBox="0 0 ' + round(width) +
+        " " + round(height) + '"><path d="' + paths[side] + '" fill="' +
+        colors[side] + '"/></svg>',
+    };
+  }
+
+  function pseudoExists(style) {
+    const content = String(style.content || "").trim().toLowerCase();
+    return content && content !== "none" && content !== "normal";
+  }
+
+  function pseudoOffset(style, hostWidth, hostHeight, width, height) {
+    const left = String(style.left || "auto");
+    const right = String(style.right || "auto");
+    const top = String(style.top || "auto");
+    const bottom = String(style.bottom || "auto");
+    let x = left !== "auto"
+      ? cssPixels(left)
+      : right !== "auto"
+        ? hostWidth - cssPixels(right) - width
+        : 0;
+    let y = top !== "auto"
+      ? cssPixels(top)
+      : bottom !== "auto"
+        ? hostHeight - cssPixels(bottom) - height
+        : 0;
+    let rotation = 0;
+    if (style.transform && style.transform !== "none") {
+      try {
+        const matrix = new DOMMatrixReadOnly(style.transform);
+        x += matrix.e || 0;
+        y += matrix.f || 0;
+        rotation = round((Math.atan2(matrix.b, matrix.a) * 180) / Math.PI);
+      } catch {}
+    }
+    return { x: round(x), y: round(y), rotation };
+  }
+
+  function pseudoDefinition(element, pseudo, hostWidth, hostHeight) {
+    if (nodeCount >= MAX_NODES) return null;
+    const style = getComputedStyle(element, pseudo);
+    if (!pseudoExists(style) || style.display === "none" || style.visibility === "hidden") {
+      return null;
+    }
+    const triangle = borderTriangle(style);
+    const size = triangle || cssBoxSize(style);
+    if (size.width <= 0.5 || size.height <= 0.5) return null;
+    const kind = pseudo === "::before" ? "before" : "after";
+    const offset = pseudoOffset(style, hostWidth, hostHeight, size.width, size.height);
+    const common = {
+      id: uniqueId(element, kind),
+      name: (element.getAttribute("aria-label") || element.getAttribute("data-codex-id") || element.tagName.toLowerCase()) + " " + kind,
+      sourceRef: null,
+      width: positive(size.width),
+      height: positive(size.height),
+      x: offset.x,
+      y: offset.y,
+      opacity: Math.max(0, Math.min(1, Number.parseFloat(style.opacity) || 1)),
+      rotation: offset.rotation,
+      style: {},
+    };
+    if (triangle) {
+      nodeCount += 1;
+      return { ...common, type: "svg", svg: triangle.svg };
+    }
+    const decoration = boxStyle(style);
+    if (Object.keys(decoration).length === 0) return null;
+    nodeCount += 1;
+    return {
+      ...common,
+      type: "frame",
+      clipsContent: false,
+      style: decoration,
+      layout: {
+        kind: "none",
+        direction: "none",
+        wrap: false,
+        gap: 0,
+        counterGap: 0,
+        padding: { top: 0, right: 0, bottom: 0, left: 0 },
+        align: "start",
+        justify: "start",
+        primarySizing: "fixed",
+        counterSizing: "fixed",
+      },
+      children: [],
+    };
+  }
+
   function parseBackdropBlur(value) {
     if (!value || value === "none") return null;
     const match = String(value).match(/blur\(\s*([\d.]+)px\s*\)/i);
@@ -999,6 +1158,9 @@ export const CAPTURE_PAGE_SCRIPT = String.raw`
       type: "frame",
       name: element.getAttribute("aria-label") || id,
       sourceRef: ref,
+      clipsContent:
+        ["hidden", "clip"].includes(style.overflowX) ||
+        ["hidden", "clip"].includes(style.overflowY),
       width: geometry.width,
       height: geometry.height,
       x: isRoot ? 0 : round(rect.left - parentRect.left),
@@ -1010,6 +1172,38 @@ export const CAPTURE_PAGE_SCRIPT = String.raw`
       layout: layoutDefinition(element, style),
       children: [],
     };
+
+    const triangle = borderTriangle(style);
+    if (triangle) {
+      delete node.style.stroke;
+      delete node.style.strokeWidth;
+      delete node.style.strokeWidths;
+      if (nodeCount < MAX_NODES) {
+        nodeCount += 1;
+        node.children.push({
+          id: uniqueId(element, "border-shape"),
+          type: "svg",
+          name: (element.getAttribute("aria-label") || id) + " border shape",
+          sourceRef: null,
+          width: positive(triangle.width),
+          height: positive(triangle.height),
+          x: 0,
+          y: 0,
+          opacity: 1,
+          rotation: 0,
+          style: {},
+          svg: triangle.svg,
+        });
+      }
+    }
+
+    const before = pseudoDefinition(
+      element,
+      "::before",
+      geometry.width,
+      geometry.height,
+    );
+    if (before) node.children.push(before);
 
     const repeatedGrid = repeatedGridFallback(
       style,
@@ -1045,6 +1239,13 @@ export const CAPTURE_PAGE_SCRIPT = String.raw`
       if (definition) node.children.push(definition);
     }
     node.children.push(...directTextChildren(element, rect, style));
+    const after = pseudoDefinition(
+      element,
+      "::after",
+      geometry.width,
+      geometry.height,
+    );
+    if (after) node.children.push(after);
     return node;
   }
 

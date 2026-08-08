@@ -253,9 +253,15 @@ test("local Figma bridge auto-pairs, imports a page, and stores changes", async 
 test("publishes manifest pages and accepts page-list import requests", async (t) => {
   const projectDir = await mkdtemp(path.join(os.tmpdir(), "local-figma-catalog-"));
   const importedRequests = [];
+  let resetCount = 0;
   const bridge = new LocalFigmaBridge(projectDir, {
     port: 0,
+    projectName: "Music workspace",
+    projectKey: "music-project-key",
     onImportPages: async (pageIds) => importedRequests.push(pageIds),
+    onResetWorkspace: async () => {
+      resetCount += 1;
+    },
   });
   bridge.setPageCatalog([
     {
@@ -284,6 +290,8 @@ test("publishes manifest pages and accepts page-list import requests", async (t)
   const pairing = await fetch(`http://localhost:${bridge.status().port}/api/pair`, {
     headers: { origin: "https://www.figma.com" },
   }).then((response) => response.json());
+  assert.equal(pairing.projectName, "Music workspace");
+  assert.equal(pairing.projectKey, "music-project-key");
   const socket = new WebSocket(`${pairing.wsUrl}?token=${pairing.token}`, {
     origin: "https://www.figma.com",
   });
@@ -302,7 +310,9 @@ test("publishes manifest pages and accepts page-list import requests", async (t)
       changedPageIds: ["settings"],
     }),
   );
-  await inbox.next("plugin.ready");
+  const ready = await inbox.next("plugin.ready");
+  assert.equal(ready.projectName, "Music workspace");
+  assert.equal(ready.projectKey, "music-project-key");
   const catalog = await inbox.next("page.catalog");
   assert.equal(catalog.pages.length, 2);
   assert.equal(
@@ -320,6 +330,13 @@ test("publishes manifest pages and accepts page-list import requests", async (t)
   assert.equal(result.ok, true);
   assert.deepEqual(result.pageIds, ["home"]);
   assert.deepEqual(importedRequests, [["home"]]);
+
+  socket.send(JSON.stringify({ type: "workspace.reset.request" }));
+  const reset = await inbox.next("workspace.reset.result");
+  assert.equal(reset.ok, true);
+  assert.equal(resetCount, 1);
+  assert.equal(bridge.status().unsentChanges, false);
+  assert.deepEqual(bridge.status().pageStates, []);
 });
 
 test("accepts a Figma-first page without importing a Codex page first", async (t) => {

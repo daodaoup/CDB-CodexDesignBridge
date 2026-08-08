@@ -7,7 +7,7 @@ Codex Design Bridge（简称 CDB）把本地前端页面、Codex 和 Figma Deskt
 CDB 使用本机回环连接，不依赖官方 Figma MCP，也不消耗官方 Figma MCP 配额。
 
 当前公开版本：`0.7.0`  
-Codex 插件构建：`0.7.0+codex.20260807151937`
+Codex 插件构建：`0.7.0+codex.20260808005823`
 
 > 0.7.0 源码和自动化测试已经完成，但真实 Codex Apps UI、Figma Desktop 往返和 macOS 安装仍属于发布验收门禁。自动化通过不等于桌面链路已经完整验收。
 
@@ -20,6 +20,7 @@ Codex 插件构建：`0.7.0+codex.20260807151937`
 - 支持文字、填充、描边、尺寸、透明度、圆角和常用排版属性回写。
 - 支持 Auto Layout 与 CSS Flex、基础 Grid 的双向映射。
 - 支持受约束的节点重排和跨父级移动，并在真实预览中验证结果。
+- 支持将 CSS 边框三角形及简单 `::before` / `::after` 图标细节转换为可见的 Figma 图层。
 - 多文件事务写入、安全回滚和冲突保护 Undo。
 
 ## 安装前准备
@@ -36,7 +37,7 @@ Codex 插件构建：`0.7.0+codex.20260807151937`
 可以克隆仓库：
 
 ```bash
-git clone <你的仓库地址>
+git clone https://github.com/daodaoup/codex-design-bridge.git
 cd codex-design-bridge
 ```
 
@@ -162,7 +163,7 @@ npm ci
 npm run check
 ```
 
-当前 Windows 验证结果：100 项测试，94 通过、0 失败、6 项 macOS 专用用例跳过。仓库检查还会阻止误提交本机缓存、运行状态、发布 ZIP 和绝对路径。
+当前 Windows 验证结果：102 项测试，96 通过、0 失败、6 项 macOS 专用用例跳过。仓库检查还会阻止误提交本机缓存、运行状态、发布 ZIP 和绝对路径。
 
 ## 文档
 

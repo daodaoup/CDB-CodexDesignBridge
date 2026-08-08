@@ -274,6 +274,10 @@ async function handleUiMessage(message) {
       figma.viewport.scrollAndZoomIntoView([root]);
       return;
     }
+    if (message.type === "workspace.reset") {
+      resetWorkspaceAssociations();
+      return;
+    }
     if (message.type === "page.seed.capture") {
       await captureSelectedPageSeed(message);
       return;
@@ -313,6 +317,51 @@ async function handleUiMessage(message) {
       error: error instanceof Error ? error.message : String(error),
     });
   }
+}
+
+function resetWorkspaceAssociations() {
+  suppressChangesUntil = Date.now() + 800;
+  clearTimeout(pageStatusTimer);
+  pageStatusTimer = null;
+  for (const pending of pendingFlushes.values()) {
+    clearTimeout(pending.timer);
+  }
+  pendingFlushes.clear();
+  snapshots.clear();
+  trackedPageFigmaNodeIds.clear();
+
+  const pageKeys = [
+    PAGE_ID_KEY,
+    PAGE_NODE_ID_KEY,
+    PAGE_NODE_TYPE_KEY,
+    PAGE_SOURCE_REF_KEY,
+    PAGE_LAYOUT_META_KEY,
+    PAGE_LAYOUT_ITEM_KEY,
+    PAGE_BASELINE_KEY,
+    PAGE_SVG_BASELINE_KEY,
+    PAGE_ANNOTATION_BASELINE_KEY,
+    PAGE_STRUCTURE_BASELINE_KEY,
+    PAGE_VECTOR_INSERT_VERSION_KEY,
+  ];
+  const roots = figma.root.findAll(
+    (node) => node.getPluginData?.(ROLE_KEY) === ROLE_PAGE_ROOT,
+  );
+  for (const root of roots) {
+    for (const node of [root, ...root.findAll(() => true)]) {
+      const role = node.getPluginData?.(ROLE_KEY);
+      if (role === ROLE_PAGE_ROOT || role === ROLE_PAGE_NODE) {
+        node.setPluginData(ROLE_KEY, "");
+        node.setPluginData(SOURCE_HASH_KEY, "");
+        for (const key of pageKeys) node.setPluginData(key, "");
+      }
+    }
+  }
+  lastReportedUnsentChanges = false;
+  figma.currentPage.selection = [];
+  figma.ui.postMessage({
+    type: "workspace.reset.complete",
+    preservedFrames: roots.length,
+  });
 }
 
 async function loadConnectionSettings() {
@@ -604,6 +653,7 @@ async function reconcilePageNode({
     if (!("children" in node)) {
       throw new Error(`Page frame ${definition.id} is not editable.`);
     }
+    node.clipsContent = definition.clipsContent;
     applyFrameLayout(node, definition.layout);
     applyNodeStyle(node, definition.style, { clearFill: true });
     const existingById = new Map(
@@ -720,6 +770,7 @@ async function createPageNode({
   setPageNodeData(node, page, definition, isRoot);
 
   if (definition.type === "frame") {
+    node.clipsContent = definition.clipsContent;
     applyFrameLayout(node, definition.layout);
     applyNodeStyle(node, definition.style, { clearFill: true });
     for (const childDefinition of definition.children) {
