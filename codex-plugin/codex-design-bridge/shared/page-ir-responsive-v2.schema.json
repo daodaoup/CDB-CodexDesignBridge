@@ -1,0 +1,259 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codex-design-bridge.local/schemas/page-ir-responsive-v2.schema.json",
+  "title": "Codex Design Bridge Page IR Responsive v2",
+  "type": "object",
+  "required": [
+    "schemaVersion", "protocolVersion", "identity", "pageId", "projectKey", "name", "rootId",
+    "origin", "designViewport", "runtimeViewports", "previewScale", "breakpoints", "nodes",
+    "degradations", "irHash"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 2, "x-cdb-owner": "system" },
+    "protocolVersion": { "const": 16, "x-cdb-owner": "system" },
+    "identity": { "$ref": "#/$defs/identity", "x-cdb-owner": "system" },
+    "pageId": { "$ref": "#/$defs/id", "x-cdb-owner": "system" },
+    "projectKey": { "type": "string", "maxLength": 256, "x-cdb-owner": "system" },
+    "name": { "type": "string", "maxLength": 160, "x-cdb-owner": "shared" },
+    "rootId": { "$ref": "#/$defs/id", "x-cdb-owner": "system" },
+    "origin": { "$ref": "#/$defs/origin", "x-cdb-owner": "system" },
+    "designViewport": { "$ref": "#/$defs/designViewport", "x-cdb-owner": "figma" },
+    "runtimeViewports": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 6,
+      "items": { "$ref": "#/$defs/runtimeViewport" },
+      "x-cdb-owner": "html"
+    },
+    "previewScale": { "$ref": "#/$defs/previewScale", "x-cdb-owner": "system" },
+    "breakpoints": {
+      "type": "array",
+      "maxItems": 32,
+      "items": { "$ref": "#/$defs/breakpoint" },
+      "x-cdb-owner": "shared"
+    },
+    "nodes": {
+      "type": "object",
+      "minProperties": 1,
+      "maxProperties": 500,
+      "propertyNames": { "$ref": "#/$defs/id" },
+      "additionalProperties": { "$ref": "#/$defs/node" },
+      "x-cdb-owner": "shared"
+    },
+    "degradations": {
+      "type": "array",
+      "maxItems": 500,
+      "items": { "$ref": "#/$defs/degradation" },
+      "x-cdb-owner": "shared"
+    },
+    "irHash": { "$ref": "#/$defs/sha256", "x-cdb-owner": "system" }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9._-]{0,127}$" },
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "identity": {
+      "type": "object",
+      "required": ["kind", "generation", "exactBuild"],
+      "properties": {
+        "kind": { "const": "cdb-page-ir-responsive-v2" },
+        "generation": { "const": "0.9" },
+        "exactBuild": { "type": "string", "pattern": "^0\\.9\\.0\\+codex\\.[0-9]{14}$", "maxLength": 160 }
+      },
+      "additionalProperties": false
+    },
+    "origin": {
+      "type": "object",
+      "required": ["kind", "figmaFileKey", "rootNodeId", "rootNodeName", "sourceFile", "sourceSelector"],
+      "properties": {
+        "kind": { "enum": ["html", "figma", "mixed"] },
+        "figmaFileKey": { "type": "string", "maxLength": 256 },
+        "rootNodeId": { "type": "string", "maxLength": 128 },
+        "rootNodeName": { "type": "string", "maxLength": 256 },
+        "sourceFile": { "type": "string", "maxLength": 500 },
+        "sourceSelector": { "type": "string", "maxLength": 500 }
+      },
+      "additionalProperties": false
+    },
+    "designViewport": {
+      "type": "object",
+      "required": ["width", "height"],
+      "properties": {
+        "width": { "type": "number", "exclusiveMinimum": 0, "maximum": 100000 },
+        "height": { "type": "number", "exclusiveMinimum": 0, "maximum": 100000 }
+      },
+      "additionalProperties": false
+    },
+    "runtimeViewport": {
+      "type": "object",
+      "required": ["id", "width", "height", "devicePixelRatio"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "width": { "enum": [320, 375, 402, 430, 768, 1440] },
+        "height": { "type": ["number", "null"], "exclusiveMinimum": 0, "maximum": 100000 },
+        "devicePixelRatio": { "type": "number", "exclusiveMinimum": 0, "maximum": 8 }
+      },
+      "additionalProperties": false
+    },
+    "previewScale": {
+      "type": "object",
+      "required": ["mode", "value", "breakpointId"],
+      "properties": {
+        "mode": { "enum": ["one-to-one", "fit-window", "breakpoint"] },
+        "value": { "type": "number", "exclusiveMinimum": 0, "maximum": 16 },
+        "breakpointId": { "oneOf": [{ "$ref": "#/$defs/id" }, { "type": "null" }] }
+      },
+      "additionalProperties": false
+    },
+    "breakpoint": {
+      "type": "object",
+      "required": ["id", "minWidth", "maxWidth", "viewport", "overrides"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id", "x-cdb-owner": "html" },
+        "minWidth": { "type": "number", "minimum": 0, "x-cdb-owner": "html" },
+        "maxWidth": { "type": ["number", "null"], "exclusiveMinimum": 0, "maximum": 100000, "x-cdb-owner": "html" },
+        "viewport": { "$ref": "#/$defs/breakpointViewport", "x-cdb-owner": "html" },
+        "overrides": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/nodeOverride" },
+          "x-cdb-owner": "shared"
+        }
+      },
+      "additionalProperties": false
+    },
+    "breakpointViewport": {
+      "type": "object",
+      "required": ["width", "height"],
+      "properties": {
+        "width": { "enum": [320, 375, 402, 430, 768, 1440] },
+        "height": { "type": ["number", "null"], "exclusiveMinimum": 0, "maximum": 100000 }
+      },
+      "additionalProperties": false
+    },
+    "nodeOverride": {
+      "type": "object",
+      "minProperties": 1,
+      "properties": {
+        "sizing": { "$ref": "#/$defs/sizing" },
+        "constraints": { "$ref": "#/$defs/constraints" },
+        "overflow": { "$ref": "#/$defs/overflow" },
+        "layout": { "type": ["object", "null"] },
+        "visibility": { "type": "object" }
+      },
+      "additionalProperties": false
+    },
+    "node": {
+      "type": "object",
+      "required": [
+        "id", "type", "tag", "name", "parentId", "order", "childIds", "sourceRef", "semantics",
+        "interaction", "figma", "geometry", "visibility", "appearance", "layout", "content", "resource",
+        "adaptation", "sizing", "constraints", "overflow", "textFlow"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/id", "x-cdb-owner": "system" },
+        "type": { "enum": ["frame", "image", "svg", "text"], "x-cdb-owner": "system" },
+        "tag": { "type": "string", "pattern": "^[a-z][a-z0-9-]{0,40}$", "x-cdb-owner": "html" },
+        "name": { "type": "string", "maxLength": 160, "x-cdb-owner": "figma" },
+        "parentId": { "oneOf": [{ "$ref": "#/$defs/id" }, { "type": "null" }], "x-cdb-owner": "system" },
+        "order": { "type": "integer", "minimum": -10000, "maximum": 10000, "x-cdb-owner": "system" },
+        "childIds": { "type": "array", "maxItems": 500, "items": { "$ref": "#/$defs/id" }, "x-cdb-owner": "system" },
+        "sourceRef": { "type": "object", "x-cdb-owner": "html" },
+        "semantics": { "type": "object", "x-cdb-owner": "html" },
+        "interaction": { "type": "object", "x-cdb-owner": "html" },
+        "figma": { "type": "object", "x-cdb-owner": "figma" },
+        "geometry": { "$ref": "#/$defs/geometry", "x-cdb-owner": "shared" },
+        "visibility": { "type": "object", "x-cdb-owner": "shared" },
+        "appearance": { "type": "object", "x-cdb-owner": "shared" },
+        "layout": { "type": ["object", "null"], "x-cdb-owner": "shared" },
+        "content": { "type": ["object", "null"], "x-cdb-owner": "shared" },
+        "resource": { "type": ["object", "null"], "x-cdb-owner": "shared" },
+        "adaptation": { "$ref": "#/$defs/adaptation", "x-cdb-owner": "shared" },
+        "sizing": { "oneOf": [{ "$ref": "#/$defs/sizing" }, { "type": "null" }], "x-cdb-owner": "shared" },
+        "constraints": { "oneOf": [{ "$ref": "#/$defs/constraints" }, { "type": "null" }], "x-cdb-owner": "shared" },
+        "overflow": { "oneOf": [{ "$ref": "#/$defs/overflow" }, { "type": "null" }], "x-cdb-owner": "shared" },
+        "textFlow": { "oneOf": [{ "$ref": "#/$defs/textFlow" }, { "type": "null" }], "x-cdb-owner": "shared" }
+      },
+      "additionalProperties": false
+    },
+    "geometry": {
+      "type": "object",
+      "required": ["width", "height", "x", "y", "rotation"],
+      "properties": {
+        "width": { "type": "number", "exclusiveMinimum": 0, "maximum": 100000 },
+        "height": { "type": "number", "exclusiveMinimum": 0, "maximum": 100000 },
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "rotation": { "type": "number" }
+      },
+      "additionalProperties": false
+    },
+    "adaptation": {
+      "type": "object",
+      "required": ["status", "reason"],
+      "properties": {
+        "status": { "enum": ["supported", "unsupported"] },
+        "reason": { "type": "string", "maxLength": 500 }
+      },
+      "additionalProperties": false
+    },
+    "sizing": {
+      "type": "object",
+      "required": ["horizontal", "vertical", "aspectRatio"],
+      "properties": {
+        "horizontal": { "$ref": "#/$defs/axisSizing" },
+        "vertical": { "$ref": "#/$defs/axisSizing" },
+        "aspectRatio": { "type": ["number", "null"], "exclusiveMinimum": 0, "maximum": 10000 }
+      },
+      "additionalProperties": false
+    },
+    "axisSizing": {
+      "type": "object",
+      "required": ["mode", "min", "max"],
+      "properties": {
+        "mode": { "enum": ["fixed", "hug", "fill"] },
+        "min": { "type": ["number", "null"], "minimum": 0 },
+        "max": { "type": ["number", "null"], "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "constraints": {
+      "type": "object",
+      "required": ["horizontal", "vertical"],
+      "properties": {
+        "horizontal": { "enum": ["MIN", "CENTER", "MAX", "STRETCH", "SCALE"] },
+        "vertical": { "enum": ["MIN", "CENTER", "MAX", "STRETCH", "SCALE"] }
+      },
+      "additionalProperties": false
+    },
+    "overflow": {
+      "type": "object",
+      "required": ["x", "y"],
+      "properties": {
+        "x": { "enum": ["visible", "hidden", "clip", "scroll", "auto"] },
+        "y": { "enum": ["visible", "hidden", "clip", "scroll", "auto"] }
+      },
+      "additionalProperties": false
+    },
+    "textFlow": {
+      "type": "object",
+      "required": ["wrap", "overflow", "autoHeight", "fallbackFamilies"],
+      "properties": {
+        "wrap": { "enum": ["wrap", "no-wrap"] },
+        "overflow": { "enum": ["visible", "clip", "ellipsis"] },
+        "autoHeight": { "type": "boolean" },
+        "fallbackFamilies": { "type": "array", "maxItems": 16, "items": { "type": "string", "maxLength": 120 } }
+      },
+      "additionalProperties": false
+    },
+    "degradation": {
+      "type": "object",
+      "required": ["nodeId", "reason", "message"],
+      "properties": {
+        "nodeId": { "type": "string", "maxLength": 128 },
+        "reason": { "type": "string", "maxLength": 160 },
+        "message": { "type": "string", "maxLength": 500 }
+      },
+      "additionalProperties": false
+    }
+  }
+}

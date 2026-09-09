@@ -3,6 +3,8 @@ const ASSET_ID_KEY = "figmaSyncAssetId";
 const ELEMENT_ID_KEY = "figmaSyncElementId";
 const SOURCE_HASH_KEY = "figmaSyncSourceHash";
 const PAGE_ID_KEY = "figmaSyncPageId";
+const PAGE_PROJECT_KEY = "figmaSyncProjectKey";
+const PAGE_RUNTIME_IDENTITY_KEY = "figmaSyncRuntimeIdentity";
 const PAGE_NODE_ID_KEY = "figmaSyncPageNodeId";
 const PAGE_NODE_TYPE_KEY = "figmaSyncPageNodeType";
 const PAGE_SOURCE_REF_KEY = "figmaSyncPageSourceRef";
@@ -12,6 +14,8 @@ const PAGE_BASELINE_KEY = "figmaSyncPageBaseline";
 const PAGE_SVG_BASELINE_KEY = "figmaSyncPageSvgBaseline";
 const PAGE_ANNOTATION_BASELINE_KEY = "figmaSyncPageAnnotationBaseline";
 const PAGE_STRUCTURE_BASELINE_KEY = "figmaSyncPageStructureBaseline";
+const PAGE_STRUCTURE_BASELINE_META_KEY = "figmaSyncPageStructureBaselineMeta";
+const PAGE_STRUCTURE_BASELINE_CHUNK_PREFIX = "figmaSyncPageStructureBaselineChunk";
 const PAGE_VECTOR_INSERT_VERSION_KEY = "figmaSyncPageVectorInsertVersion";
 const DESIGN_ID_KEY = "codexDesignId";
 const DESIGN_NODE_ID_KEY = "codexDesignNodeId";
@@ -38,6 +42,8 @@ const INSERTABLE_PAGE_VECTOR_TYPES = new Set([
   "RECTANGLE",
 ]);
 const VECTOR_INSERT_VERSION = "5";
+const PAGE_STRUCTURE_BASELINE_FORMAT = 2;
+const PAGE_STRUCTURE_BASELINE_CHUNK_SIZE = 24_000;
 const SAFE_PAGE_DELETE_TYPES = new Set(["frame", "image", "svg", "text"]);
 const CLONEABLE_PAGE_TYPES = new Set(["frame", "image", "svg", "text"]);
 const INSERTABLE_PAGE_FRAME_TYPES = new Set([
@@ -48,7 +54,14 @@ const INSERTABLE_PAGE_FRAME_TYPES = new Set([
 ]);
 const MAX_INSERTED_PAGE_NODES = 200;
 const MAX_INSERTED_IMAGE_BYTES = 2 * 1024 * 1024;
-const PAGE_CHANGE_PROTOCOL_VERSION = 14;
+const PAGE_CHANGE_PROTOCOL_VERSION = 16;
+const DESIGN_OFFER_PROTOCOL_VERSION = 16;
+const PAGE_IR_SCHEMA_VERSION = 2;
+const CDB_EXACT_BUILD = "0.9.0+codex.20260829100031";
+const CDB_RUNTIME_IDENTITY = "cdb-0.9-responsive-v2";
+const RESPONSIVE_ACCEPTANCE_WIDTHS = new Set([320, 375, 402, 430, 768, 1440]);
+const MAX_DESIGN_OFFER_NODES = 500;
+const DESIGN_RECOVERY_STORAGE_KEY = "cdbDesignRecovery";
 const EDITABLE_PROPERTIES = new Set([
   "fills",
   "strokes",
@@ -138,9 +151,12 @@ const LAYOUT_PROPERTIES = new Set([
 let suppressChangesUntil = 0;
 const snapshots = new Map();
 const pendingFlushes = new Map();
+const pendingPageChangeIds = new Map();
 let pageStatusTimer = null;
 let lastReportedUnsentChanges = null;
+let activeProjectKey = "";
 const trackedPageFigmaNodeIds = new Set();
+let lastHtmlConflictUndo = null;
 
 figma.showUI(__html__, {
   width: 380,
@@ -160,6 +176,10 @@ async function initialize() {
   figma.on("documentchange", (event) => {
     if (Date.now() < suppressChangesUntil) {
       return;
+    }
+
+    if (lastHtmlConflictUndo && event.documentChanges.length > 0) {
+      lastHtmlConflictUndo = null;
     }
 
     for (const change of event.documentChanges) {
@@ -208,7 +228,10 @@ async function initialize() {
   figma.on("currentpagechange", () => {
     indexCurrentPage();
     reportPageStatus(true);
+    reportDesignSelection();
   });
+
+  figma.on("selectionchange", reportDesignSelection);
 
   figma.ui.onmessage = (message) => {
     void handleUiMessage(message);
@@ -233,6 +256,7 @@ async function initialize() {
     unsentChanges: hasUnsentPageChanges(),
     changedPageIds: unsentPageIds(),
   });
+  reportDesignSelection();
 }
 
 async function handleUiMessage(message) {
@@ -254,7 +278,12 @@ async function handleUiMessage(message) {
       return;
     }
     if (message.type === "page.upsert") {
+      activeProjectKey = String(message.page?.projectKey || activeProjectKey);
       await upsertPage(message.page);
+      return;
+    }
+    if (message.type === "page.import.undo") {
+      await undoHtmlConflictPage(message);
       return;
     }
     if (message.type === "page.remove") {
@@ -274,12 +303,58 @@ async function handleUiMessage(message) {
       figma.viewport.scrollAndZoomIntoView([root]);
       return;
     }
+    if (message.type === "page.node.locate") {
+      const root = findPageRoot(message.pageId);
+      if (!root) {
+        throw new Error("这个 CDB 页面还没有导入 Figma。");
+      }
+      const nodeId = String(message.figmaNodeId || "");
+      const node = root.id === nodeId ? root : findPageDescendantById(root, nodeId);
+      if (!node || node.removed) {
+        throw new Error("这个差异节点已经不在当前 CDB 页面中。");
+      }
+      figma.currentPage.selection = [node];
+      figma.viewport.scrollAndZoomIntoView([node]);
+      return;
+    }
     if (message.type === "workspace.reset") {
       resetWorkspaceAssociations();
       return;
     }
+    if (message.type === "workspace.identity") {
+      activeProjectKey = String(message.projectKey || "");
+      const currentRoots = findPageRoots();
+      figma.ui.postMessage({
+        type: "workspace.identity.ready",
+        projectKey: activeProjectKey,
+        importedPageIds: currentRoots.map((root) =>
+          root.getPluginData(PAGE_ID_KEY),
+        ).filter(Boolean),
+        unsentChanges: hasUnsentPageChanges(),
+        changedPageIds: unsentPageIds(),
+      });
+      reportPageStatus(true);
+      return;
+    }
     if (message.type === "page.seed.capture") {
+      activeProjectKey = String(message.projectKey || activeProjectKey);
       await captureSelectedPageSeed(message);
+      return;
+    }
+    if (message.type === "figma.design.offer.capture") {
+      await captureDesignOffer(message);
+      return;
+    }
+    if (message.type === "figma.design.payload.capture") {
+      await captureDesignPayload(message);
+      return;
+    }
+    if (message.type === "figma.design.result.accepted") {
+      await acceptDesignOfferResult(message.result);
+      return;
+    }
+    if (message.type === "figma.design.recovery.clear") {
+      await clearDesignRecovery();
       return;
     }
     if (message.type === "design.capture") {
@@ -290,6 +365,7 @@ async function handleUiMessage(message) {
       message.type === "review.capture" ||
       message.type === "feedback.capture"
     ) {
+      activeProjectKey = String(message.projectKey || activeProjectKey);
       captureCurrentFeedback();
       await capturePageChanges(message.requestId || null);
       return;
@@ -319,8 +395,441 @@ async function handleUiMessage(message) {
   }
 }
 
+function reportDesignSelection() {
+  const selection = figma.currentPage.selection.filter((node) => !node.removed);
+  const root = selection.length === 1 ? selection[0] : null;
+  const supported = Boolean(
+    root &&
+    DESIGN_ROOT_TYPES.has(root.type) &&
+    RESPONSIVE_ACCEPTANCE_WIDTHS.has(Number(root.width)),
+  );
+  const estimatedNodeCount = supported ? countDesignNodes(root, MAX_DESIGN_OFFER_NODES + 1) : 0;
+  figma.ui.postMessage({
+    type: "figma.design.selection",
+    selection: {
+      supported: supported && estimatedNodeCount <= MAX_DESIGN_OFFER_NODES,
+      reason: selection.length !== 1
+        ? "请选择一个完整页面"
+        : !root || !DESIGN_ROOT_TYPES.has(root.type)
+          ? "请选择 Frame、Component、Instance 或 Group"
+          : !RESPONSIVE_ACCEPTANCE_WIDTHS.has(Number(root.width))
+            ? "页面宽度不在 0.9 验收合同内"
+          : estimatedNodeCount > MAX_DESIGN_OFFER_NODES
+            ? `可编辑图层超过 ${MAX_DESIGN_OFFER_NODES} 个`
+            : "",
+      rootNodeId: root?.id || "",
+      rootName: root?.name || "",
+      rootType: root?.type || "",
+      width: Number(root?.width || 0),
+      height: Number(root?.height || 0),
+      estimatedNodeCount,
+      linkedProjectKey: root?.getPluginData?.(PAGE_PROJECT_KEY) || "",
+      linkedPageId: root?.getPluginData?.(PAGE_ID_KEY) || "",
+    },
+  });
+}
+
+async function captureDesignOffer(message) {
+  const selection = figma.currentPage.selection.filter((node) => !node.removed);
+  if (selection.length !== 1) throw new Error("请只选择一个完整的页面 Frame。");
+  const root = selection[0];
+  if (!DESIGN_ROOT_TYPES.has(root.type)) {
+    throw new Error("请选择 Frame、Component、Instance 或 Group 作为完整页面。");
+  }
+  const estimatedNodeCount = countDesignNodes(root, MAX_DESIGN_OFFER_NODES + 1);
+  if (estimatedNodeCount > MAX_DESIGN_OFFER_NODES) {
+    throw new Error(`可编辑图层不能超过 ${MAX_DESIGN_OFFER_NODES} 个。`);
+  }
+  const figmaFileKey = await persistentFigmaFileIdentity();
+  const responsiveContract = responsiveContractForRoot(root);
+  await saveDesignRecovery({
+    sessionId: String(message.sessionId || ""),
+    offerId: String(message.offerId || ""),
+  });
+  figma.ui.postMessage({
+    type: "figma.design.offer.emit",
+    offer: {
+      type: "figma.design.offer",
+      protocolVersion: DESIGN_OFFER_PROTOCOL_VERSION,
+      runtimeIdentity: currentRuntimeIdentity(),
+      offerId: String(message.offerId || ""),
+      sessionId: String(message.sessionId || ""),
+      figmaFileKey,
+      rootNodeId: root.id,
+      rootName: root.name || "Untitled",
+      rootType: root.type,
+      width: Number(root.width || 0),
+      height: Number(root.height || 0),
+      responsiveContract,
+      estimatedNodeCount,
+      linkedProjectKey:
+        root.getPluginData(PAGE_PROJECT_KEY) || String(message.projectKey || ""),
+      linkedPageId: root.getPluginData(PAGE_ID_KEY) || "",
+      createdAt: new Date().toISOString(),
+    },
+  });
+}
+
+async function captureDesignPayload(message) {
+  const root = await figma.getNodeByIdAsync(String(message.rootNodeId || ""));
+  if (!root || root.removed || !DESIGN_ROOT_TYPES.has(root.type)) {
+    throw new Error("原始 Figma 页面已删除或不再受支持，请重新选择并发送。");
+  }
+  figma.ui.postMessage({
+    type: "figma.design.progress.emit",
+    offerId: message.offerId,
+    sessionId: message.sessionId,
+    phase: "collecting",
+    completed: 0,
+    total: Number(message.estimatedNodeCount || 0),
+    message: "正在采集 Figma 页面图层",
+  });
+  const serialized = await serializeDesignPagePayload(root);
+  const responsiveContract = responsiveContractForRoot(root);
+  const referenceImage = await exportDesignScreenshot(root);
+  figma.ui.postMessage({
+    type: "figma.design.payload.emit",
+    payload: {
+      type: "figma.design.payload",
+      protocolVersion: DESIGN_OFFER_PROTOCOL_VERSION,
+      runtimeIdentity: currentRuntimeIdentity(),
+      offerId: String(message.offerId || ""),
+      sessionId: String(message.sessionId || ""),
+      figma: {
+        fileKey: await persistentFigmaFileIdentity(),
+        pageId: figma.currentPage.id,
+        pageName: figma.currentPage.name,
+        rootNodeId: root.id,
+        rootNodeName: root.name,
+      },
+      pageSeed: { node: serialized.definition },
+      responsiveContract,
+      referenceImage,
+      report: serialized.report,
+      capturedAt: new Date().toISOString(),
+    },
+  });
+}
+
+function currentRuntimeIdentity() {
+  return {
+    kind: CDB_RUNTIME_IDENTITY,
+    protocolVersion: DESIGN_OFFER_PROTOCOL_VERSION,
+    pageIrSchemaVersion: PAGE_IR_SCHEMA_VERSION,
+    exactBuild: CDB_EXACT_BUILD,
+  };
+}
+
+function responsiveContractForRoot(root) {
+  const width = Number(root?.width || 0);
+  const height = Number(root?.height || 0);
+  if (!RESPONSIVE_ACCEPTANCE_WIDTHS.has(width) || !Number.isFinite(height) || height <= 0) {
+    throw new Error("页面 viewport 不在 0.9 明确支持合同内，不能推测响应式规则。");
+  }
+  return {
+    designViewport: { width, height },
+    runtimeViewports: [{
+      id: `figma-${width}`,
+      width,
+      height,
+      devicePixelRatio: 1,
+    }],
+    previewScale: { mode: "one-to-one", value: 1, breakpointId: null },
+    breakpoints: [],
+  };
+}
+
+async function acceptDesignOfferResult(result) {
+  const pageId = typeof result?.pageId === "string" ? result.pageId.trim() : "";
+  const projectKey =
+    typeof result?.projectKey === "string" ? result.projectKey.trim() : "";
+  const sourceHash =
+    typeof result?.sourceHash === "string" ? result.sourceHash.trim() : "";
+  const rootNodeId =
+    typeof result?.rootNodeId === "string" ? result.rootNodeId.trim() : "";
+  const mappings = Array.isArray(result?.nodeMappings) ? result.nodeMappings : [];
+  if (!pageId || !projectKey || !sourceHash || !rootNodeId || mappings.length === 0) {
+    throw new Error("CDB 新页面结果缺少稳定映射。");
+  }
+  const root = await figma.getNodeByIdAsync(rootNodeId);
+  if (!root || root.removed || !INSERTABLE_PAGE_FRAME_TYPES.has(root.type)) {
+    throw new Error("CDB 新页面对应的 Figma Frame 已不存在。");
+  }
+  const rootMapping = mappings.find(
+    (mapping) => mapping?.figmaNodeId === root.id,
+  );
+  if (!rootMapping?.pageNodeId || !rootMapping?.nodeType) {
+    throw new Error("CDB 新页面结果缺少根节点映射。");
+  }
+  activeProjectKey = projectKey;
+  setPageNodeData(
+    root,
+    { pageId, projectKey, sourceHash },
+    {
+      id: rootMapping.pageNodeId,
+      type: rootMapping.nodeType,
+      sourceRef: rootMapping.sourceRef || {
+        selector: `[data-codex-id="${rootMapping.pageNodeId}"]`,
+      },
+      layout: null,
+      layoutItem: null,
+    },
+    true,
+  );
+  for (const mapping of mappings) {
+    if (
+      !mapping?.pageNodeId ||
+      !mapping?.figmaNodeId ||
+      !mapping?.nodeType ||
+      mapping.figmaNodeId === root.id
+    ) {
+      continue;
+    }
+    const node = findPageDescendantById(root, mapping.figmaNodeId);
+    if (!node || node.removed) continue;
+    setInsertedPageNodeData(
+      root,
+      node,
+      mapping.pageNodeId,
+      mapping.nodeType,
+    );
+    if (mapping.sourceRef && typeof mapping.sourceRef === "object") {
+      node.setPluginData(PAGE_SOURCE_REF_KEY, JSON.stringify(mapping.sourceRef));
+    }
+  }
+  storePageBaselines(root);
+  indexCurrentPage();
+  reportPageStatus(true);
+  await clearDesignRecovery();
+}
+
+async function serializeDesignPagePayload(rootNode, options = {}) {
+  const state = {
+    count: 0,
+    resourceBytes: 0,
+    resourceCount: 0,
+    degradations: [],
+  };
+  const definition = await serializePayloadNode(rootNode, state, true, options);
+  return {
+    definition,
+    report: {
+      nodeCount: state.count,
+      resourceBytes: state.resourceBytes,
+      resourceCount: state.resourceCount,
+      degradations: state.degradations,
+    },
+  };
+}
+
+async function serializePayloadNode(node, state, isRoot = false, options = {}) {
+  state.count += 1;
+  if (state.count > MAX_DESIGN_OFFER_NODES) {
+    throw new Error(`可编辑图层不能超过 ${MAX_DESIGN_OFFER_NODES} 个。`);
+  }
+  const pageNodeType = isRoot ? "frame" : insertedPageNodeType(node);
+  if (!pageNodeType) {
+    state.degradations.push({
+      nodeId: node.id,
+      nodeName: node.name || node.type,
+      nodeType: node.type,
+      reason: "unsupported_node_type",
+    });
+    return payloadPlaceholder(node, "不支持的 Figma 图层");
+  }
+  const trackedNodeId = options.preservePageNodeIds
+    ? node.getPluginData?.(PAGE_NODE_ID_KEY) || ""
+    : "";
+  const nodeId = trackedNodeId || (isRoot ? "page-root" : `figma-node-${normalizeNodeId(node.id)}`);
+  const sourceRef = options.preservePageNodeIds
+    ? readJsonPluginData(node, PAGE_SOURCE_REF_KEY) || { selector: `[data-codex-id="${nodeId}"]` }
+    : { selector: `[data-codex-id="${nodeId}"]` };
+  const properties = snapshotNodeProperties(node);
+  const storedLayout = readJsonPluginData(node, PAGE_LAYOUT_META_KEY);
+  const storedLayoutItem = readJsonPluginData(node, PAGE_LAYOUT_ITEM_KEY);
+  const parentLayout = node.parent
+    ? readJsonPluginData(node.parent, PAGE_LAYOUT_META_KEY)
+    : null;
+  const parentLayoutMode = node.parent && "layoutMode" in node.parent
+    ? node.parent.layoutMode
+    : null;
+  const layout = storedLayout?.kind === "grid"
+    ? {
+        ...storedLayout,
+        kind: "grid",
+        mode: "NONE",
+        direction: "none",
+      }
+    : {
+        kind: properties.layoutMode === "NONE" ? "none" : "flex",
+        mode: properties.layoutMode,
+        direction: properties.layoutMode === "HORIZONTAL" ? "horizontal" : properties.layoutMode === "VERTICAL" ? "vertical" : "none",
+        wrap: properties.layoutWrap === "WRAP",
+        itemSpacing: properties.itemSpacing,
+        counterAxisSpacing: properties.counterAxisSpacing,
+        padding: properties.padding,
+        primaryAxisAlignItems: properties.primaryAxisAlignItems,
+        counterAxisAlignItems: properties.counterAxisAlignItems,
+        primaryAxisSizingMode: properties.primaryAxisSizingMode,
+        counterAxisSizingMode: properties.counterAxisSizingMode,
+      };
+  const definition = {
+    id: nodeId,
+    type: pageNodeType,
+    tag: isRoot ? "main" : insertedMarkupTag(node, pageNodeType),
+    name: node.name || nodeId,
+    figmaNodeId: node.id,
+    sourceRef,
+    x: isRoot ? 0 : "x" in node && Number.isFinite(node.x) ? round(node.x) : 0,
+    y: isRoot ? 0 : "y" in node && Number.isFinite(node.y) ? round(node.y) : 0,
+    width: positivePageDimension(node.width),
+    height: positivePageDimension(node.height),
+    opacity: Number.isFinite(node.opacity) ? round(node.opacity) : 1,
+    visible: typeof node.visible === "boolean" ? node.visible : true,
+    rotation: Number.isFinite(node.rotation) ? round(node.rotation) : 0,
+    clipsContent: typeof node.clipsContent === "boolean" ? node.clipsContent : false,
+    constraints: properties.constraints || null,
+    style: {
+      fill: properties.fill,
+      fills: "fills" in node ? snapshotPaints(node.fills) : [],
+      stroke: properties.stroke,
+      strokes: "strokes" in node ? snapshotPaints(node.strokes) : [],
+      strokeWeight: properties.strokeWeight,
+      cornerRadius: properties.cornerRadius,
+      effects: "effects" in node && Array.isArray(node.effects) ? jsonSafe(node.effects) : [],
+    },
+    layoutItem: parentLayout?.kind === "grid" && storedLayoutItem
+      ? storedLayoutItem
+      : {
+          align: properties.layoutAlign === "STRETCH" ? "stretch" : "auto",
+          grow: Number.isFinite(properties.layoutGrow) ? properties.layoutGrow : 0,
+          positioning:
+            properties.layoutPositioning === "ABSOLUTE" || parentLayoutMode === "NONE"
+              ? "absolute"
+              : "auto",
+          horizontalSizing: String(properties.layoutSizingHorizontal || "FIXED").toLowerCase(),
+          verticalSizing: String(properties.layoutSizingVertical || "FIXED").toLowerCase(),
+        },
+  };
+  if (pageNodeType === "text") {
+    return {
+      ...definition,
+      text: typeof node.characters === "string" ? node.characters : "",
+      fontName: properties.fontName,
+      fontSize: properties.fontSize,
+      lineHeight: properties.lineHeight,
+      letterSpacing: properties.letterSpacing,
+      textAlignHorizontal: properties.textAlignHorizontal,
+      textAlignVertical: properties.textAlignVertical,
+      textCase: properties.textCase || "ORIGINAL",
+      textDecoration: properties.textDecoration || "NONE",
+      textTruncation: properties.textTruncation || "DISABLED",
+      maxLines: properties.maxLines,
+      textAutoResize: properties.textAutoResize || "NONE",
+    };
+  }
+  if (pageNodeType === "svg" || pageNodeType === "image") {
+    const settings = pageNodeType === "svg"
+      ? { format: "SVG", svgIdAttribute: true }
+      : { format: "PNG" };
+    let bytes;
+    try {
+      bytes = await node.exportAsync(settings);
+    } catch (error) {
+      state.degradations.push({
+        nodeId: node.id,
+        nodeName: node.name || node.type,
+        nodeType: node.type,
+        reason: "resource_export_failed",
+        error: error instanceof Error ? error.message : String(error),
+      });
+      return payloadPlaceholder(node, "图层不可见或无法导出", definition);
+    }
+    const perResourceLimit = pageNodeType === "svg" ? 768 * 1024 : MAX_INSERTED_IMAGE_BYTES;
+    if (bytes.length === 0 || bytes.length > perResourceLimit) {
+      state.degradations.push({
+        nodeId: node.id,
+        nodeName: node.name || node.type,
+        nodeType: node.type,
+        reason: "resource_limit_exceeded",
+        bytes: bytes.length,
+      });
+      return payloadPlaceholder(node, "资源超过单文件限制", definition);
+    }
+    state.resourceBytes += bytes.length;
+    state.resourceCount += 1;
+    if (state.resourceBytes > 24 * 1024 * 1024) {
+      throw new Error("Figma 页面资源总量不能超过 24 MB。");
+    }
+    return {
+      ...definition,
+      [pageNodeType === "svg" ? "svg" : "image"]: {
+        mimeType: pageNodeType === "svg" ? "image/svg+xml" : "image/png",
+        base64: encodeBase64(bytes),
+        contentHash: shortHash(encodeBase64(bytes)),
+      },
+    };
+  }
+  const children = [];
+  for (const child of node.children || []) {
+    if (!child.removed) children.push(await serializePayloadNode(child, state, false, options));
+  }
+  return {
+    ...definition,
+    layout,
+    children,
+  };
+}
+
+function payloadPlaceholder(node, reason, base = null) {
+  const id = `figma-node-${normalizeNodeId(node.id)}`;
+  return {
+    ...(base || {
+      id,
+      type: "frame",
+      tag: "div",
+      name: node.name || node.type,
+      sourceRef: { selector: `[data-codex-id="${id}"]` },
+      width: positivePageDimension(node.width || 1),
+      height: positivePageDimension(node.height || 1),
+      opacity: 1,
+      visible: true,
+      rotation: 0,
+      style: {},
+    }),
+    type: "frame",
+    tag: "div",
+    degradation: { reason },
+    children: [],
+  };
+}
+
+function countDesignNodes(root, limit) {
+  let count = 0;
+  const visit = (node) => {
+    count += 1;
+    if (count >= limit) return;
+    for (const child of node.children || []) {
+      visit(child);
+      if (count >= limit) return;
+    }
+  };
+  visit(root);
+  return count;
+}
+
+async function persistentFigmaFileIdentity() {
+  const storageKey = "cdbFigmaFileIdentity";
+  const existing = await figma.clientStorage.getAsync(storageKey);
+  if (typeof existing === "string" && existing) return existing;
+  const identity = `figma-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  await figma.clientStorage.setAsync(storageKey, identity);
+  return identity;
+}
+
 function resetWorkspaceAssociations() {
   suppressChangesUntil = Date.now() + 800;
+  lastHtmlConflictUndo = null;
   clearTimeout(pageStatusTimer);
   pageStatusTimer = null;
   for (const pending of pendingFlushes.values()) {
@@ -332,6 +841,8 @@ function resetWorkspaceAssociations() {
 
   const pageKeys = [
     PAGE_ID_KEY,
+    PAGE_PROJECT_KEY,
+    PAGE_RUNTIME_IDENTITY_KEY,
     PAGE_NODE_ID_KEY,
     PAGE_NODE_TYPE_KEY,
     PAGE_SOURCE_REF_KEY,
@@ -341,12 +852,14 @@ function resetWorkspaceAssociations() {
     PAGE_SVG_BASELINE_KEY,
     PAGE_ANNOTATION_BASELINE_KEY,
     PAGE_STRUCTURE_BASELINE_KEY,
+    PAGE_STRUCTURE_BASELINE_META_KEY,
     PAGE_VECTOR_INSERT_VERSION_KEY,
   ];
   const roots = figma.root.findAll(
     (node) => node.getPluginData?.(ROLE_KEY) === ROLE_PAGE_ROOT,
   );
   for (const root of roots) {
+    clearPageStructureBaselineChunks(root);
     for (const node of [root, ...root.findAll(() => true)]) {
       const role = node.getPluginData?.(ROLE_KEY);
       if (role === ROLE_PAGE_ROOT || role === ROLE_PAGE_NODE) {
@@ -366,17 +879,47 @@ function resetWorkspaceAssociations() {
 
 async function loadConnectionSettings() {
   try {
-    const [endpoint, token] = await Promise.all([
+    const [endpoint, token, designRecovery] = await Promise.all([
       figma.clientStorage.getAsync("figmaSyncEndpoint"),
       figma.clientStorage.getAsync("figmaSyncToken"),
+      figma.clientStorage.getAsync(DESIGN_RECOVERY_STORAGE_KEY),
     ]);
     return {
       endpoint: typeof endpoint === "string" ? endpoint : "",
       token: typeof token === "string" ? token : "",
+      designRecovery: validDesignRecovery(designRecovery)
+        ? designRecovery
+        : null,
     };
   } catch {
-    return { endpoint: "", token: "" };
+    return { endpoint: "", token: "", designRecovery: null };
   }
+}
+
+async function saveDesignRecovery(value) {
+  if (!validDesignRecovery(value)) return;
+  await figma.clientStorage.setAsync(DESIGN_RECOVERY_STORAGE_KEY, {
+    sessionId: value.sessionId,
+    offerId: value.offerId,
+    updatedAt: new Date().toISOString(),
+  });
+}
+
+async function clearDesignRecovery() {
+  await figma.clientStorage.setAsync(DESIGN_RECOVERY_STORAGE_KEY, null);
+}
+
+function validDesignRecovery(value) {
+  return Boolean(
+    value &&
+    typeof value === "object" &&
+    typeof value.sessionId === "string" &&
+    value.sessionId.length > 0 &&
+    value.sessionId.length <= 128 &&
+    typeof value.offerId === "string" &&
+    value.offerId.length > 0 &&
+    value.offerId.length <= 128
+  );
 }
 
 async function saveConnectionSettings(message) {
@@ -479,7 +1022,15 @@ async function upsertAsset(asset) {
 async function upsertPage(page) {
   validatePage(page);
   const existing = findPageRoot(page.pageId);
+  const htmlConflictResolution =
+    page.conflictResolution?.direction === "html" &&
+    typeof page.conflictResolution?.transactionId === "string" &&
+    page.conflictResolution.transactionId !== "";
+  if (!htmlConflictResolution) {
+    lastHtmlConflictUndo = null;
+  }
   if (
+    !htmlConflictResolution &&
     existing &&
     existing.getPluginData(SOURCE_HASH_KEY) === page.sourceHash
   ) {
@@ -497,13 +1048,14 @@ async function upsertPage(page) {
       nodeId: existing.id,
       fileKey: typeof figma.fileKey === "string" ? figma.fileKey : null,
       figmaPageId: figma.currentPage.id,
+      nodeMappings: collectPageNodeMappings(existing),
       reused: true,
     });
     reportPageStatus(true);
     return;
   }
 
-  if (existing && pageHasUnsentChanges(existing)) {
+  if (existing && pageHasUnsentChanges(existing) && !htmlConflictResolution) {
     figma.currentPage.selection = [existing];
     figma.ui.postMessage({
       type: "page.result",
@@ -523,6 +1075,42 @@ async function upsertPage(page) {
   const insertIndex =
     existing && "children" in parent ? parent.children.indexOf(existing) : -1;
   let replacement = null;
+  let htmlUndoCheckpoint = null;
+
+  if (htmlConflictResolution) {
+    if (!existing) {
+      figma.ui.postMessage({
+        type: "page.result",
+        ok: false,
+        code: "figma_conflict_undo_unavailable",
+        pageId: page.pageId,
+        sourceHash: page.sourceHash,
+        error: "当前 Figma 会话无法建立可撤销的接受 HTML 事务。",
+        rolledBack: true,
+      });
+      reportPageStatus(true);
+      return;
+    }
+    const capturedUndoSnapshot = page.conflictResolution.undoSnapshot &&
+      typeof page.conflictResolution.undoSnapshot === "object"
+      ? page.conflictResolution.undoSnapshot
+      : (await serializeDesignPagePayload(existing, {
+          preservePageNodeIds: true,
+        })).definition;
+    if (typeof figma.commitUndo === "function") {
+      figma.commitUndo();
+    }
+    htmlUndoCheckpoint = {
+      pageId: page.pageId,
+      transactionId: page.conflictResolution.transactionId,
+      beforeSourceHash: existing.getPluginData(SOURCE_HASH_KEY),
+      afterSourceHash: page.sourceHash,
+      beforePageFingerprint: trackedPageFingerprint(existing),
+      beforeBaselineData: captureTrackedBaselineData(existing),
+      beforeStructureBaseline: readPageStructureBaseline(existing),
+      undoSnapshot: capturedUndoSnapshot,
+    };
+  }
 
   suppressChangesUntil = Date.now() + 1000;
   if (existing) {
@@ -542,6 +1130,9 @@ async function upsertPage(page) {
         .filter(Boolean);
       figma.currentPage.selection =
         restoredSelection.length > 0 ? restoredSelection : [existing];
+      if (htmlUndoCheckpoint) {
+        lastHtmlConflictUndo = htmlUndoCheckpoint;
+      }
       figma.ui.postMessage({
         type: "page.result",
         ok: true,
@@ -551,6 +1142,8 @@ async function upsertPage(page) {
         nodeId: existing.id,
         fileKey: typeof figma.fileKey === "string" ? figma.fileKey : null,
         figmaPageId: figma.currentPage.id,
+        nodeMappings: collectPageNodeMappings(existing),
+        transactionId: htmlUndoCheckpoint?.transactionId || "",
         reused: true,
         incremental: true,
       });
@@ -600,6 +1193,10 @@ async function upsertPage(page) {
       figma.viewport.scrollAndZoomIntoView([replacement]);
     }
 
+    if (htmlUndoCheckpoint) {
+      lastHtmlConflictUndo = htmlUndoCheckpoint;
+    }
+
     figma.ui.postMessage({
       type: "page.result",
       ok: true,
@@ -609,6 +1206,8 @@ async function upsertPage(page) {
       nodeId: replacement.id,
       fileKey: typeof figma.fileKey === "string" ? figma.fileKey : null,
       figmaPageId: figma.currentPage.id,
+      nodeMappings: collectPageNodeMappings(replacement),
+      transactionId: htmlUndoCheckpoint?.transactionId || "",
       reused: false,
     });
     reportPageStatus(true);
@@ -620,6 +1219,33 @@ async function upsertPage(page) {
     if (existing && !existing.removed) {
       figma.currentPage.selection = [existing];
     }
+    if (htmlUndoCheckpoint) {
+      suppressChangesUntil = Date.now() + 1000;
+      const rollbackRoot = findPageRoot(page.pageId);
+      if (rollbackRoot && !rollbackRoot.removed) {
+        try {
+          await restoreTrackedPageFromSnapshot(
+            rollbackRoot,
+            htmlUndoCheckpoint.undoSnapshot,
+            {
+              pageId: page.pageId,
+              sourceHash: htmlUndoCheckpoint.beforeSourceHash,
+            },
+          );
+          restoreTrackedBaselineData(
+            rollbackRoot,
+            htmlUndoCheckpoint.beforeBaselineData,
+          );
+          writePageStructureBaseline(
+            rollbackRoot,
+            htmlUndoCheckpoint.beforeStructureBaseline,
+          );
+        } catch {
+          // The original import error is more actionable than rollback details.
+        }
+      }
+      lastHtmlConflictUndo = null;
+    }
     figma.ui.postMessage({
       type: "page.result",
       ok: false,
@@ -627,6 +1253,75 @@ async function upsertPage(page) {
       error: error instanceof Error ? error.message : String(error),
       rolledBack: Boolean(existing),
     });
+  }
+}
+
+async function undoHtmlConflictPage(message) {
+  const requestId = typeof message.requestId === "string" ? message.requestId : "";
+  const pageId = typeof message.pageId === "string" ? message.pageId : "";
+  const transactionId =
+    typeof message.transactionId === "string" ? message.transactionId : "";
+  const fail = (code, error) => {
+    figma.ui.postMessage({
+      type: "page.import.undo.result",
+      requestId,
+      pageId,
+      transactionId,
+      ok: false,
+      code,
+      error,
+    });
+  };
+  const checkpoint = lastHtmlConflictUndo;
+  if (
+    !checkpoint ||
+    checkpoint.pageId !== pageId ||
+    checkpoint.transactionId !== transactionId
+  ) {
+    fail("figma_undo_stale", "接受 HTML 的 Figma 撤销事务已失效，请重新解决当前冲突。");
+    return;
+  }
+  const root = findPageRoot(pageId);
+  if (
+    !root ||
+    root.getPluginData(SOURCE_HASH_KEY) !== checkpoint.afterSourceHash ||
+    pageHasUnsentChanges(root)
+  ) {
+    lastHtmlConflictUndo = null;
+    fail("figma_undo_source_changed", "Figma 页面在接受 HTML 后又发生变化，不能安全撤销。");
+    return;
+  }
+  try {
+    suppressChangesUntil = Date.now() + 1000;
+    await restoreTrackedPageFromSnapshot(root, checkpoint.undoSnapshot, {
+      pageId,
+      sourceHash: checkpoint.beforeSourceHash,
+    });
+    indexCurrentPage();
+    const restored = findPageRoot(pageId);
+    if (!restored || restored.getPluginData(SOURCE_HASH_KEY) !== checkpoint.beforeSourceHash) {
+      throw new Error("Figma Undo 没有恢复解决前的完整页面状态。");
+    }
+    restoreTrackedBaselineData(restored, checkpoint.beforeBaselineData);
+    writePageStructureBaseline(restored, checkpoint.beforeStructureBaseline);
+    lastHtmlConflictUndo = null;
+    figma.currentPage.selection = [restored];
+    reportPageStatus(true);
+    figma.ui.postMessage({
+      type: "page.import.undo.result",
+      requestId,
+      pageId,
+      transactionId,
+      sourceHash: checkpoint.beforeSourceHash,
+      nodeMappings: collectPageNodeMappings(restored),
+      ok: true,
+    });
+  } catch (error) {
+    lastHtmlConflictUndo = null;
+    fail(
+      "figma_undo_failed",
+      error instanceof Error ? error.message : String(error),
+    );
   }
 }
 
@@ -729,6 +1424,7 @@ async function reconcilePageNode({
     throw new Error(`Page vector ${definition.id} requires replacement.`);
   }
   applyLayoutItem(node, definition.layoutItem);
+  applyNodeConstraints(node, definition.constraints || definition.responsive?.constraints);
 }
 
 function refreshPageNodeTypes(root, definition) {
@@ -822,6 +1518,7 @@ async function createPageNode({
   }
 
   applyLayoutItem(node, definition.layoutItem);
+  applyNodeConstraints(node, definition.constraints || definition.responsive?.constraints);
 
   const annotations = annotationsByNode?.get(definition.id);
   if (annotations && "annotations" in node) {
@@ -907,6 +1604,17 @@ function applyLayoutItem(node, layoutItem) {
   if ("layoutSizingVertical" in node) {
     node.layoutSizingVertical = layoutItem.verticalSizing.toUpperCase();
   }
+}
+
+function applyNodeConstraints(node, constraints) {
+  if (!("constraints" in node) || !constraints) return;
+  const parent = node.parent;
+  if (parent && "layoutMode" in parent && parent.layoutMode !== "NONE") return;
+  const allowed = new Set(["MIN", "CENTER", "MAX", "STRETCH", "SCALE"]);
+  const horizontal = String(constraints.horizontal || "").toUpperCase();
+  const vertical = String(constraints.vertical || "").toUpperCase();
+  if (!allowed.has(horizontal) || !allowed.has(vertical)) return;
+  node.constraints = { horizontal, vertical };
 }
 
 function applyPageImage(node, definition) {
@@ -1043,6 +1751,8 @@ function paintFromHex(value) {
 function setPageNodeData(node, page, definition, isRoot) {
   node.setPluginData(ROLE_KEY, isRoot ? ROLE_PAGE_ROOT : ROLE_PAGE_NODE);
   node.setPluginData(PAGE_ID_KEY, page.pageId);
+  node.setPluginData(PAGE_PROJECT_KEY, String(page.projectKey || activeProjectKey));
+  node.setPluginData(PAGE_RUNTIME_IDENTITY_KEY, CDB_EXACT_BUILD);
   node.setPluginData(PAGE_NODE_ID_KEY, definition.id);
   node.setPluginData(PAGE_NODE_TYPE_KEY, definition.type);
   node.setPluginData(SOURCE_HASH_KEY, page.sourceHash);
@@ -1077,10 +1787,7 @@ function storePageBaselines(root) {
       JSON.stringify(collectDirectFigmaAnnotations(node)),
     );
   }
-  root.setPluginData(
-    PAGE_STRUCTURE_BASELINE_KEY,
-    JSON.stringify(snapshotPageStructure(root)),
-  );
+  writePageStructureBaseline(root, snapshotPageStructure(root));
   root.setPluginData(PAGE_VECTOR_INSERT_VERSION_KEY, VECTOR_INSERT_VERSION);
 }
 
@@ -1112,19 +1819,16 @@ function ensurePageBaselines(root) {
       );
     }
   }
-  if (!root.getPluginData(PAGE_STRUCTURE_BASELINE_KEY)) {
-    root.setPluginData(
-      PAGE_STRUCTURE_BASELINE_KEY,
-      JSON.stringify(snapshotPageStructure(root)),
-    );
+  if (!hasPageStructureBaseline(root)) {
+    writePageStructureBaseline(root, snapshotPageStructure(root));
   }
   if (
     root.getPluginData(PAGE_VECTOR_INSERT_VERSION_KEY) !==
     VECTOR_INSERT_VERSION
   ) {
-    root.setPluginData(
-      PAGE_STRUCTURE_BASELINE_KEY,
-      JSON.stringify(snapshotPageStructureWithoutUnmappedVectors(root)),
+    writePageStructureBaseline(
+      root,
+      snapshotPageStructureWithoutUnmappedVectors(root),
     );
     root.setPluginData(
       PAGE_VECTOR_INSERT_VERSION_KEY,
@@ -1353,6 +2057,25 @@ function compareFigmaNodeIds(left, right) {
 }
 
 function readPageStructureBaseline(root) {
+  const chunkMeta = readPageStructureBaselineMeta(root);
+  if (chunkMeta) {
+    try {
+      let serialized = "";
+      for (let index = 0; index < chunkMeta.chunkCount; index += 1) {
+        const chunk = root.getPluginData(
+          `${PAGE_STRUCTURE_BASELINE_CHUNK_PREFIX}${index}`,
+        );
+        if (!chunk) return [];
+        serialized += chunk;
+      }
+      const parsed = JSON.parse(serialized || "[]");
+      return Array.isArray(parsed)
+        ? collapseTrackedSvgDescendants(root, parsed)
+        : [];
+    } catch {
+      return [];
+    }
+  }
   try {
     const parsed = JSON.parse(
       root.getPluginData(PAGE_STRUCTURE_BASELINE_KEY) || "[]",
@@ -1362,6 +2085,67 @@ function readPageStructureBaseline(root) {
       : [];
   } catch {
     return [];
+  }
+}
+
+function writePageStructureBaseline(root, structure) {
+  const serialized = JSON.stringify(structure);
+  const chunks = [];
+  for (
+    let offset = 0;
+    offset < serialized.length;
+    offset += PAGE_STRUCTURE_BASELINE_CHUNK_SIZE
+  ) {
+    chunks.push(serialized.slice(offset, offset + PAGE_STRUCTURE_BASELINE_CHUNK_SIZE));
+  }
+  if (chunks.length === 0) chunks.push("[]");
+
+  const previousChunkCount = readPageStructureBaselineMeta(root)?.chunkCount || 0;
+  for (let index = 0; index < chunks.length; index += 1) {
+    root.setPluginData(
+      `${PAGE_STRUCTURE_BASELINE_CHUNK_PREFIX}${index}`,
+      chunks[index],
+    );
+  }
+  root.setPluginData(
+    PAGE_STRUCTURE_BASELINE_META_KEY,
+    JSON.stringify({
+      format: PAGE_STRUCTURE_BASELINE_FORMAT,
+      chunkCount: chunks.length,
+    }),
+  );
+  root.setPluginData(PAGE_STRUCTURE_BASELINE_KEY, "");
+  for (let index = chunks.length; index < previousChunkCount; index += 1) {
+    root.setPluginData(`${PAGE_STRUCTURE_BASELINE_CHUNK_PREFIX}${index}`, "");
+  }
+}
+
+function hasPageStructureBaseline(root) {
+  return Boolean(
+    readPageStructureBaselineMeta(root) ||
+      root.getPluginData(PAGE_STRUCTURE_BASELINE_KEY),
+  );
+}
+
+function readPageStructureBaselineMeta(root) {
+  try {
+    const meta = JSON.parse(
+      root.getPluginData(PAGE_STRUCTURE_BASELINE_META_KEY) || "null",
+    );
+    return meta?.format === PAGE_STRUCTURE_BASELINE_FORMAT &&
+      Number.isInteger(meta.chunkCount) &&
+      meta.chunkCount > 0
+      ? meta
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+function clearPageStructureBaselineChunks(root) {
+  const chunkCount = readPageStructureBaselineMeta(root)?.chunkCount || 0;
+  for (let index = 0; index < chunkCount; index += 1) {
+    root.setPluginData(`${PAGE_STRUCTURE_BASELINE_CHUNK_PREFIX}${index}`, "");
   }
 }
 
@@ -1397,13 +2181,19 @@ function acceptPageChanges(message) {
     return;
   }
   const root = findPageRoot(message.pageId);
+  if (!root) return;
+  lastHtmlConflictUndo = null;
+  const pendingChangeSetId = pendingPageChangeIds.get(message.pageId);
   if (
-    !root ||
-    root.getPluginData(SOURCE_HASH_KEY) !== message.sourceHash
-  ) {
-    return;
+    message.changeSetId &&
+    pendingChangeSetId &&
+    message.changeSetId !== pendingChangeSetId
+  ) return;
+  for (const node of findTrackedPageNodes(root)) {
+    node.setPluginData(SOURCE_HASH_KEY, message.sourceHash);
   }
   storePageBaselines(root);
+  pendingPageChangeIds.delete(message.pageId);
   reportPageStatus(true);
 }
 
@@ -1421,6 +2211,234 @@ function capturePagePreservedState(root) {
     .filter((node) => isDescendantOf(node, root))
     .map((node) => node.getPluginData(PAGE_NODE_ID_KEY));
   return { annotationsByNode, selectedNodeIds };
+}
+
+function trackedPageFingerprint(root) {
+  const nodes = findTrackedPageNodes(root)
+    .map((node) => ({
+      pageNodeId: node.getPluginData(PAGE_NODE_ID_KEY),
+      nodeType: node.type,
+      properties: snapshotNodeProperties(node),
+    }))
+    .sort((left, right) => left.pageNodeId.localeCompare(right.pageNodeId));
+  return JSON.stringify(nodes);
+}
+
+function captureTrackedBaselineData(root) {
+  return findTrackedPageNodes(root).map((node) => ({
+    pageNodeId: node.getPluginData(PAGE_NODE_ID_KEY),
+    baseline: node.getPluginData(PAGE_BASELINE_KEY),
+    svgBaseline: node.getPluginData(PAGE_SVG_BASELINE_KEY),
+    annotationBaseline: node.getPluginData(PAGE_ANNOTATION_BASELINE_KEY),
+  }));
+}
+
+function restoreTrackedBaselineData(root, entries) {
+  for (const entry of Array.isArray(entries) ? entries : []) {
+    const node = findTrackedPageNode(root, entry.pageNodeId);
+    if (!node || node.removed) continue;
+    node.setPluginData(PAGE_BASELINE_KEY, String(entry.baseline || ""));
+    node.setPluginData(PAGE_SVG_BASELINE_KEY, String(entry.svgBaseline || ""));
+    node.setPluginData(
+      PAGE_ANNOTATION_BASELINE_KEY,
+      String(entry.annotationBaseline || ""),
+    );
+  }
+}
+
+async function restoreTrackedPageFromSnapshot(root, snapshot, { pageId, sourceHash }) {
+  if (!snapshot || typeof snapshot !== "object") {
+    throw new Error("接受 HTML 前的 Figma 页面快照不可用。");
+  }
+  const visit = async (definition, expectedRoot = false) => {
+    const node = expectedRoot
+      ? root
+      : findTrackedPageNode(root, String(definition.id || ""));
+    if (!node || node.removed) {
+      throw new Error(`Figma Undo 缺少快照图层 ${definition.id || "unknown"}。`);
+    }
+    node.name = String(definition.name || node.name);
+    if (Number.isFinite(definition.width) && Number.isFinite(definition.height)) {
+      node.resize(Math.max(0.01, definition.width), Math.max(0.01, definition.height));
+    }
+    if (typeof definition.visible === "boolean") node.visible = definition.visible;
+    if (Number.isFinite(definition.opacity)) node.opacity = definition.opacity;
+    if (Number.isFinite(definition.rotation)) node.rotation = definition.rotation;
+    restoreSnapshotStyle(node, definition.style || {});
+    if (node.type === "FRAME") {
+      if (typeof definition.clipsContent === "boolean") {
+        node.clipsContent = definition.clipsContent;
+      }
+      restoreSnapshotLayout(node, definition.layout || {});
+      const children = Array.isArray(definition.children) ? definition.children : [];
+      for (let index = 0; index < children.length; index += 1) {
+        const childDefinition = children[index];
+        const child = findTrackedPageNode(root, String(childDefinition.id || ""));
+        if (!child || child.removed) continue;
+        node.insertChild(index, child);
+        await visit(childDefinition, false);
+        if (node.layoutMode === "NONE") {
+          if (Number.isFinite(childDefinition.x)) child.x = childDefinition.x;
+          if (Number.isFinite(childDefinition.y)) child.y = childDefinition.y;
+        }
+        restoreSnapshotLayoutItem(child, childDefinition.layoutItem || {});
+      }
+    } else if (node.type === "TEXT") {
+      const fontName = definition.fontName && typeof definition.fontName === "object"
+        ? definition.fontName
+        : { family: "Inter", style: "Regular" };
+      await figma.loadFontAsync(fontName);
+      node.fontName = fontName;
+      if (typeof definition.text === "string") node.characters = definition.text;
+      if (Number.isFinite(definition.fontSize)) node.fontSize = definition.fontSize;
+      if (definition.lineHeight && typeof definition.lineHeight === "object") {
+        node.lineHeight = jsonSafe(definition.lineHeight);
+      }
+      if (definition.letterSpacing && typeof definition.letterSpacing === "object") {
+        node.letterSpacing = jsonSafe(definition.letterSpacing);
+      }
+      for (const property of [
+        "textAlignHorizontal",
+        "textAlignVertical",
+        "textCase",
+        "textDecoration",
+      ]) {
+        if (typeof definition[property] === "string" && property in node) {
+          node[property] = definition[property];
+        }
+      }
+    }
+    if (definition.constraints && "constraints" in node) {
+      node.constraints = jsonSafe(definition.constraints);
+    }
+    node.setPluginData(SOURCE_HASH_KEY, sourceHash);
+    node.setPluginData(PAGE_ID_KEY, pageId);
+    return node;
+  };
+  await visit(snapshot, true);
+  restoreSnapshotStyle(root, snapshot.style || {});
+  const expectedRootFill =
+    snapshot.style?.fills?.find?.((paint) => paint?.type === "SOLID")?.color ||
+    (typeof snapshot.style?.fill === "string"
+      ? snapshot.style.fill
+      : snapshot.style?.fill?.color) ||
+    null;
+  const restoredRootFill = snapshotNodeProperties(root).fill?.color || null;
+  if (expectedRootFill && restoredRootFill !== expectedRootFill) {
+    throw new Error(
+      `Figma Undo 根填充恢复失败（期望 ${expectedRootFill}，实际 ${restoredRootFill || "none"}）。`,
+    );
+  }
+}
+
+function restoreSnapshotStyle(node, style) {
+  if ("fills" in node) {
+    const fills = Array.isArray(style.fills)
+      ? style.fills.map(restoreSnapshotPaint).filter(Boolean)
+      : [];
+    if (fills.length > 0) {
+      node.fills = fills;
+    } else if (style.fill) {
+      const fill = typeof style.fill === "string" ? style.fill : style.fill.color;
+      if (fill) {
+        const paint = paintFromHex(fill);
+        if (typeof style.fill?.opacity === "number") paint.opacity = style.fill.opacity;
+        node.fills = [paint];
+      }
+    } else {
+      node.fills = [];
+    }
+  }
+  if ("strokes" in node) {
+    const strokes = Array.isArray(style.strokes)
+      ? style.strokes.map(restoreSnapshotPaint).filter(Boolean)
+      : [];
+    if (strokes.length > 0) {
+      node.strokes = strokes;
+    } else if (style.stroke) {
+      const stroke = typeof style.stroke === "string" ? style.stroke : style.stroke.color;
+      node.strokes = stroke ? [paintFromHex(stroke)] : [];
+    } else {
+      node.strokes = [];
+    }
+  }
+  if ("effects" in node && Array.isArray(style.effects)) {
+    node.effects = jsonSafe(style.effects);
+  }
+  if (typeof style.strokeWeight === "number" && "strokeWeight" in node) {
+    node.strokeWeight = style.strokeWeight;
+  }
+  const radius = style.cornerRadius ?? style.radius;
+  if (typeof radius === "number" && "cornerRadius" in node) {
+    node.cornerRadius = radius;
+  } else if (radius && typeof radius === "object") {
+    const radii = [
+      ["topLeftRadius", radius.topLeft],
+      ["topRightRadius", radius.topRight],
+      ["bottomRightRadius", radius.bottomRight],
+      ["bottomLeftRadius", radius.bottomLeft],
+    ];
+    for (const [property, value] of radii) {
+      if (typeof value === "number" && property in node) node[property] = value;
+    }
+  }
+}
+
+function restoreSnapshotPaint(paint) {
+  if (!paint || typeof paint !== "object") return null;
+  if (paint.type === "SOLID" && typeof paint.color === "string") {
+    return {
+      ...paintFromHex(paint.color),
+      opacity: typeof paint.opacity === "number" ? paint.opacity : 1,
+      visible: paint.visible !== false,
+    };
+  }
+  return jsonSafe(paint);
+}
+
+function restoreSnapshotLayout(frame, layout) {
+  if ("layoutMode" in frame) {
+    frame.layoutMode = typeof layout.mode === "string"
+      ? layout.mode
+      : layout.direction === "horizontal"
+        ? "HORIZONTAL"
+        : layout.direction === "vertical"
+          ? "VERTICAL"
+          : "NONE";
+  }
+  const assignments = [
+    ["itemSpacing", layout.itemSpacing],
+    ["counterAxisSpacing", layout.counterAxisSpacing],
+    ["paddingTop", layout.padding?.top],
+    ["paddingRight", layout.padding?.right],
+    ["paddingBottom", layout.padding?.bottom],
+    ["paddingLeft", layout.padding?.left],
+    ["primaryAxisAlignItems", layout.primaryAxisAlignItems],
+    ["counterAxisAlignItems", layout.counterAxisAlignItems],
+    ["primaryAxisSizingMode", layout.primaryAxisSizingMode],
+    ["counterAxisSizingMode", layout.counterAxisSizingMode],
+  ];
+  for (const [property, value] of assignments) {
+    if (value !== undefined && value !== null && property in frame) frame[property] = value;
+  }
+  if ("layoutWrap" in frame && typeof layout.wrap === "boolean") {
+    frame.layoutWrap = layout.wrap ? "WRAP" : "NO_WRAP";
+  }
+}
+
+function restoreSnapshotLayoutItem(node, layoutItem) {
+  const parent = node.parent;
+  if (!parent || !("layoutMode" in parent) || parent.layoutMode === "NONE") return;
+  const assignments = [
+    ["layoutGrow", layoutItem.grow],
+    ["layoutAlign", layoutItem.align === "stretch" ? "STRETCH" : "INHERIT"],
+    ["layoutPositioning", layoutItem.positioning === "absolute" ? "ABSOLUTE" : "AUTO"],
+    ["layoutSizingHorizontal", String(layoutItem.horizontalSizing || "FIXED").toUpperCase()],
+    ["layoutSizingVertical", String(layoutItem.verticalSizing || "FIXED").toUpperCase()],
+  ];
+  for (const [property, value] of assignments) {
+    if (value !== undefined && value !== null && property in node) node[property] = value;
+  }
 }
 
 function capturePreservedState(root) {
@@ -1747,18 +2765,32 @@ async function capturePageChanges(captureRequestId = null) {
     if (changes.length === 0 && annotations.length === 0) {
       continue;
     }
+    const pageSnapshot = await serializeDesignPagePayload(root, {
+      preservePageNodeIds: true,
+    });
+    const referenceImage = await exportDesignScreenshot(root);
     const changeSetId = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    pendingPageChangeIds.set(root.getPluginData(PAGE_ID_KEY), changeSetId);
     figma.ui.postMessage({
       type: "page.changes.emit",
       requestId: captureRequestId || changeSetId,
       changeSet: {
         protocolVersion: PAGE_CHANGE_PROTOCOL_VERSION,
+        runtimeIdentity: currentRuntimeIdentity(),
         changeSetId,
         pageId: root.getPluginData(PAGE_ID_KEY),
         sourceHash: root.getPluginData(SOURCE_HASH_KEY),
         changes,
         annotations,
+        pageSnapshot: {
+          pageSeed: { node: pageSnapshot.definition },
+          report: pageSnapshot.report,
+          responsiveContract: responsiveContractForRoot(root),
+          referenceImage,
+          capturedAt: new Date().toISOString(),
+        },
         figma: {
+          fileKey: typeof figma.fileKey === "string" ? figma.fileKey : "",
           pageName: figma.currentPage.name,
           rootNodeId: root.id,
           rootNodeName: root.name,
@@ -1802,19 +2834,21 @@ async function captureSelectedPageSeed(message) {
   if (!pageId || !sourceHash) {
     throw new Error("当前 CDB 页面缺少可用映射。");
   }
-  if (findPageRoot(pageId)) {
-    throw new Error("当前页面已经从 Figma 建立过映射。");
-  }
   const selection = figma.currentPage.selection.filter((node) => !node.removed);
   if (selection.length !== 1) {
     throw new Error("请只选择一个完整的页面 Frame。");
   }
   const root = selection[0];
+  const existingRoot = findPageRoot(pageId);
+  if (existingRoot && existingRoot.id !== root.id) {
+    throw new Error("当前页面已关联到另一个 Figma Frame，请先选中原 Frame 或清除关联。");
+  }
   if (!INSERTABLE_PAGE_FRAME_TYPES.has(root.type)) {
     throw new Error("请选择 Frame、Component、Instance 或 Group 作为完整页面。");
   }
 
   const serialized = await serializeInsertedPageNode(root);
+  const referenceImage = await exportDesignScreenshot(root);
   const sourceRef = { selector: '[data-codex-id="page-root"]' };
   const definition = {
     ...serialized.definition,
@@ -1841,11 +2875,13 @@ async function captureSelectedPageSeed(message) {
   indexCurrentPage();
 
   const changeSetId = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  pendingPageChangeIds.set(pageId, changeSetId);
   figma.ui.postMessage({
     type: "page.changes.emit",
     requestId,
     changeSet: {
       protocolVersion: PAGE_CHANGE_PROTOCOL_VERSION,
+      runtimeIdentity: currentRuntimeIdentity(),
       changeSetId,
       pageId,
       sourceHash,
@@ -1860,7 +2896,10 @@ async function captureSelectedPageSeed(message) {
         to: { node: definition },
       }],
       annotations: [],
+      responsiveContract: responsiveContractForRoot(root),
+      referenceImage,
       figma: {
+        fileKey: typeof figma.fileKey === "string" ? figma.fileKey : "",
         pageName: figma.currentPage.name,
         rootNodeId: root.id,
         rootNodeName: root.name,
@@ -2122,7 +3161,7 @@ async function prepareInsertedPageNodes(
 }
 
 async function serializeInsertedPageNode(rootNode) {
-  const state = { count: 0, mappings: [] };
+  const state = { count: 0, mappings: [], degradations: [] };
   const visit = async (node) => {
     state.count += 1;
     if (state.count > MAX_INSERTED_PAGE_NODES) {
@@ -2136,13 +3175,15 @@ async function serializeInsertedPageNode(rootNode) {
     const sourceRef = {
       selector: `[data-codex-id="${nodeId}"]`,
     };
-    state.mappings.push({ node, nodeId, pageNodeType });
+    const mapping = { node, nodeId, pageNodeType };
+    state.mappings.push(mapping);
     const properties = snapshotNodeProperties(node);
     const definition = {
       id: nodeId,
       type: pageNodeType,
       tag: insertedMarkupTag(node, pageNodeType),
       name: node.name || nodeId,
+      figmaNodeId: node.id,
       sourceRef,
       width: positivePageDimension(node.width),
       height: positivePageDimension(node.height),
@@ -2152,6 +3193,7 @@ async function serializeInsertedPageNode(rootNode) {
           : 1,
       visible: typeof node.visible === "boolean" ? node.visible : true,
       rotation: Number.isFinite(node.rotation) ? round(node.rotation) : 0,
+      constraints: properties.constraints,
       style: {
         fill: properties.fill,
         stroke: properties.stroke,
@@ -2187,17 +3229,26 @@ async function serializeInsertedPageNode(rootNode) {
         letterSpacing: properties.letterSpacing,
         textAlignHorizontal: properties.textAlignHorizontal,
         textAlignVertical: properties.textAlignVertical,
-        textCase: properties.textCase,
-        textDecoration: properties.textDecoration,
+        textCase: properties.textCase || "ORIGINAL",
+        textDecoration: properties.textDecoration || "NONE",
       };
     }
     if (pageNodeType === "svg") {
-      const bytes = await node.exportAsync({
-        format: "SVG",
-        svgIdAttribute: true,
-      });
+      let bytes;
+      try {
+        bytes = await node.exportAsync({
+          format: "SVG",
+          svgIdAttribute: true,
+        });
+      } catch (error) {
+        state.degradations.push(insertedResourceDegradation(node, error));
+        mapping.pageNodeType = "frame";
+        return insertedResourcePlaceholder(definition, node);
+      }
       if (bytes.length === 0 || bytes.length > 768 * 1024) {
-        throw new Error("The inserted SVG exceeds the 768 KB sync limit.");
+        state.degradations.push(insertedResourceDegradation(node, "SVG 资源为空或超过 768 KB"));
+        mapping.pageNodeType = "frame";
+        return insertedResourcePlaceholder(definition, node);
       }
       return {
         ...definition,
@@ -2208,9 +3259,18 @@ async function serializeInsertedPageNode(rootNode) {
       };
     }
     if (pageNodeType === "image") {
-      const bytes = await node.exportAsync({ format: "PNG" });
+      let bytes;
+      try {
+        bytes = await node.exportAsync({ format: "PNG" });
+      } catch (error) {
+        state.degradations.push(insertedResourceDegradation(node, error));
+        mapping.pageNodeType = "frame";
+        return insertedResourcePlaceholder(definition, node);
+      }
       if (bytes.length === 0 || bytes.length > MAX_INSERTED_IMAGE_BYTES) {
-        throw new Error("The inserted image exceeds the 2 MB sync limit.");
+        state.degradations.push(insertedResourceDegradation(node, "图片资源为空或超过 2 MB"));
+        mapping.pageNodeType = "frame";
+        return insertedResourcePlaceholder(definition, node);
       }
       return {
         ...definition,
@@ -2254,12 +3314,39 @@ async function serializeInsertedPageNode(rootNode) {
   return {
     definition: await visit(rootNode),
     mappings: state.mappings,
+    degradations: state.degradations,
+  };
+}
+
+function insertedResourceDegradation(node, error) {
+  return {
+    nodeId: node.id,
+    nodeName: node.name || node.type,
+    nodeType: node.type,
+    reason: "resource_export_failed",
+    error: error instanceof Error ? error.message : String(error),
+  };
+}
+
+function insertedResourcePlaceholder(definition, node) {
+  return {
+    ...definition,
+    type: "frame",
+    tag: "div",
+    degradation: {
+      reason: "图层不可见或无法导出",
+      nodeName: node.name || node.type,
+    },
+    children: [],
   };
 }
 
 function insertedPageNodeType(node) {
   if (node.type === "TEXT") {
     return "text";
+  }
+  if (isSmallAtomicVisualContainer(node)) {
+    return "image";
   }
   if (hasVisibleImageFill(node)) {
     return "image";
@@ -2269,6 +3356,47 @@ function insertedPageNodeType(node) {
     return "svg";
   }
   return INSERTABLE_PAGE_FRAME_TYPES.has(node.type) ? "frame" : "";
+}
+
+function isSmallAtomicVisualContainer(node) {
+  if (
+    !INSERTABLE_PAGE_FRAME_TYPES.has(node.type) ||
+    node.layoutMode !== "NONE" ||
+    !Number.isFinite(node.width) ||
+    !Number.isFinite(node.height) ||
+    node.width <= 0 ||
+    node.height <= 0 ||
+    node.width > 64 ||
+    node.height > 64 ||
+    !("children" in node)
+  ) {
+    return false;
+  }
+  const children = node.children.filter((child) => !child.removed);
+  if (children.length === 0) return false;
+  const results = children.map(atomicVisualChildResult);
+  return (
+    results.every((result) => result.supported) &&
+    results.some((result) => result.hasVector)
+  );
+}
+
+function atomicVisualChildResult(node) {
+  if (INSERTABLE_PAGE_VECTOR_TYPES.has(node.type)) {
+    return { supported: true, hasVector: true };
+  }
+  if (node.type !== "GROUP" || !("children" in node)) {
+    return { supported: false, hasVector: false };
+  }
+  const children = node.children.filter((child) => !child.removed);
+  if (children.length === 0) {
+    return { supported: false, hasVector: false };
+  }
+  const results = children.map(atomicVisualChildResult);
+  return {
+    supported: results.every((result) => result.supported),
+    hasVector: results.some((result) => result.hasVector),
+  };
 }
 
 function hasVisibleImageFill(node) {
@@ -2310,6 +3438,7 @@ function positivePageDimension(value) {
 
 function setInsertedPageNodeData(root, node, nodeId, pageNodeType) {
   node.setPluginData(ROLE_KEY, ROLE_PAGE_NODE);
+  node.setPluginData(PAGE_RUNTIME_IDENTITY_KEY, CDB_EXACT_BUILD);
   node.setPluginData(PAGE_ID_KEY, root.getPluginData(PAGE_ID_KEY));
   node.setPluginData(PAGE_NODE_ID_KEY, nodeId);
   node.setPluginData(PAGE_NODE_TYPE_KEY, pageNodeType);
@@ -3248,6 +4377,10 @@ function snapshotNodeProperties(node) {
       typeof node.layoutSizingVertical === "string"
         ? node.layoutSizingVertical
         : null,
+    constraints:
+      "constraints" in node && node.constraints
+        ? jsonSafe(node.constraints)
+        : null,
   };
 
   if (node.type === "TEXT") {
@@ -3268,6 +4401,14 @@ function snapshotNodeProperties(node) {
       typeof node.textCase === "string" ? node.textCase : null;
     properties.textDecoration =
       typeof node.textDecoration === "string" ? node.textDecoration : null;
+    properties.textTruncation =
+      typeof node.textTruncation === "string" ? node.textTruncation : null;
+    properties.maxLines =
+      typeof node.maxLines === "number" && Number.isInteger(node.maxLines)
+        ? node.maxLines
+        : null;
+    properties.textAutoResize =
+      typeof node.textAutoResize === "string" ? node.textAutoResize : null;
   }
 
   return properties;
@@ -3329,7 +4470,9 @@ function snapshotUnitValue(value) {
   }
   return {
     unit: value.unit,
-    ...(typeof value.value === "number" ? { value: round(value.value) } : {}),
+    ...(typeof value.value === "number" && Number.isFinite(value.value)
+      ? { value: round(value.value) }
+      : {}),
   };
 }
 
@@ -3534,7 +4677,10 @@ function refreshSnapshotsForRoot(root) {
 
 function findPageRoots() {
   return figma.currentPage.findAll(
-    (node) => node.getPluginData(ROLE_KEY) === ROLE_PAGE_ROOT,
+    (node) =>
+      node.getPluginData(ROLE_KEY) === ROLE_PAGE_ROOT &&
+      node.getPluginData(PAGE_RUNTIME_IDENTITY_KEY) === CDB_EXACT_BUILD &&
+      pageBelongsToActiveProject(node),
   );
 }
 
@@ -3543,9 +4689,16 @@ function findPageRoot(pageId) {
     figma.currentPage.findOne(
       (node) =>
         node.getPluginData(ROLE_KEY) === ROLE_PAGE_ROOT &&
+        node.getPluginData(PAGE_RUNTIME_IDENTITY_KEY) === CDB_EXACT_BUILD &&
+        pageBelongsToActiveProject(node) &&
         node.getPluginData(PAGE_ID_KEY) === pageId,
     ) || null
   );
+}
+
+function pageBelongsToActiveProject(node) {
+  if (!activeProjectKey) return true;
+  return node.getPluginData(PAGE_PROJECT_KEY) === activeProjectKey;
 }
 
 function findTrackedPageNodes(root) {
@@ -3555,6 +4708,15 @@ function findTrackedPageNodes(root) {
       (node) => node.getPluginData(ROLE_KEY) === ROLE_PAGE_NODE,
     ),
   ];
+}
+
+function collectPageNodeMappings(root) {
+  return findTrackedPageNodes(root).slice(0, 500).map((node) => ({
+    pageNodeId: node.getPluginData(PAGE_NODE_ID_KEY),
+    figmaNodeId: node.id,
+    nodeType: node.getPluginData(PAGE_NODE_TYPE_KEY),
+    sourceRef: readJsonPluginData(node, PAGE_SOURCE_REF_KEY),
+  }));
 }
 
 function findTrackedPageNode(root, nodeId) {

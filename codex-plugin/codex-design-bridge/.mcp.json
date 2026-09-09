@@ -3,7 +3,7 @@
     "design_workspace": {
       "command": "node",
       "args": [
-        "./mcp/server.mjs"
+        "./mcp/gateway.mjs"
       ],
       "cwd": "."
     }

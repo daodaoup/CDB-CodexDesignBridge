@@ -1,14 +1,45 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { spawn } from "node:child_process";
+import { mkdir, mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import {
   applyDesignPreflightFixes,
+  addPageFromFigmaPayload,
   createDesignProject,
   createFigmaSeedProject,
+  createProjectFromFigmaPayload,
   preflightDesignProject,
+  recoverAbandonedProjectStaging,
 } from "../codex-plugin/codex-design-bridge/mcp/project-contract.mjs";
+
+test("cleans staging directories owned by a terminated generator process", async (t) => {
+  const workspaceDir = await mkdtemp(path.join(os.tmpdir(), "cdb-staging-recovery-"));
+  t.after(() => rm(workspaceDir, { recursive: true, force: true }));
+  const owner = spawn(process.execPath, ["-e", ""], { stdio: "ignore" });
+  const deadPid = owner.pid;
+  await new Promise((resolve, reject) => {
+    owner.once("error", reject);
+    owner.once("exit", resolve);
+  });
+  const abandonedProject = `.demo.cdb-create-${deadPid}-${Date.now()}`;
+  const abandonedCheck = `.cdb-add-page-check-${deadPid}-ABC123`;
+  const liveProject = `.live.cdb-create-${process.pid}-${Date.now()}`;
+  await Promise.all([
+    mkdir(path.join(workspaceDir, abandonedProject)),
+    mkdir(path.join(workspaceDir, abandonedCheck)),
+    mkdir(path.join(workspaceDir, liveProject)),
+  ]);
+
+  const recovered = await recoverAbandonedProjectStaging(workspaceDir);
+  assert.equal(recovered.recoveredCount, 2);
+  assert.deepEqual(
+    new Set(recovered.removedDirectories),
+    new Set([abandonedProject, abandonedCheck]),
+  );
+  assert.deepEqual(await readdir(workspaceDir), [liveProject]);
+});
 
 test("creates a native CDB project that passes preflight", async (t) => {
   const workspaceDir = await mkdtemp(path.join(os.tmpdir(), "cdb-create-"));
@@ -46,6 +77,13 @@ test("creates a native CDB project that passes preflight", async (t) => {
   assert.equal(report.status, "pass", JSON.stringify(report.issues));
   assert.equal(report.pageCount, 1);
   assert.ok(report.estimatedEditableLayers > 0);
+
+  const stylesheetPath = path.join(created.projectDir, "styles.css");
+  const stylesheet = await readFile(stylesheetPath, "utf8");
+  await writeFile(stylesheetPath, `${stylesheet}\n[data-codex-root] { opacity: 0.96; }\n`, "utf8");
+  const styleChanged = await preflightDesignProject(created.projectDir);
+  assert.notEqual(styleChanged.pages[0].sourceHash, report.pages[0].sourceHash);
+  assert.notEqual(styleChanged.sourceHash, report.sourceHash);
 });
 
 test("creates a preflight-ready Figma seed project", async (t) => {
@@ -66,6 +104,134 @@ test("creates a preflight-ready Figma seed project", async (t) => {
   assert.match(
     await readFile(path.join(created.projectDir, "index.html"), "utf8"),
     /data-codex-root data-codex-id="page-root"/,
+  );
+});
+
+test("atomically creates a preflighted local project from a complete Figma payload", async (t) => {
+  const workspaceDir = await mkdtemp(path.join(os.tmpdir(), "cdb-figma-payload-"));
+  t.after(() => rm(workspaceDir, { recursive: true, force: true }));
+  const png = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]).toString("base64");
+  const created = await createProjectFromFigmaPayload({
+    workspaceDir,
+    projectName: "figma-home",
+    pageId: "home-page",
+    pageName: "首页",
+    pageSeed: {
+      node: {
+        id: "page-root",
+        type: "frame",
+        tag: "main",
+        name: "首页",
+        width: 390,
+        height: 844,
+        opacity: 1,
+        visible: true,
+        rotation: 0,
+        style: { fill: "#FFFFFF" },
+        layout: { mode: "VERTICAL", itemSpacing: 16, counterAxisSpacing: 0, padding: { top: 24, right: 24, bottom: 24, left: 24 } },
+        children: [{
+          id: "hero-image",
+          type: "image",
+          tag: "img",
+          name: "Hero",
+          width: 342,
+          height: 180,
+          opacity: 1,
+          visible: true,
+          rotation: 0,
+          style: {},
+          image: { mimeType: "image/png", base64: png },
+        }],
+      },
+    },
+  });
+
+  assert.equal(path.basename(created.projectDir), "figma-home");
+  assert.equal(created.report.status, "pass", JSON.stringify(created.report.issues));
+  assert.equal(created.generated.nodeCount, 2);
+  assert.equal(created.generated.resourceCount, 1);
+  const manifest = JSON.parse(await readFile(path.join(created.projectDir, ".cdb", "manifest.json"), "utf8"));
+  assert.equal(manifest.source.kind, "figma-payload");
+  assert.equal(manifest.pages[0].id, "home-page");
+  assert.deepEqual(manifest.pages[0].viewport, { width: 390, height: 844 });
+  const html = await readFile(path.join(created.projectDir, "index.html"), "utf8");
+  const assetName = html.match(/\.\/assets\/([a-f0-9]{32}\.png)/)?.[1];
+  assert.ok(assetName);
+  assert.ok(await readFile(path.join(created.projectDir, "assets", assetName)));
+});
+
+test("adds a Figma payload as a preflighted page in one existing-project transaction", async (t) => {
+  const workspaceDir = await mkdtemp(path.join(os.tmpdir(), "cdb-figma-add-page-"));
+  t.after(() => rm(workspaceDir, { recursive: true, force: true }));
+  const created = await createDesignProject({
+    workspaceDir,
+    description: "Existing local project",
+    projectName: "existing-project",
+  });
+  const pngBytes = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
+  const pageSeed = {
+    node: {
+      id: "pricing-root",
+      type: "frame",
+      tag: "main",
+      name: "Pricing",
+      width: 1440,
+      height: 900,
+      opacity: 1,
+      visible: true,
+      rotation: 0,
+      style: { fill: "#FFFFFF" },
+      children: [
+        {
+          id: "pricing-image",
+          type: "image",
+          tag: "img",
+          name: "Plan visual",
+          width: 320,
+          height: 180,
+          opacity: 1,
+          visible: true,
+          rotation: 0,
+          style: {},
+          image: { mimeType: "image/png", base64: pngBytes.toString("base64") },
+        },
+      ],
+    },
+  };
+
+  const added = await addPageFromFigmaPayload({
+    projectDir: created.projectDir,
+    pageId: "pricing-page",
+    pageName: "Pricing",
+    pageSeed,
+  });
+
+  assert.equal(added.transaction.status, "committed");
+  assert.equal(added.report.status, "pass", JSON.stringify(added.report.issues));
+  assert.equal(added.generated.pageId, "pricing-page");
+  assert.deepEqual(
+    added.transaction.changedFiles.sort(),
+    [".cdb/manifest.json", "assets/4c4b6a3be1314ab86138bef4314dde02.png", "pricing.css", "pricing.html"].sort(),
+  );
+  const manifest = JSON.parse(
+    await readFile(path.join(created.projectDir, ".cdb", "manifest.json"), "utf8"),
+  );
+  assert.equal(manifest.pages.length, 2);
+  assert.equal(manifest.pages[1].entry, "pricing.html");
+  assert.deepEqual(manifest.pages[1].viewport, { width: 1440, height: 900 });
+  assert.match(
+    await readFile(path.join(created.projectDir, "pricing.html"), "utf8"),
+    /href="\.\/pricing\.css"/,
+  );
+
+  await assert.rejects(
+    addPageFromFigmaPayload({
+      projectDir: created.projectDir,
+      pageId: "different-id",
+      pageName: "Pricing",
+      pageSeed,
+    }),
+    (error) => error.code === "page_name_conflict",
   );
 });
 

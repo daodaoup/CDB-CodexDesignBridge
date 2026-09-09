@@ -29,6 +29,10 @@ const silentInstallerPath = path.join(
   workspaceRoot,
   "Install Codex Design Bridge.vbs",
 );
+const windowsWorkspaceLauncherPath = path.join(
+  workspaceRoot,
+  "Open CDB Workspace.cmd",
+);
 const macInstallerPath = path.join(
   workspaceRoot,
   "scripts",
@@ -63,8 +67,9 @@ test(
     assert.equal(report.version, manifestVersion());
     assert.equal(report.checkOnly, true);
     assert.equal(report.status, "package-valid");
-    assert.equal(report.coreFileCount, 18);
-    assert.equal(Object.keys(report.hashes).length, 18);
+    assert.equal(report.coreFileCount, 27);
+    assert.equal(Object.keys(report.hashes).length, 27);
+    assert.match(report.hashes["mcp/local-workspace-server.mjs"], /^[A-F0-9]{64}$/);
     assert.match(report.hashes["mcp/browser-capture.mjs"], /^[A-F0-9]{64}$/);
     assert.match(report.hashes[".codex-plugin/plugin.json"], /^[A-F0-9]{64}$/);
     const installerSource = readFileSync(installerPath, "utf8");
@@ -79,6 +84,26 @@ test(
     assert.doesNotMatch(silentInstallerSource, /Stop-Process|taskkill/i);
   },
 );
+
+test("Windows entrypoints bootstrap the current local runtime", () => {
+  const installerSource = readFileSync(installerPath, "utf8");
+  assert.match(installerSource, /codex-design-bridge-local/);
+  assert.match(installerSource, /function Write-LocalMarketplace/);
+  assert.match(installerSource, /plugin", "marketplace", "add"/);
+  assert.match(installerSource, /function Resolve-NodeCommandPath/);
+  assert.match(installerSource, /Set-McpRuntime -PluginPath \$stagingPath/);
+  assert.match(installerSource, /mcpNodePath = \$mcpNodePath/);
+  assert.match(installerSource, /LocalApplicationData/);
+
+  const silentInstallerSource = readFileSync(silentInstallerPath, "utf8");
+  assert.match(silentInstallerSource, /CDB 0\.9 beta/);
+  assert.doesNotMatch(silentInstallerSource, /CDB 0\.7/);
+
+  const workspaceLauncher = readFileSync(windowsWorkspaceLauncherPath, "utf8");
+  assert.match(workspaceLauncher, /codex-primary-runtime\\dependencies\\node/);
+  assert.match(workspaceLauncher, /scripts\\open-local-workspace\.mjs/);
+  assert.match(workspaceLauncher, /where node\.exe/);
+});
 
 test(
   "macOS installer validates the release without changing plugin state",
@@ -99,8 +124,9 @@ test(
     assert.equal(report.version, manifestVersion());
     assert.equal(report.checkOnly, true);
     assert.equal(report.status, "package-valid");
-    assert.equal(report.coreFileCount, 18);
-    assert.equal(Object.keys(report.hashes).length, 18);
+    assert.equal(report.coreFileCount, 27);
+    assert.equal(Object.keys(report.hashes).length, 27);
+    assert.match(report.hashes["mcp/local-workspace-server.mjs"], /^[a-f0-9]{64}$/);
     assert.match(report.hashes["mcp/browser-capture.mjs"], /^[a-f0-9]{64}$/);
     assert.match(report.hashes[".codex-plugin/plugin.json"], /^[a-f0-9]{64}$/);
   },
@@ -137,6 +163,7 @@ test(
         "--codex-command", fixture.codexCommand,
         "--report", fixture.reportPath,
         "--skip-process-check",
+        "--clean-install",
       ],
       fixture.home,
     );
@@ -147,13 +174,28 @@ test(
     );
     assert.equal(installedManifest.version, manifestVersion());
     const entries = await import("node:fs/promises").then(({ readdir }) => readdir(fixture.destinationRoot));
-    assert.ok(entries.some((entry) => entry.startsWith("codex-design-bridge.backup-")));
+    assert.ok(!entries.some((entry) => entry.startsWith("codex-design-bridge.backup-")));
+    assert.equal(
+      spawnSync("test", ["-d", path.join(fixture.legacyCacheRoot, "0.7.0+codex.legacy")]).status,
+      0,
+      "runtime caches remain available to tasks that already loaded them",
+    );
     const report = JSON.parse(await readFile(fixture.reportPath, "utf8"));
     assert.equal(report.status, "installed");
     assert.equal(report.previousVersion, "0.4.3+codex.old");
     assert.equal(report.hashesVerified, true);
     assert.equal(report.pluginListConfirmed, true);
     assert.equal(report.installedPath, fixture.cachePath);
+    assert.equal(spawnSync(report.mcpNodePath, ["--version"]).status, 0);
+    const installedMcpConfig = JSON.parse(
+      await readFile(path.join(fixture.destinationRoot, "codex-design-bridge", ".mcp.json"), "utf8"),
+    );
+    assert.equal(installedMcpConfig.mcpServers.design_workspace.command, report.mcpNodePath);
+    assert.deepEqual(installedMcpConfig.mcpServers.design_workspace.args, ["./mcp/gateway.mjs"]);
+    const cachedMcpConfig = JSON.parse(
+      await readFile(path.join(fixture.cachePath, ".mcp.json"), "utf8"),
+    );
+    assert.equal(cachedMcpConfig.mcpServers.design_workspace.command, report.mcpNodePath);
   },
 );
 
@@ -250,7 +292,77 @@ test(
   },
 );
 
-function runInstaller(argumentsList) {
+test(
+  "Windows installer bootstraps a dedicated marketplace and runtime cache",
+  { skip: process.platform !== "win32" },
+  async (t) => {
+    const root = await mkdtemp(path.join(os.tmpdir(), "design-bridge-win-install-"));
+    const profile = path.join(root, "profile");
+    const localAppData = path.join(root, "local-app-data");
+    const statePath = path.join(root, "plugin-state.json");
+    const fakeCodex = path.join(root, "fake-codex.cmd");
+    const reportPath = path.join(root, "install-report.json");
+    t.after(() => rm(root, { recursive: true, force: true }));
+
+    await mkdir(profile, { recursive: true });
+    await mkdir(localAppData, { recursive: true });
+    await writeFile(
+      fakeCodex,
+      `@echo off\r\n"${process.execPath}" "${path.resolve("scripts", "test-fixtures", "fake-codex-plugin-cli.mjs")}" %*\r\n`,
+      "utf8",
+    );
+
+    const result = runInstaller(
+      [
+        "-SourcePath", pluginRoot,
+        "-CodexCommand", fakeCodex,
+        "-ReportPath", reportPath,
+        "-SkipProcessCheck",
+      ],
+      {
+        ...process.env,
+        USERPROFILE: profile,
+        HOME: profile,
+        LOCALAPPDATA: localAppData,
+        CDB_FAKE_CODEX_STATE: statePath,
+        CODEX_DESIGN_BRIDGE_LOCAL_MARKETPLACE_ROOT: path.join(
+          localAppData,
+          "Codex Design Bridge",
+        ),
+        PATH: `${path.dirname(process.execPath)};${process.env.PATH || ""}`,
+      },
+    );
+
+    assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
+    const report = JSON.parse(
+      (await readFile(reportPath, "utf8")).replace(/^\uFEFF/, ""),
+    );
+    assert.equal(report.status, "installed");
+    assert.equal(report.marketplace, "codex-design-bridge-local");
+    assert.equal(report.hashesVerified, true);
+    assert.equal(report.pluginListConfirmed, true);
+    assert.equal(report.mcpNodePath, process.execPath);
+    assert.equal(
+      report.targetPath,
+      path.join(localAppData, "Codex Design Bridge", "plugins", "codex-design-bridge"),
+    );
+    const cachedMcp = JSON.parse(
+      (await readFile(path.join(report.installedPath, ".mcp.json"), "utf8"))
+        .replace(/^\uFEFF/, ""),
+    );
+    assert.equal(cachedMcp.mcpServers.design_workspace.command, process.execPath);
+    const state = JSON.parse(await readFile(statePath, "utf8"));
+    assert.deepEqual(state.installed, [
+      {
+        pluginId: "codex-design-bridge@codex-design-bridge-local",
+        version: manifestVersion(),
+      },
+    ]);
+    assert.equal(state.marketplaces[0].name, "codex-design-bridge-local");
+  },
+);
+
+function runInstaller(argumentsList, environment = process.env) {
   return spawnSync(
     "powershell.exe",
     [
@@ -266,6 +378,7 @@ function runInstaller(argumentsList) {
       cwd: workspaceRoot,
       encoding: "utf8",
       windowsHide: true,
+      env: environment,
     },
   );
 }
@@ -277,6 +390,7 @@ function runMacInstaller(argumentsList, home) {
     env: {
       ...process.env,
       HOME: home,
+      TMPDIR: home,
       PATH: `${path.dirname(process.execPath)}:${process.env.PATH || ""}`,
     },
   });
@@ -300,6 +414,14 @@ async function createMacInstallerFixture(mode) {
     "codex-design-bridge",
     manifestVersion(),
   );
+  const legacyCacheRoot = path.join(
+    home,
+    ".codex",
+    "plugins",
+    "cache",
+    "personal",
+    "codex-design-bridge",
+  );
 
   await mkdir(marketplaceDirectory, { recursive: true });
   await writeFile(
@@ -310,6 +432,8 @@ async function createMacInstallerFixture(mode) {
     }),
   );
   await mkdir(destinationRoot, { recursive: true });
+  await mkdir(path.join(home, "tmp"), { recursive: true });
+  await mkdir(path.join(legacyCacheRoot, "0.7.0+codex.legacy"), { recursive: true });
   await cp(pluginRoot, target, { recursive: true });
   const oldManifestPath = path.join(target, ".codex-plugin", "plugin.json");
   const oldManifest = JSON.parse(await readFile(oldManifestPath, "utf8"));
@@ -359,7 +483,7 @@ if (args[1] === "list") {
 `,
   );
   await chmod(codexCommand, 0o755);
-  return { root, home, destinationRoot, codexCommand, reportPath, cachePath, statePath };
+  return { root, home, destinationRoot, codexCommand, reportPath, cachePath, legacyCacheRoot, statePath };
 }
 
 function manifestVersion() {

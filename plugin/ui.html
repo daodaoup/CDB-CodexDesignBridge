@@ -106,6 +106,12 @@
         grid-column: 1 / -1;
       }
 
+      #capture.alternative {
+        color: var(--figma-color-text-brand);
+        background: var(--figma-color-bg-secondary);
+        border: 1px solid var(--figma-color-border-brand);
+      }
+
       .pages {
         margin: 0 0 16px;
         border: 1px solid var(--figma-color-border);
@@ -212,9 +218,9 @@
     </section>
 
     <div class="buttons">
-      <button id="seed-page" disabled hidden>用选中稿创建页面</button>
-      <button id="capture" disabled>发送修改给 Codex</button>
-      <button class="secondary" id="reset-workspace" disabled>重置</button>
+      <button id="seed-page" disabled hidden>用选中稿生成当前页面</button>
+      <button id="capture" disabled>发送到 CDB 工作台</button>
+      <button class="secondary" id="reset-workspace" disabled>清除关联</button>
     </div>
 
     <p id="result" class="result">支持快速同步文字、颜色、字号、间距和圆角。</p>
@@ -227,7 +233,10 @@
     </div>
 
     <script>
-      const FIGMA_PLUGIN_VERSION = "0.7.0";
+      const FIGMA_PLUGIN_VERSION = "0.9.0";
+      const CDB_EXACT_BUILD = "0.9.0+codex.20260829100031";
+      const CDB_PROTOCOL_VERSION = 16;
+      const PAGE_IR_SCHEMA_VERSION = 2;
       const captureButton = document.getElementById("capture");
       const seedPageButton = document.getElementById("seed-page");
       const statusDot = document.getElementById("status-dot");
@@ -261,6 +270,10 @@
       let activePageId = "";
       let connectedProjectName = "";
       let connectedProjectKey = "";
+      let helloProjectKey = "";
+      let designSessionId = createIdentity("session");
+      let designSelection = null;
+      let activeOfferId = "";
 
       seedPageButton.addEventListener("click", () => {
         const page = catalogPages.find((candidate) => candidate.id === activePageId);
@@ -274,6 +287,7 @@
               pageId: page.id,
               sourceHash: page.sourceHash,
               requestId: `figma-seed-${Date.now()}`,
+              projectKey: connectedProjectKey,
             },
           },
           "*",
@@ -282,18 +296,27 @@
 
       captureButton.addEventListener("click", () => {
         captureButton.disabled = true;
-        if (localWorkspace) {
-          captureButton.textContent = "正在发送…";
-          setStatus("connected", "正在读取 Figma 修改…");
-          statusDetail.textContent = "页面保持可见，不需要等待加载界面";
-          parent.postMessage(
-            { pluginMessage: { type: "review.capture" } },
-            "*",
-          );
-        } else {
-          captureButton.textContent = "Capturing design…";
-          parent.postMessage({ pluginMessage: { type: "design.capture" } }, "*");
+        if (selectedFrameHasCurrentProjectLink()) {
+          captureButton.textContent = "正在发送修改…";
+          setStatus("connected", "正在把 Figma 修改传给 Codex…");
+          statusDetail.textContent = "发送成功后 Codex 会自动开始处理";
+          parent.postMessage({ pluginMessage: {
+            type: "review.capture",
+            requestId: `figma-changes-${Date.now()}`,
+            projectKey: connectedProjectKey,
+          } }, "*");
+          return;
         }
+        activeOfferId = createIdentity("offer");
+        captureButton.textContent = "正在准备…";
+        setStatus("connected", "正在提交设计提案…");
+        statusDetail.textContent = "CDB 会决定项目和源码位置";
+        parent.postMessage({ pluginMessage: {
+          type: "figma.design.offer.capture",
+          offerId: activeOfferId,
+          sessionId: designSessionId,
+          projectKey: connectedProjectKey,
+        } }, "*");
       });
 
       resetWorkspaceButton.addEventListener("click", () => {
@@ -314,6 +337,13 @@
         if (message.type === "plugin.settings") {
           endpoint = message.endpoint || endpoint;
           token = message.token || "";
+          if (
+            message.designRecovery?.sessionId &&
+            message.designRecovery?.offerId
+          ) {
+            designSessionId = String(message.designRecovery.sessionId);
+            activeOfferId = String(message.designRecovery.offerId);
+          }
           if (token) {
             shouldReconnect = true;
             connect();
@@ -335,6 +365,58 @@
           appendLog(`Figma ready · ${message.pageName}`);
           return;
         }
+        if (message.type === "workspace.identity.ready") {
+          importedPages.clear();
+          for (const pageId of message.importedPageIds || []) {
+            importedPages.add(pageId);
+          }
+          unsentChanges = Boolean(message.unsentChanges);
+          changedPageIds = message.changedPageIds || [];
+          pageCount.textContent = String(importedPages.size);
+          renderCatalogActions();
+          renderDesignSelection();
+          return;
+        }
+        if (message.type === "figma.design.selection") {
+          designSelection = message.selection || null;
+          renderDesignSelection();
+          return;
+        }
+        if (message.type === "figma.design.offer.emit") {
+          send(message.offer);
+          captureButton.textContent = "等待 CDB…";
+          resultElement.textContent = "设计提案已发送，等待 CDB 选择目标。";
+          return;
+        }
+        if (message.type === "figma.design.progress.emit") {
+          send({
+            type: "figma.design.progress",
+            protocolVersion: CDB_PROTOCOL_VERSION,
+            runtimeIdentity: currentRuntimeIdentity(),
+            offerId: message.offerId,
+            sessionId: message.sessionId,
+            phase: message.phase,
+            completed: message.completed || 0,
+            total: message.total || 0,
+            message: message.message || "",
+          });
+          resultElement.textContent = message.message || "正在采集完整页面…";
+          setStatus("connected", "正在读取完整页面");
+          statusDetail.textContent = message.total
+            ? `${message.completed || 0} / ${message.total} 个图层`
+            : "不可导出的隐藏图层会自动跳过";
+          return;
+        }
+        if (message.type === "figma.design.payload.emit") {
+          send(message.payload);
+          captureButton.disabled = true;
+          captureButton.textContent = "正在传输…";
+          resultElement.textContent = "完整页面和资源已发送，等待 CDB 校验。";
+          statusDetail.textContent = message.payload?.report?.degradations?.length
+            ? `已跳过 ${message.payload.report.degradations.length} 个不可导出图层`
+            : "全部图层已读取";
+          return;
+        }
         if (message.type === "workspace.reset.complete") {
           importedAssets.clear();
           importedPages.clear();
@@ -345,7 +427,7 @@
           renderCatalog();
           captureButton.disabled = true;
           resetWorkspaceButton.disabled = true;
-          resetWorkspaceButton.textContent = "重置";
+          resetWorkspaceButton.textContent = "清除关联";
           setConnectedStatus();
           statusDetail.textContent = "Figma 关联已清空 · Codex 项目仍保持打开";
           resultElement.textContent = "可以继续在当前 Codex 项目中发送页面到 Figma。";
@@ -360,10 +442,11 @@
             changedPageIds: message.changedPageIds || [],
           });
           if (localWorkspace && socket?.readyState === WebSocket.OPEN) {
-            captureButton.textContent = "发送修改给 Codex";
+            captureButton.textContent = "发送到 CDB 工作台";
             statusDetail.textContent = unsentChanges
               ? "有尚未发送的修改"
               : "当前修改已发送";
+            renderDesignSelection();
           }
           return;
         }
@@ -382,6 +465,16 @@
           }
           renderCatalogActions();
           send({ type: "page.import.result", result: message });
+          return;
+        }
+        if (message.type === "page.import.undo.result") {
+          resultElement.textContent = message.ok
+            ? "已撤销接受 HTML，Figma 页面已恢复。"
+            : message.error || "Figma 页面未能恢复。";
+          statusDetail.textContent = message.ok
+            ? "冲突已重新打开"
+            : "请回到 CDB 工作台重试";
+          send(message);
           return;
         }
         if (message.type === "asset.result") {
@@ -424,7 +517,7 @@
           });
           if (localWorkspace) {
             captureButton.disabled = false;
-            captureButton.textContent = "发送修改给 Codex";
+            captureButton.textContent = "发送到 CDB 工作台";
             setStatus("connected", "没有新的修改");
             statusDetail.textContent = "继续在 Figma 中调整即可";
             resultElement.textContent = "当前设计与上次发送时一致。";
@@ -456,10 +549,10 @@
         if (message.type === "plugin.error") {
           appendLog(`Plugin error: ${message.error}`);
           captureButton.disabled = false;
-          captureButton.textContent = "重新发送";
+          captureButton.textContent = "重新发送到 CDB";
           setStatus("error", "这次没有发送成功");
-          statusDetail.textContent = "可以直接重试，不会重复修改代码";
-          resultElement.textContent = message.error;
+          statusDetail.textContent = message.error || "可以直接重试";
+          resultElement.textContent = "不会重复修改代码；修正问题后可直接重试。";
           renderCatalogActions();
         }
       };
@@ -502,13 +595,17 @@
           resetWorkspaceButton.disabled = false;
           send({
             type: "plugin.hello",
-            protocolVersion: 14,
+            protocolVersion: CDB_PROTOCOL_VERSION,
+            runtimeIdentity: currentRuntimeIdentity(),
             pluginVersion: FIGMA_PLUGIN_VERSION,
+            sessionId: designSessionId,
             importedAssetIds: [...importedAssets],
             importedPageIds: [...importedPages],
             unsentChanges,
             changedPageIds,
+            projectKey: connectedProjectKey,
           });
+          helloProjectKey = connectedProjectKey;
           appendLog("Connected to local bridge");
         };
         socket.onmessage = (event) => handleBridgeMessage(JSON.parse(event.data));
@@ -561,6 +658,27 @@
           localWorkspace = Boolean(message.localWorkspace);
           connectedProjectName = String(message.projectName || connectedProjectName);
           connectedProjectKey = String(message.projectKey || connectedProjectKey);
+          if (connectedProjectKey) {
+            parent.postMessage({ pluginMessage: {
+              type: "workspace.identity",
+              projectKey: connectedProjectKey,
+            } }, "*");
+          }
+          if (connectedProjectKey && connectedProjectKey !== helloProjectKey) {
+            send({
+              type: "plugin.hello",
+              protocolVersion: CDB_PROTOCOL_VERSION,
+              runtimeIdentity: currentRuntimeIdentity(),
+              pluginVersion: FIGMA_PLUGIN_VERSION,
+              sessionId: designSessionId,
+              importedAssetIds: [...importedAssets],
+              importedPageIds: [...importedPages],
+              unsentChanges,
+              changedPageIds,
+              projectKey: connectedProjectKey,
+            });
+            helloProjectKey = connectedProjectKey;
+          }
           assetCount.textContent = String(message.assets || 0);
           pageCount.textContent = String(message.pages || 0);
           if (message.codexRunner?.runningTaskId) {
@@ -570,9 +688,7 @@
           } else {
             activeTaskId = null;
             captureButton.disabled = false;
-            captureButton.textContent = localWorkspace
-              ? "发送修改给 Codex"
-              : "发送设计给 Codex";
+            captureButton.textContent = "发送到 CDB 工作台";
             setConnectedStatus();
           }
           resetWorkspaceButton.disabled = !localWorkspace;
@@ -582,6 +698,125 @@
           }
           if (message.runtimeVersion) {
             appendLog(`CDB runtime: ${message.runtimeVersion}`);
+          }
+          return;
+        }
+        if (message.type === "figma.design.offer.ack") {
+          if (message.state === "rejected") {
+            activeOfferId = "";
+            parent.postMessage({ pluginMessage: {
+              type: "figma.design.recovery.clear",
+            } }, "*");
+            captureButton.disabled = !designSelection?.supported;
+            captureButton.textContent = "重新发送到 CDB";
+            setStatus("error", "设计提案未被接收");
+            resultElement.textContent = message.error || "请重新选择后再试。";
+          } else {
+            captureButton.disabled = true;
+            captureButton.textContent = "等待 CDB…";
+            setStatus("connected", message.duplicate ? "CDB 已有这份提案" : "提案已到达 CDB");
+            statusDetail.textContent = "回到 CDB 工作台选择新建、添加或更新目标";
+            resultElement.textContent = "Frame 已安全进入接收箱，Figma 画布不会被修改。";
+          }
+          return;
+        }
+        if (message.type === "figma.design.inbox") {
+          const offers = Array.isArray(message.offers) ? message.offers : [];
+          const offer = offers.find(
+            (candidate) => candidate?.offerId === activeOfferId,
+          );
+          if (activeOfferId && !offer) {
+            activeOfferId = "";
+            parent.postMessage({ pluginMessage: {
+              type: "figma.design.recovery.clear",
+            } }, "*");
+            captureButton.disabled = !designSelection?.supported;
+            captureButton.textContent = "发送到 CDB 工作台";
+            setConnectedStatus();
+            renderDesignSelection();
+            return;
+          }
+          if (offer) {
+            captureButton.disabled = true;
+            if (offer.state === "pending") {
+              captureButton.textContent = "等待 CDB…";
+              setStatus("connected", "提案已到达 CDB");
+              statusDetail.textContent = "回到 CDB 工作台选择添加、更新或创建目标";
+              resultElement.textContent = "提案已在本地工作台收件箱中。";
+            } else {
+              captureButton.textContent = "正在恢复…";
+              setStatus("connected", "正在恢复当前传输");
+              statusDetail.textContent = "CDB 正在读取当前版本的处理结果";
+            }
+            send({
+              type: "figma.design.result.query",
+              protocolVersion: CDB_PROTOCOL_VERSION,
+              runtimeIdentity: currentRuntimeIdentity(),
+              offerId: offer.offerId,
+              sessionId: designSessionId,
+            });
+          }
+          return;
+        }
+        if (message.type === "figma.design.accept") {
+          activeOfferId = String(message.offerId || activeOfferId);
+          captureButton.disabled = true;
+          captureButton.textContent = "正在采集…";
+          setStatus("connected", "CDB 已接收提案");
+          statusDetail.textContent = "正在重新读取原始 Frame 和资源";
+          parent.postMessage({ pluginMessage: {
+            type: "figma.design.payload.capture",
+            offerId: message.offerId,
+            sessionId: message.sessionId,
+            rootNodeId: message.rootNodeId || "",
+            estimatedNodeCount: message.estimatedNodeCount || 0,
+          } }, "*");
+          return;
+        }
+        if (message.type === "figma.design.result") {
+          captureButton.disabled = !designSelection?.supported;
+          captureButton.textContent = "发送到 CDB 工作台";
+          if (message.state === "payload_received") {
+            setStatus("connected", "完整页面已传输");
+            statusDetail.textContent = "回到 CDB 工作台完成页面生成";
+            resultElement.textContent = message.result?.degradationCount
+              ? `传输完成；${message.result.degradationCount} 个不可导出图层已安全降级。`
+              : "传输完成，CDB 已收到全部可编辑内容。";
+          } else if (message.state === "failed") {
+            activeOfferId = "";
+            parent.postMessage({ pluginMessage: {
+              type: "figma.design.recovery.clear",
+            } }, "*");
+            setStatus("error", "页面传输未完成");
+            statusDetail.textContent = "已收到的提案仍保留，可以直接重试";
+            resultElement.textContent = message.error || "CDB 校验失败。";
+          } else if (message.state === "completed" && message.result?.pageId) {
+            parent.postMessage({ pluginMessage: {
+              type: "figma.design.result.accepted",
+              result: message.result,
+            } }, "*");
+            activeOfferId = "";
+            setStatus("connected", "页面代码已生成");
+            statusDetail.textContent = "Figma Frame 已建立本地页面映射";
+            resultElement.textContent = `已生成 ${message.result.entry || message.result.pageId}`;
+          } else {
+            if (message.state === "cancelled") {
+              activeOfferId = "";
+              parent.postMessage({ pluginMessage: {
+                type: "figma.design.recovery.clear",
+              } }, "*");
+            }
+            if (message.state === "pending") {
+              captureButton.disabled = true;
+              captureButton.textContent = "等待 CDB…";
+              setStatus("connected", "提案已到达 CDB");
+              statusDetail.textContent = "回到 CDB 工作台选择添加、更新或创建目标";
+              resultElement.textContent = "提案已在本地工作台收件箱中。";
+            } else {
+              resultElement.textContent = message.state === "cancelled"
+                ? "设计提案已取消。"
+                : `设计提案状态：${message.state || "未知"}`;
+            }
           }
           return;
         }
@@ -600,7 +835,7 @@
             appendLog(`Codex started ${task.taskId}`);
           } else if (task.state === "completed") {
             captureButton.disabled = false;
-            captureButton.textContent = "发送修改给 Codex";
+            captureButton.textContent = "发送到 CDB 工作台";
             setStatus("connected", "页面代码已更新");
             if (!completedTasks.has(task.taskId)) {
               completedTasks.add(task.taskId);
@@ -610,7 +845,7 @@
             appendLog(`Code updated · ${task.lastMessagePath || task.taskId}`);
           } else if (task.state === "failed") {
             captureButton.disabled = false;
-            captureButton.textContent = "重新发送";
+            captureButton.textContent = "重新发送到 CDB";
             setStatus("error", "Codex 更新失败");
             appendLog(`Codex failed: ${task.error || "Unknown error"}`);
           }
@@ -643,18 +878,33 @@
           );
           return;
         }
+        if (message.type === "page.node.locate") {
+          parent.postMessage(
+            { pluginMessage: message },
+            "*",
+          );
+          return;
+        }
+        if (message.type === "page.import.undo") {
+          parent.postMessage(
+            { pluginMessage: message },
+            "*",
+          );
+          return;
+        }
         if (message.type === "page.catalog") {
           catalogPages = Array.isArray(message.pages) ? message.pages : [];
           if (!catalogPages.some((page) => page.id === activePageId)) {
             activePageId = catalogPages[0]?.id || "";
           }
           renderCatalog();
+          renderDesignSelection();
           return;
         }
         if (message.type === "workspace.reset.result") {
           if (!message.ok) {
             resetWorkspaceButton.disabled = false;
-            resetWorkspaceButton.textContent = "重置";
+            resetWorkspaceButton.textContent = "清除关联";
             resultElement.textContent = message.error || "工作台重置失败。";
             return;
           }
@@ -696,30 +946,32 @@
           return;
         }
         if (message.type === "page.changes.ack") {
-          parent.postMessage(
-            {
-              pluginMessage: {
-                type: "page.changes.accepted",
-                pageId: message.pageId || null,
-                sourceHash: message.sourceHash || null,
-                changeSetId: message.changeSetId || null,
-              },
-            },
-            "*",
-          );
           appendLog(
             `${message.state === "conflict" ? "Conflict" : "Saved"} page changes · ${message.path}`,
           );
           const fastApply = message.fastApply || {};
           const appliedCount = fastApply.appliedCount || 0;
           const pendingCount = fastApply.pendingCount || 0;
+          if (pendingCount === 0) {
+            parent.postMessage(
+              {
+                pluginMessage: {
+                  type: "page.changes.accepted",
+                  pageId: message.pageId || null,
+                  sourceHash: message.sourceHash || null,
+                  changeSetId: message.changeSetId || null,
+                },
+              },
+              "*",
+            );
+          }
           const seconds = Math.max(
             0.1,
             (fastApply.durationMs || 0) / 1000,
           ).toFixed(1);
           captureButton.disabled = false;
-          unsentChanges = false;
-          captureButton.textContent = "继续发送修改";
+          unsentChanges = pendingCount > 0;
+          captureButton.textContent = pendingCount > 0 ? "重试生成" : "发送到 CDB 工作台";
           if (appliedCount > 0 && pendingCount === 0) {
             setStatus("connected", `已更新 ${appliedCount} 处修改`);
             statusDetail.textContent = "Codex 页面代码已经保存";
@@ -729,10 +981,13 @@
             statusDetail.textContent = `另有 ${pendingCount} 处交给 Codex 处理`;
             resultElement.textContent = "页面不会阻塞，可以继续设计。";
           } else {
-            setStatus("connected", `已发送 ${pendingCount} 处修改`);
-            statusDetail.textContent = "这些结构修改将由 Codex 处理";
-            resultElement.textContent = "页面不会阻塞，可以继续设计。";
+            const reason = fastApply.pending?.[0]?.reason || "unknown";
+            const detail = String(fastApply.error || "").trim();
+            setStatus("error", "已收到，但生成未完成");
+            statusDetail.textContent = `CDB 落盘失败：${detail || pendingReasonLabel(reason)}`;
+            resultElement.textContent = `失败阶段：生成页面代码 · ${reason}`;
           }
+          renderCatalogActions();
           return;
         }
         if (message.type === "session.ended") {
@@ -750,13 +1005,27 @@
             "如有尚未发送的修改，它们仍保留在当前 Figma 文件中。";
           return;
         }
+        if (message.type === "session.replaced") {
+          appendLog("旧连接已由当前连接替换");
+          sessionEnded = true;
+          shouldReconnect = false;
+          clearTimeout(reconnectTimer);
+          clearTimeout(pairingTimer);
+          if (socket) {
+            socket.onclose = null;
+            socket.close();
+          }
+          return;
+        }
         if (message.type === "bridge.error") {
           appendLog(`Bridge error: ${message.error}`);
           captureButton.disabled = false;
-          captureButton.textContent = "重新发送";
+          captureButton.textContent = "重新发送到 CDB";
           setStatus("error", "这次没有发送成功");
-          statusDetail.textContent = "连接仍会自动恢复";
-          resultElement.textContent = message.error || "请直接重试。";
+          statusDetail.textContent = message.error || "连接仍会自动恢复";
+          resultElement.textContent = message.code
+            ? `错误代码：${message.code}`
+            : "连接仍会自动恢复，可以直接重试。";
         }
       }
 
@@ -766,6 +1035,48 @@
           return;
         }
         socket.send(JSON.stringify(value));
+      }
+
+      function renderDesignSelection() {
+        const selection = designSelection;
+        const seedTarget = catalogPages.find((candidate) => candidate.id === activePageId)?.acceptsFigmaSeed;
+        if (activeOfferId) {
+          captureButton.disabled = true;
+          captureButton.className = seedTarget ? "alternative" : "";
+          captureButton.textContent = "等待 CDB…";
+          resultElement.textContent = "提案已在本地工作台收件箱中。";
+          return;
+        }
+        captureButton.disabled = !selection?.supported || !socket || socket.readyState !== WebSocket.OPEN;
+        captureButton.className = seedTarget ? "alternative" : "";
+        if (!activeOfferId || captureButton.textContent !== "等待 CDB…") {
+          captureButton.textContent = "发送到 CDB 工作台";
+        }
+        if (!selection?.supported) {
+          resultElement.textContent = selection?.reason || "请选择一个完整页面。";
+          return;
+        }
+        if (!selectedFrameHasCurrentProjectLink()) {
+          setStatus("connected", `已选择新页面 · ${selection.rootName}`);
+          statusDetail.textContent = "将发送到当前 CDB 工作台，再选择添加为新页面";
+        }
+        resultElement.textContent = seedTarget
+          ? `${selection.rootName} · 主按钮生成当前空白页；工作台按钮可另选目标`
+          : `${selection.rootName} · ${selection.estimatedNodeCount} 个图层 · 发送后在 CDB 选择目标`;
+      }
+
+      function currentRuntimeIdentity() {
+        return {
+          kind: "cdb-0.9-responsive-v2",
+          protocolVersion: CDB_PROTOCOL_VERSION,
+          pageIrSchemaVersion: PAGE_IR_SCHEMA_VERSION,
+          exactBuild: CDB_EXACT_BUILD,
+        };
+      }
+
+      function createIdentity(prefix) {
+        if (globalThis.crypto?.randomUUID) return `${prefix}-${globalThis.crypto.randomUUID()}`;
+        return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
       }
 
       function renderCatalog() {
@@ -817,19 +1128,52 @@
 
       function renderCatalogActions() {
         const activePage = catalogPages.find((page) => page.id === activePageId);
-        const hasFigmaLinks =
-          importedPages.size > 0 ||
-          catalogPages.some((page) => page.state && page.state !== "not_imported");
+        const hasFigmaLinks = currentProjectHasFigmaLinks();
+        const selectionLinked = selectedFrameHasCurrentProjectLink();
         const canSeed =
           localWorkspace &&
           activePage?.acceptsFigmaSeed &&
-          activePage.state === "not_imported";
+          ["not_imported", "conflict", "failed"].includes(activePage.state);
         seedPageButton.hidden = !canSeed;
         seedPageButton.disabled = !canSeed;
+        captureButton.className = canSeed ? "alternative" : "";
         resetWorkspaceButton.disabled = !localWorkspace || !hasFigmaLinks;
-        if (localWorkspace && !activeTaskId) {
-          captureButton.disabled = !hasFigmaLinks;
+        if (!activeTaskId) {
+          captureButton.disabled =
+            (!selectionLinked && !designSelection?.supported) ||
+            !socket ||
+            socket.readyState !== WebSocket.OPEN;
+          captureButton.textContent = selectionLinked
+            ? unsentChanges
+              ? "发送修改到 CDB"
+              : "重新发送到 CDB"
+            : "发送到 CDB 工作台";
         }
+      }
+
+      function currentProjectHasFigmaLinks() {
+        return catalogPages.some(
+          (page) => page.state && page.state !== "not_imported",
+        );
+      }
+
+      function selectedFrameHasCurrentProjectLink() {
+        const linkedPageId = String(designSelection?.linkedPageId || "");
+        const linkedProjectKey = String(designSelection?.linkedProjectKey || "");
+        if (!linkedPageId) return false;
+        if (
+          linkedProjectKey &&
+          connectedProjectKey &&
+          linkedProjectKey !== connectedProjectKey
+        ) {
+          return false;
+        }
+        return catalogPages.some(
+          (page) =>
+            page.id === linkedPageId &&
+            page.state &&
+            page.state !== "not_imported",
+        );
       }
 
       function stateLabel(state) {
@@ -852,6 +1196,17 @@
           conflict: "源码和 Figma 在上次同步后都发生了修改，请先确认要保留哪一侧",
           failed: "最近一次页面操作失败",
         }[state] || "";
+      }
+
+      function pendingReasonLabel(reason) {
+        return {
+          unsafe_svg_export: "Figma 矢量包含不支持的效果",
+          invalid_inserted_node_style: "部分图层样式无法转换",
+          stylesheet_not_found: "没有找到页面样式文件",
+          source_element_not_found: "没有找到页面写入位置",
+          stale_page_mapping: "页面映射已经过期",
+          fast_apply_failed: "页面生成器发生异常",
+        }[reason] || reason || "未知原因";
       }
 
       function setStatus(kind, text) {

@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import WebSocket from "ws";
+import WebSocket from "../codex-plugin/codex-design-bridge/vendor/ws/wrapper.mjs";
 import { BridgeServer } from "../src/server.js";
 
 test("sends prepared assets to a plugin and persists feedback", async (t) => {

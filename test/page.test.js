@@ -103,6 +103,12 @@ function samplePage() {
   return {
     pageId: "landing-page",
     name: "Landing page",
+    responsiveContract: {
+      designViewport: { width: 1440, height: 900 },
+      runtimeViewports: [{ id: "desktop-1440", width: 1440, height: 900, devicePixelRatio: 1 }],
+      previewScale: { mode: "one-to-one", value: 1, breakpointId: null },
+      breakpoints: [],
+    },
     source: {
       file: "examples/landing/index.html",
       component: "LandingPage",

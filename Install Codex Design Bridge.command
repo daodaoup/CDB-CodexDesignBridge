@@ -1,7 +1,7 @@
 #!/bin/bash
 
 INSTALLER_DIRECTORY="$(cd "$(dirname "$0")" && pwd -P)"
-"$INSTALLER_DIRECTORY/scripts/install-codex-design-bridge-macos.sh"
+"$INSTALLER_DIRECTORY/scripts/install-codex-design-bridge-macos.sh" --clean-install
 INSTALL_EXIT=$?
 
 printf '\n'
@@ -13,4 +13,3 @@ fi
 
 read -r -p 'Press Return to close this window...' _
 exit "$INSTALL_EXIT"
-

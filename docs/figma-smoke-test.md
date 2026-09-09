@@ -1,121 +1,111 @@
-# CDB 0.7.0 Codex/Figma 桌面验收清单
+# CDB 0.9 测试版 Codex/Figma 桌面验收清单
 
-精确候选：以当前 `.codex-plugin/plugin.json` 为准  
-协议：12  
-状态：待真实桌面执行
+精确候选：以 `.codex-plugin/plugin.json` 为准；当前文档编写时为 `0.9.0+codex.20260829100031`
 
-自动化、localhost 请求和安装器 `CheckOnly` 不能替代本清单。每轮记录操作系统、Codex/Figma 版本、候选完整版本、耗时、截图、修改文件和失败恢复结果。
+本地 Bridge：protocol 16 / Page IR Responsive v2 schema 2；不兼容、不迁移任何旧协议、旧 Page IR、旧 exact-build 或旧同步数据
 
-## 0. 安装与身份
+原则：自动化、localhost 请求和安装器 `--check-only` 不能替代真实 Codex/Figma Desktop 验收。
 
-- [ ] 完整退出 Codex/ChatGPT，安装精确候选后新建任务。
-- [ ] 安装报告为 `installed`，个人源与运行缓存版本一致，18 个核心文件（含 protocol 14 schema）哈希一致。
-- [ ] `codex plugin list` 显示 `codex-design-bridge@personal` 已安装启用且版本正确。
-- [ ] 工作台只显示 `V 0.7.0`；诊断完整版本为精确候选。
-- [ ] 关闭并重新运行 Figma CDB 开发插件；协议 11 的旧窗口收到版本不匹配而不能静默连接。
+Windows 当前候选的完整执行顺序和证据模板见 [Windows 开发与验收交接](handoff-2026-08-31-windows.zh-CN.md)。
 
-## 1. 空启动器
+每轮记录操作系统、Codex/Figma 版本、精确构建、耗时、截图、修改文件、后台 PID 和失败恢复结果。
 
-在包含多个前端目录、旧 `.figma-sync` 和旧 CDB 状态的工作区中，连续 5 次只发送 `@CDB`：
+## 1. 安装与版本身份
 
-- [ ] 每次显示空启动器，不自动绑定项目。
-- [ ] 没有新增草稿、`.cdb`、`.codex` 或导入目录。
-- [ ] 没有 preview 进程/端口、Figma Bridge 连接或活动 lease。
-- [ ] 已在另一个任务工作的真实工作台不被关闭或抢占。
-- [ ] 拖入 HTML/文件夹、选择项目、新设计表单均可见；新设计表单通过当前任务 follow-up 继续。
+- [ ] 完全退出 Codex/ChatGPT，安装精确候选后新建任务。
+- [ ] 安装报告为 `installed`，个人源码与运行缓存哈希一致。
+- [ ] 工作台显示 `V 0.9.0`，诊断 `runtimeVersion` 为精确候选。
+- [ ] `get_cdb_health` healthy；后台 PID 稳定，活动项目与预期一致。
+- [ ] 关闭并重新运行 Figma CDB 开发插件；连接客户端为 1，`lastError` 为空。
 
-## 2. 打开项目与新建设计
+## 2. 后台、启动器与新任务
 
-- [ ] “`@CDB 打开项目 <绝对路径>`”优先打开该路径。
-- [ ] 带 HTML/文件夹附件时解析附件；没有可用入口时回到启动器，不建假页面。
-- [ ] “`@CDB 新建设计：做一个摄影师作品集首页`”不追问，直接创建并打开。
-- [ ] 新项目包含 `index.html`、`styles.css`、`assets/`、`AGENTS.md`、`.cdb/manifest.json`。
-- [ ] 新脚手架预检为通过，唯一捕获根和 `data-codex-id` 稳定且唯一。
+- [ ] 无项目任务可以打开 CDB 启动器，不因当前目录没有 `.cdb` 而失败。
+- [ ] 关闭当前任务后，新任务复用同版本后台；工作台打开不重复启动多个 `9847` 服务。
+- [ ] 新精确版本使用新运行 socket；旧版本后台不能劫持新版本网关。
+- [ ] 启动器不创建假项目、不扫描无关目录、不抢占仍在工作的真实项目。
+- [ ] 打开明确项目后只存在一个 preview/Figma/lease owner。
 
-## 3. 统一预检
+## 3. 项目和重复连接隔离
 
-为每个场景准备独立项目：
+- [ ] 在项目 A 建立 Figma 页面映射，再打开项目 B；B 不继承 A 的“已导入”状态。
+- [ ] Figma 插件显示当前项目名称和正确 `projectKey` 短键。
+- [ ] 连续重载 Figma 插件 5 次，Bridge 始终只使用最新客户端。
+- [ ] 旧 WebSocket 收到替换通知并关闭，不出现重复回执或随机发送到旧窗口。
+- [ ] 切回项目 A 后仅恢复 A 自己的映射和未发送修改状态。
 
-| 场景 | 期望 |
-| --- | --- |
-| 合法脚手架 | 通过，启动真实工作台 |
-| 缺 manifest、根目录有静态 HTML | 警告，内存推断页面，可继续 |
-| 首次缺捕获根/稳定 ID | 安全自动修复；未确认前不启动 preview/Figma |
-| 应用修复后源码被改 | 旧 `reportId/sourceHash` 被拒绝 |
-| 多捕获根、重复 ID、入口/资源缺失 | 阻断，不启动真实工作台 |
-| 禁止的远程资源、危险 SVG | 阻断 |
-| 运行时 DOM | 警告，说明只保证初始静态节点映射 |
-| 空白/零可编辑层 | 阻断 |
+## 4. CDB → Figma
 
-- [ ] CSS、JS、图片、SVG 和字体只记为依赖，不出现在页面列表。
-- [ ] 多页面来自 manifest 的 HTML 入口、路由或有限 `captureState`；CSS/JS/资源不成为页面，工作台没有“添加页面”。
-- [ ] 页面入口/路由和预检问题在工作台可读。
+- [ ] 静态 HTML/CSS 项目通过预检，页面列表只包含页面而非 CSS/JS/资源。
+- [ ] 当前页导入后得到稳定顶层 Frame，Text/Frame/SVG/图片保持可编辑。
+- [ ] 再次发送只更新对应页面；未变化节点尽量复用。
+- [ ] Figma 有未发送修改时，源码更新不会静默覆盖。
+- [ ] 多页入口/路由分别对应正确 Frame，不重复生成同一页。
 
-## 4. Apps UI 与页面预览
+## 5. Figma → 已有静态项目 pageSeed
 
-- [ ] Codex 中出现内嵌工作台，状态最终为 `workspaceMounted: true`，记录 `uiMountedAt`。
-- [ ] 预览位于工作台内；只有外部浏览器 localhost 不算成功。
-- [ ] 视图缩放在 50%–150% 范围工作，外层圆角为 8px。
-- [ ] 关闭当前任务按钮存在，运行时添加/重命名假页面入口不存在。
-- [ ] manifest 多页切换到正确入口/路由，刷新后选中状态保持。
-- [ ] 导入 Music 单 HTML 后显示 Home、Discover、Library 三项；逐项预览内容不同，Player 不被误列为 Tab 页面。
+准备一个 `acceptsFigmaSeed: true` 的占位页面，并在 Figma 选中一个完整顶层 Frame。
 
-## 5. Figma “CDB 页面”列表
+- [ ] 页面未导入时显示“用选中稿生成当前页面”。
+- [ ] 点击后立即显示处理中，不需要再向 Codex发送第二条消息。
+- [ ] 成功后显示“已同步”、写入文件和耗时。
+- [ ] `index.html`、`styles.css` 和资源实际生成；稳定 `data-codex-id` 唯一。
+- [ ] 工作台 `appliedChangeCount > 0` 且 `pendingChangeCount = 0`。
+- [ ] Figma 背景模糊 SVG 包含 `foreignObject` 时，安全移除 XHTML 层并保留可用 SVG 主体。
+- [ ] 没有 Auto Layout 字段的普通矩形/Group 可以生成，不报 `invalid_inserted_node_style`。
+- [ ] 对同一已关联 Frame 重试不会创建重复页面或重复修改源码。
 
-- [ ] 每项显示名称、入口/路由和状态；不显示 CSS/JS/素材文件树。
-- [ ] 首次显示“未导入”；导入成功为“已同步”。
-- [ ] 修改 HTML 后刷新为“源码更新”。
-- [ ] Figma 修改未发送时为“Figma 修改”。
-- [ ] 源码与 Figma 同时变化为“冲突”。
-- [ ] 模拟导入错误为“失败”，原 Frame 保留。
-- [ ] “定位 Frame”“导入当前”“导入选中”“更新全部”行为与选择一致。
-- [ ] 多页分别成为稳定顶层 Frame，再次导入只更新对应 Frame。
-- [ ] Music 的 Home、Discover、Library 分别成为稳定顶层 Frame，不得三个 Frame 都重复 Home。
+## 6. 修改回传、冲突与 Undo
 
-## 6. Figma→Codex 回传与恢复
-
-- [ ] 文字、颜色、尺寸、透明度、排版、间距、圆角和 Frame 描边写回同一预览。
-- [ ] 安全内联 SVG、同源外部 SVG 和支持的新增/复制/删除/同级排序回归通过。
+- [ ] 文字、颜色、尺寸、透明度、排版、间距、圆角和描边写回当前预览。
+- [ ] Flex/Auto Layout 方向、gap、padding、对齐、grow/order 可安全写回。
+- [ ] 基础 Grid placement 和受约束节点重排/跨父级移动通过真实预览验证。
 - [ ] 一次多文件修改全部成功；注入中途失败时全部回滚。
-- [ ] Undo 能恢复最近事务；事务后发生无关编辑时 Undo 报冲突且不覆盖。
-- [ ] 大型/不明确结构保留为待处理差异，由当前 Codex 任务继续；不删除原页面。
-- [ ] 关闭任务时，仅存在未发送 Figma 修改才弹确认。
+- [ ] Undo 恢复最近 CDB 事务；事务后有外部修改时拒绝覆盖。
+- [ ] 源码与 Figma 同时变化显示冲突，不把重试当成成功。
 
-## 7. 单工作台接管
+## 7. 失败提示与恢复
 
-使用两个 Codex 任务和两个静态项目：
+- [ ] WebSocket/协议/会话失败显示“发送失败”。
+- [ ] 数据已入 Bridge 但转换失败显示“已收到，但生成未完成”。
+- [ ] 失败信息包含阶段、原因或错误代码；不只显示泛化红条。
+- [ ] pending 变更不发送 `page.changes.accepted`，也不清除未发送状态。
+- [ ] 修复后可直接“重试生成”，无需清除所有关联或重装。
+- [ ] 失败事务不留下半成品 HTML/CSS/assets。
 
-- [ ] 启动器不抢占任务 A 的真实工作台。
-- [ ] 任务 B 预检通过、准备完成后才请求接管。
-- [ ] 任务 A 干净时自动收到优雅关闭；preview/Figma 释放，B 成为唯一 owner。
-- [ ] A 有未发送 Figma 修改时，B 仍直接关闭 A 并获取 lease，不出现接管确认。
-- [ ] A 的未发送修改不写回源码，B 成为唯一的 preview/Figma owner。
-- [ ] 杀死旧 owner 后，有效 TTL 内不强抢；过期后可恢复。
-- [ ] lease JSON 不含 control secret；control endpoint 只监听 loopback，错误 secret 返回未授权。
+## 8. protocol 16 提案
 
-## 8. Windows 安装与缓存一致性
+- [ ] 无活动项目时，Figma 单个顶层 Frame 可提交轻量 offer。
+- [ ] CDB 启动器展示来源、尺寸、节点数和 offer 身份。
+- [ ] 重复 offer 幂等；身份冲突拒绝；取消与结果查询可恢复。
+- [ ] 接受后重新采集完整 payload，接收端重新计算资源字节和 SHA-256。
+- [ ] 节点数、单资源或总资源超限时明确拒绝，不生成半个项目。
 
-- [ ] 从 0.5.1 干净升级，安装器备份旧个人源码并写报告。
-- [ ] 残留 Codex/ChatGPT 进程会列出 PID 并征求确认，不静默终止。
-- [ ] 个人源码、运行缓存、安装报告与新任务诊断均为同一完整版本。
+- [ ] 从 offer 创建完整新项目并通过事务、预检、视觉门禁和预览验证。
+- [ ] 将未关联 Frame 加入现有项目并明确处理同名、身份和基线冲突。
+- [ ] 成功结果重放后 Figma 建立 source hash、项目键、页面 ID 和节点映射。
+
+## 9. 平台安装
+
+### macOS
+
+- [ ] `.command` 双击安装成功；缺执行权限时按安装文档恢复。
+- [ ] 不要求完全磁盘访问、关闭 Gatekeeper 或关闭 SIP。
+- [ ] 精确缓存、新任务、Figma 重载和 pageSeed 往返均使用同一候选。
+
+### Windows
+
+- [ ] `.vbs`/`.cmd` 安装、备份、注册、缓存和报告均成功。
+- [ ] 全新用户目录无需预建 `personal` marketplace；安装器自动创建 `codex-design-bridge-local`，报告包含可执行的 `mcpNodePath`。
+- [ ] 双击 `Open CDB Workspace.cmd` 可独立于 Codex 任务打开本地 Web Workspace。
+- [ ] 对安装报告中的 `installedPath` 运行 `scripts/verify-local-runtime.mjs`，报告为 `passed`，且 daemon PID 发生变化后项目、页面、预览和 lease 均恢复。
+- [ ] GitHub Windows CI 的 `cdb-windows-verification` artifact 同时包含 `package-valid` 安装检查报告与 `passed` 运行时恢复报告；记录对应提交 SHA。
+- [ ] 当前精确候选完成真实 Codex Apps UI 与 Figma Desktop 往返。
 - [ ] 任一核心哈希不一致时安装失败并恢复旧注册。
-- [ ] UI 始终只显示正式版本 `V 0.7.0`。
-
-## 0.7 结构与布局往返
-
-- [ ] 将 `examples/codex-landing` 的 `daodao` 从 `hero-actions` 跨父级移动到 `hero-copy`，不提供截图或人工定位提示。
-- [ ] 工作台自动写回后显示 `pendingChangeCount = 0`，源码 DOM 父级、顺序、文字、事件、ARIA 与稳定 ID 保持正确。
-- [ ] 真实预览校验目标父级和索引，关键节点位置误差不超过 2px；故意制造失败时事务自动回滚。
-- [ ] Flex 页面导入 Figma 后为 Auto Layout；修改方向、换行、间距、padding、对齐、grow/order 后可安全回写 CSS。
-- [ ] 基础 Grid 模板、间距和 placement 可往返；超出声明范围时明确 pending，不生成猜测性 CSS。
-- [ ] Figma 存在未发送修改时，源码更新被阻止并显示冲突；发送或撤销后可继续。
-
-## 9. macOS
-
-- [ ] 对同一精确候选执行 `CheckOnly`。
-- [ ] 完成干净安装、权限、缓存哈希、Apps UI、Figma 页面列表与往返。
-- [ ] 若未完成，发布说明明确标注 macOS 未验收，不沿用 0.5.1 证据。
+- [ ] Figma 插件保持打开时强制结束健康检查记录的 daemon PID；同一 Codex gateway 重开项目后，插件自动恢复项目名与页面清单，`figmaBridgeCount = 1`。
 
 ## 通过标准
 
-所有 P0 项和 0.7 结构/布局往返通过、失败场景可恢复、证据归档后，才可把 0.7.0 从“源码候选”改为“桌面发布已验收”。任何以下情况直接阻断发布：版本/缓存不一致、启动器抢占连接、预检阻断后仍启动 preview、页面与依赖混淆、旧工作台未确认丢失修改、事务部分提交、自动验证未通过却清零 pending、协议错配静默连接。
+0.9 发布至少要求第 1–9 节在 macOS 与 Windows 分别留下真实桌面证据。Windows 未完成前继续标记为测试版。
+
+以下情况直接阻断：版本或项目身份不一致、重复客户端、旧服务接管新任务、页面传输成功但源码未写入、pending 被错误清零、事务部分提交、真实预览失败却报告已同步。

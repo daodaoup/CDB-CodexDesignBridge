@@ -1,0 +1,7101 @@
+{
+  "baselineVersion": 1,
+  "pageIrSchemaVersion": 1,
+  "pageId": "offer-1787412575818-967f75a56e2ad8",
+  "projectKey": "90a812eedcf25059d3101d48",
+  "sourceHash": "c5cbee6ab43b4ba7ee145a79e9c8960896e302bdd202b7e2f56d9ca69f8ab09c",
+  "pageIrHash": "d4635a3ac7bff7853b485f4d43dc7ae94baf6e4921e3b5ab6c4209ea02da46d3",
+  "figma": {
+    "fileKey": "figma-1786551086085-07125f6b878af",
+    "pageId": "",
+    "rootNodeId": "566:71",
+    "rootNodeName": "home"
+  },
+  "nodeMappings": [
+    {
+      "pageNodeId": "figma-node-566-100",
+      "figmaNodeId": "566:100",
+      "nodeType": "frame",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-100\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-101",
+      "figmaNodeId": "566:101",
+      "nodeType": "text",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-101\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-102",
+      "figmaNodeId": "566:102",
+      "nodeType": "text",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-102\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-103",
+      "figmaNodeId": "566:103",
+      "nodeType": "frame",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-103\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-104",
+      "figmaNodeId": "566:104",
+      "nodeType": "image",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-104\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-105",
+      "figmaNodeId": "566:105",
+      "nodeType": "frame",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-105\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-106",
+      "figmaNodeId": "566:106",
+      "nodeType": "text",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-106\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-107",
+      "figmaNodeId": "566:107",
+      "nodeType": "text",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-107\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-108",
+      "figmaNodeId": "566:108",
+      "nodeType": "frame",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-108\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-109",
+      "figmaNodeId": "566:109",
+      "nodeType": "text",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-109\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-110",
+      "figmaNodeId": "566:110",
+      "nodeType": "frame",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-110\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-111",
+      "figmaNodeId": "566:111",
+      "nodeType": "frame",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-111\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-112",
+      "figmaNodeId": "566:112",
+      "nodeType": "image",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-112\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-113",
+      "figmaNodeId": "566:113",
+      "nodeType": "frame",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-113\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-114",
+      "figmaNodeId": "566:114",
+      "nodeType": "text",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-114\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-115",
+      "figmaNodeId": "566:115",
+      "nodeType": "text",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-115\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-116",
+      "figmaNodeId": "566:116",
+      "nodeType": "text",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-116\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-117",
+      "figmaNodeId": "566:117",
+      "nodeType": "frame",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-117\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-118",
+      "figmaNodeId": "566:118",
+      "nodeType": "image",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-118\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-120",
+      "figmaNodeId": "566:120",
+      "nodeType": "frame",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-120\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-121",
+      "figmaNodeId": "566:121",
+      "nodeType": "image",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-121\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-122",
+      "figmaNodeId": "566:122",
+      "nodeType": "frame",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-122\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-123",
+      "figmaNodeId": "566:123",
+      "nodeType": "text",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-123\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-124",
+      "figmaNodeId": "566:124",
+      "nodeType": "text",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-124\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-125",
+      "figmaNodeId": "566:125",
+      "nodeType": "text",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-125\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-126",
+      "figmaNodeId": "566:126",
+      "nodeType": "frame",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-126\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-127",
+      "figmaNodeId": "566:127",
+      "nodeType": "image",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-127\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-129",
+      "figmaNodeId": "566:129",
+      "nodeType": "frame",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-129\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-130",
+      "figmaNodeId": "566:130",
+      "nodeType": "frame",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-130\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-131",
+      "figmaNodeId": "566:131",
+      "nodeType": "frame",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-131\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-132",
+      "figmaNodeId": "566:132",
+      "nodeType": "image",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-132\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-134",
+      "figmaNodeId": "566:134",
+      "nodeType": "text",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-134\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-135",
+      "figmaNodeId": "566:135",
+      "nodeType": "frame",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-135\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-136",
+      "figmaNodeId": "566:136",
+      "nodeType": "image",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-136\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-138",
+      "figmaNodeId": "566:138",
+      "nodeType": "text",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-138\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-139",
+      "figmaNodeId": "566:139",
+      "nodeType": "frame",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-139\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-140",
+      "figmaNodeId": "566:140",
+      "nodeType": "image",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-140\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-142",
+      "figmaNodeId": "566:142",
+      "nodeType": "text",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-142\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-143",
+      "figmaNodeId": "566:143",
+      "nodeType": "frame",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-143\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-144",
+      "figmaNodeId": "566:144",
+      "nodeType": "image",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-144\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-146",
+      "figmaNodeId": "566:146",
+      "nodeType": "text",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-146\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-147",
+      "figmaNodeId": "566:147",
+      "nodeType": "frame",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-147\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-148",
+      "figmaNodeId": "566:148",
+      "nodeType": "svg",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-148\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-72",
+      "figmaNodeId": "566:72",
+      "nodeType": "frame",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-72\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-73",
+      "figmaNodeId": "566:73",
+      "nodeType": "frame",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-73\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-74",
+      "figmaNodeId": "566:74",
+      "nodeType": "text",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-74\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-75",
+      "figmaNodeId": "566:75",
+      "nodeType": "frame",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-75\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-76",
+      "figmaNodeId": "566:76",
+      "nodeType": "image",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-76\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-78",
+      "figmaNodeId": "566:78",
+      "nodeType": "image",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-78\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-80",
+      "figmaNodeId": "566:80",
+      "nodeType": "image",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-80\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-82",
+      "figmaNodeId": "566:82",
+      "nodeType": "frame",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-82\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-83",
+      "figmaNodeId": "566:83",
+      "nodeType": "frame",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-83\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-84",
+      "figmaNodeId": "566:84",
+      "nodeType": "text",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-84\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-85",
+      "figmaNodeId": "566:85",
+      "nodeType": "text",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-85\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-86",
+      "figmaNodeId": "566:86",
+      "nodeType": "frame",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-86\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-87",
+      "figmaNodeId": "566:87",
+      "nodeType": "frame",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-87\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-88",
+      "figmaNodeId": "566:88",
+      "nodeType": "frame",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-88\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-89",
+      "figmaNodeId": "566:89",
+      "nodeType": "text",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-89\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-90",
+      "figmaNodeId": "566:90",
+      "nodeType": "text",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-90\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-91",
+      "figmaNodeId": "566:91",
+      "nodeType": "frame",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-91\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-92",
+      "figmaNodeId": "566:92",
+      "nodeType": "frame",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-92\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-93",
+      "figmaNodeId": "566:93",
+      "nodeType": "frame",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-93\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-94",
+      "figmaNodeId": "566:94",
+      "nodeType": "image",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-94\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-95",
+      "figmaNodeId": "566:95",
+      "nodeType": "frame",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-95\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-96",
+      "figmaNodeId": "566:96",
+      "nodeType": "text",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-96\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-97",
+      "figmaNodeId": "566:97",
+      "nodeType": "text",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-97\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-98",
+      "figmaNodeId": "566:98",
+      "nodeType": "frame",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-98\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "figma-node-566-99",
+      "figmaNodeId": "566:99",
+      "nodeType": "image",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"figma-node-566-99\"]",
+        "component": ""
+      }
+    },
+    {
+      "pageNodeId": "page-root",
+      "figmaNodeId": "566:71",
+      "nodeType": "frame",
+      "sourceRef": {
+        "file": "index.html",
+        "selector": "[data-codex-id=\"page-root\"]",
+        "component": ""
+      }
+    }
+  ],
+  "transactionId": "offer:offer-1787412575818-967f75a56e2ad8",
+  "createdAt": "2026-08-22T15:30:14.776Z",
+  "updatedAt": "2026-08-22T15:30:14.776Z",
+  "pageIr": {
+    "schemaVersion": 1,
+    "pageId": "offer-1787412575818-967f75a56e2ad8",
+    "projectKey": "90a812eedcf25059d3101d48",
+    "name": "home · home",
+    "rootId": "page-root",
+    "origin": {
+      "kind": "mixed",
+      "figmaFileKey": "figma-1786551086085-07125f6b878af",
+      "rootNodeId": "566:71",
+      "rootNodeName": "home",
+      "sourceFile": "http://127.0.0.1:50308/",
+      "sourceSelector": "[data-codex-id=\"page-root\"]"
+    },
+    "nodes": {
+      "figma-node-566-100": {
+        "id": "figma-node-566-100",
+        "type": "frame",
+        "tag": "div",
+        "name": "figma-node-566-100",
+        "parentId": "figma-node-566-98",
+        "order": 1,
+        "childIds": [
+          "figma-node-566-101",
+          "figma-node-566-102"
+        ],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-100\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:100",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 116,
+          "height": 36,
+          "x": 12,
+          "y": 140,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": null,
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": {
+          "kind": "flex",
+          "direction": "vertical",
+          "wrap": false,
+          "gap": 2,
+          "counterGap": 0,
+          "padding": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "align": "start",
+          "justify": "start",
+          "primarySizing": "fixed",
+          "counterSizing": "fixed",
+          "grid": null
+        },
+        "layoutItem": {
+          "align": "stretch",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": null
+      },
+      "figma-node-566-101": {
+        "id": "figma-node-566-101",
+        "type": "text",
+        "tag": "span",
+        "name": "figma-node-566-101",
+        "parentId": "figma-node-566-100",
+        "order": 0,
+        "childIds": [],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-101\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:101",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 116,
+          "height": 20,
+          "x": 0,
+          "y": 0,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": {
+            "color": "#F5F5FA",
+            "opacity": 1
+          },
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": null,
+        "layoutItem": {
+          "align": "stretch",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": {
+          "characters": "In Dust",
+          "font": {
+            "family": "Outfit",
+            "style": "Semi Bold",
+            "size": 14,
+            "lineHeight": {
+              "unit": "PERCENT",
+              "value": 140
+            },
+            "letterSpacing": {
+              "unit": "PERCENT",
+              "value": 0
+            }
+          },
+          "align": {
+            "horizontal": "LEFT",
+            "vertical": "TOP"
+          },
+          "textCase": "ORIGINAL",
+          "textDecoration": "NONE"
+        },
+        "resource": null
+      },
+      "figma-node-566-102": {
+        "id": "figma-node-566-102",
+        "type": "text",
+        "tag": "span",
+        "name": "figma-node-566-102",
+        "parentId": "figma-node-566-100",
+        "order": 1,
+        "childIds": [],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-102\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:102",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 116,
+          "height": 14,
+          "x": 0,
+          "y": 22,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": {
+            "color": "#8E8E9C",
+            "opacity": 1
+          },
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": null,
+        "layoutItem": {
+          "align": "stretch",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": {
+          "characters": "Howling",
+          "font": {
+            "family": "Outfit",
+            "style": "Medium",
+            "size": 11,
+            "lineHeight": {
+              "unit": "AUTO"
+            },
+            "letterSpacing": {
+              "unit": "PERCENT",
+              "value": 1
+            }
+          },
+          "align": {
+            "horizontal": "LEFT",
+            "vertical": "TOP"
+          },
+          "textCase": "ORIGINAL",
+          "textDecoration": "NONE"
+        },
+        "resource": null
+      },
+      "figma-node-566-103": {
+        "id": "figma-node-566-103",
+        "type": "frame",
+        "tag": "div",
+        "name": "figma-node-566-103",
+        "parentId": "figma-node-566-92",
+        "order": 2,
+        "childIds": [
+          "figma-node-566-104",
+          "figma-node-566-105"
+        ],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-103\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:103",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 140,
+          "height": 188,
+          "x": 312,
+          "y": 0,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": {
+            "color": "#131317",
+            "opacity": 1
+          },
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 16,
+          "effects": []
+        },
+        "layout": {
+          "kind": "flex",
+          "direction": "vertical",
+          "wrap": false,
+          "gap": 12,
+          "counterGap": 0,
+          "padding": {
+            "top": 12,
+            "right": 12,
+            "bottom": 12,
+            "left": 12
+          },
+          "align": "start",
+          "justify": "start",
+          "primarySizing": "fixed",
+          "counterSizing": "fixed",
+          "grid": null
+        },
+        "layoutItem": {
+          "align": "auto",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": null
+      },
+      "figma-node-566-104": {
+        "id": "figma-node-566-104",
+        "type": "image",
+        "tag": "img",
+        "name": "art",
+        "parentId": "figma-node-566-103",
+        "order": 0,
+        "childIds": [],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-104\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": 100
+        },
+        "figma": {
+          "nodeId": "566:104",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 116,
+          "height": 116,
+          "x": 12,
+          "y": 12,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": null,
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": null,
+        "layoutItem": {
+          "align": "auto",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": {
+          "kind": "image",
+          "mimeType": "image/png",
+          "bytes": 14120,
+          "sha256": "2dd1af58b3dccee37febdb5cb3a01536dd0e332621501fd8630f279e5bdf7972"
+        }
+      },
+      "figma-node-566-105": {
+        "id": "figma-node-566-105",
+        "type": "frame",
+        "tag": "div",
+        "name": "figma-node-566-105",
+        "parentId": "figma-node-566-103",
+        "order": 1,
+        "childIds": [
+          "figma-node-566-106",
+          "figma-node-566-107"
+        ],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-105\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:105",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 116,
+          "height": 36,
+          "x": 12,
+          "y": 140,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": null,
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": {
+          "kind": "flex",
+          "direction": "vertical",
+          "wrap": false,
+          "gap": 2,
+          "counterGap": 0,
+          "padding": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "align": "start",
+          "justify": "start",
+          "primarySizing": "fixed",
+          "counterSizing": "fixed",
+          "grid": null
+        },
+        "layoutItem": {
+          "align": "stretch",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": null
+      },
+      "figma-node-566-106": {
+        "id": "figma-node-566-106",
+        "type": "text",
+        "tag": "span",
+        "name": "figma-node-566-106",
+        "parentId": "figma-node-566-105",
+        "order": 0,
+        "childIds": [],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-106\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:106",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 116,
+          "height": 20,
+          "x": 0,
+          "y": 0,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": {
+            "color": "#F5F5FA",
+            "opacity": 1
+          },
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": null,
+        "layoutItem": {
+          "align": "stretch",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": {
+          "characters": "Vessel",
+          "font": {
+            "family": "Outfit",
+            "style": "Semi Bold",
+            "size": 14,
+            "lineHeight": {
+              "unit": "PERCENT",
+              "value": 140
+            },
+            "letterSpacing": {
+              "unit": "PERCENT",
+              "value": 0
+            }
+          },
+          "align": {
+            "horizontal": "LEFT",
+            "vertical": "TOP"
+          },
+          "textCase": "ORIGINAL",
+          "textDecoration": "NONE"
+        },
+        "resource": null
+      },
+      "figma-node-566-107": {
+        "id": "figma-node-566-107",
+        "type": "text",
+        "tag": "span",
+        "name": "figma-node-566-107",
+        "parentId": "figma-node-566-105",
+        "order": 1,
+        "childIds": [],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-107\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:107",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 116,
+          "height": 14,
+          "x": 0,
+          "y": 22,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": {
+            "color": "#8E8E9C",
+            "opacity": 1
+          },
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": null,
+        "layoutItem": {
+          "align": "stretch",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": {
+          "characters": "Jon Hopkins",
+          "font": {
+            "family": "Outfit",
+            "style": "Medium",
+            "size": 11,
+            "lineHeight": {
+              "unit": "AUTO"
+            },
+            "letterSpacing": {
+              "unit": "PERCENT",
+              "value": 1
+            }
+          },
+          "align": {
+            "horizontal": "LEFT",
+            "vertical": "TOP"
+          },
+          "textCase": "ORIGINAL",
+          "textDecoration": "NONE"
+        },
+        "resource": null
+      },
+      "figma-node-566-108": {
+        "id": "figma-node-566-108",
+        "type": "frame",
+        "tag": "div",
+        "name": "figma-node-566-108",
+        "parentId": "figma-node-566-72",
+        "order": 3,
+        "childIds": [
+          "figma-node-566-109",
+          "figma-node-566-110"
+        ],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-108\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:108",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 402,
+          "height": 267,
+          "x": 0,
+          "y": 390,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": null,
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": {
+          "kind": "flex",
+          "direction": "vertical",
+          "wrap": false,
+          "gap": 16,
+          "counterGap": 0,
+          "padding": {
+            "top": 0,
+            "right": 24,
+            "bottom": 24,
+            "left": 24
+          },
+          "align": "start",
+          "justify": "start",
+          "primarySizing": "fixed",
+          "counterSizing": "fixed",
+          "grid": null
+        },
+        "layoutItem": {
+          "align": "stretch",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": null
+      },
+      "figma-node-566-109": {
+        "id": "figma-node-566-109",
+        "type": "text",
+        "tag": "span",
+        "name": "figma-node-566-109",
+        "parentId": "figma-node-566-108",
+        "order": 0,
+        "childIds": [],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-109\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:109",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 158,
+          "height": 23,
+          "x": 24,
+          "y": 0,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": {
+            "color": "#F5F5FA",
+            "opacity": 1
+          },
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": null,
+        "layoutItem": {
+          "align": "auto",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": {
+          "characters": "Made for Your Aura",
+          "font": {
+            "family": "Outfit",
+            "style": "Semi Bold",
+            "size": 18,
+            "lineHeight": {
+              "unit": "PERCENT",
+              "value": 130
+            },
+            "letterSpacing": {
+              "unit": "PERCENT",
+              "value": 0
+            }
+          },
+          "align": {
+            "horizontal": "LEFT",
+            "vertical": "TOP"
+          },
+          "textCase": "ORIGINAL",
+          "textDecoration": "NONE"
+        },
+        "resource": null
+      },
+      "figma-node-566-110": {
+        "id": "figma-node-566-110",
+        "type": "frame",
+        "tag": "div",
+        "name": "figma-node-566-110",
+        "parentId": "figma-node-566-108",
+        "order": 1,
+        "childIds": [
+          "figma-node-566-111",
+          "figma-node-566-120"
+        ],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-110\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:110",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 354,
+          "height": 204,
+          "x": 24,
+          "y": 39,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": null,
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": {
+          "kind": "flex",
+          "direction": "vertical",
+          "wrap": false,
+          "gap": 12,
+          "counterGap": 0,
+          "padding": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "align": "start",
+          "justify": "start",
+          "primarySizing": "fixed",
+          "counterSizing": "fixed",
+          "grid": null
+        },
+        "layoutItem": {
+          "align": "stretch",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": null
+      },
+      "figma-node-566-111": {
+        "id": "figma-node-566-111",
+        "type": "frame",
+        "tag": "div",
+        "name": "figma-node-566-111",
+        "parentId": "figma-node-566-110",
+        "order": 0,
+        "childIds": [
+          "figma-node-566-112",
+          "figma-node-566-113",
+          "figma-node-566-117"
+        ],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-111\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:111",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 354,
+          "height": 96,
+          "x": 0,
+          "y": 0,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": {
+            "color": "#131317",
+            "opacity": 1
+          },
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 16,
+          "effects": []
+        },
+        "layout": {
+          "kind": "flex",
+          "direction": "horizontal",
+          "wrap": false,
+          "gap": 16,
+          "counterGap": 0,
+          "padding": {
+            "top": 16,
+            "right": 16,
+            "bottom": 16,
+            "left": 16
+          },
+          "align": "center",
+          "justify": "start",
+          "primarySizing": "fixed",
+          "counterSizing": "fixed",
+          "grid": null
+        },
+        "layoutItem": {
+          "align": "stretch",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": null
+      },
+      "figma-node-566-112": {
+        "id": "figma-node-566-112",
+        "type": "image",
+        "tag": "img",
+        "name": "playlist-art",
+        "parentId": "figma-node-566-111",
+        "order": 0,
+        "childIds": [],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-112\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": 100
+        },
+        "figma": {
+          "nodeId": "566:112",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 64,
+          "height": 64,
+          "x": 16,
+          "y": 16,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": null,
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": null,
+        "layoutItem": {
+          "align": "auto",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": {
+          "kind": "image",
+          "mimeType": "image/png",
+          "bytes": 9969,
+          "sha256": "0b4e61573320be3e9206e97b5becb4d616155916fc894ef387daeba8de1315f1"
+        }
+      },
+      "figma-node-566-113": {
+        "id": "figma-node-566-113",
+        "type": "frame",
+        "tag": "div",
+        "name": "figma-node-566-113",
+        "parentId": "figma-node-566-111",
+        "order": 1,
+        "childIds": [
+          "figma-node-566-114",
+          "figma-node-566-115",
+          "figma-node-566-116"
+        ],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-113\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:113",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 190,
+          "height": 60,
+          "x": 96,
+          "y": 18,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": null,
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": {
+          "kind": "flex",
+          "direction": "vertical",
+          "wrap": false,
+          "gap": 4,
+          "counterGap": 0,
+          "padding": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "align": "start",
+          "justify": "start",
+          "primarySizing": "fixed",
+          "counterSizing": "fixed",
+          "grid": null
+        },
+        "layoutItem": {
+          "align": "auto",
+          "grow": 1,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fill",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": null
+      },
+      "figma-node-566-114": {
+        "id": "figma-node-566-114",
+        "type": "text",
+        "tag": "span",
+        "name": "figma-node-566-114",
+        "parentId": "figma-node-566-113",
+        "order": 0,
+        "childIds": [],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-114\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:114",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 190,
+          "height": 20,
+          "x": 0,
+          "y": 0,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": {
+            "color": "#F5F5FA",
+            "opacity": 1
+          },
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": null,
+        "layoutItem": {
+          "align": "stretch",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": {
+          "characters": "Morning Aura",
+          "font": {
+            "family": "Outfit",
+            "style": "Semi Bold",
+            "size": 14,
+            "lineHeight": {
+              "unit": "PERCENT",
+              "value": 140
+            },
+            "letterSpacing": {
+              "unit": "PERCENT",
+              "value": 0
+            }
+          },
+          "align": {
+            "horizontal": "LEFT",
+            "vertical": "TOP"
+          },
+          "textCase": "ORIGINAL",
+          "textDecoration": "NONE"
+        },
+        "resource": null
+      },
+      "figma-node-566-115": {
+        "id": "figma-node-566-115",
+        "type": "text",
+        "tag": "span",
+        "name": "figma-node-566-115",
+        "parentId": "figma-node-566-113",
+        "order": 1,
+        "childIds": [],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-115\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:115",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 190,
+          "height": 18,
+          "x": 0,
+          "y": 24,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": {
+            "color": "#8E8E9C",
+            "opacity": 1
+          },
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": null,
+        "layoutItem": {
+          "align": "stretch",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": {
+          "characters": "Warm ambient pads to gently wake you up",
+          "font": {
+            "family": "Outfit",
+            "style": "Regular",
+            "size": 12,
+            "lineHeight": {
+              "unit": "PERCENT",
+              "value": 150
+            },
+            "letterSpacing": {
+              "unit": "PERCENT",
+              "value": 0
+            }
+          },
+          "align": {
+            "horizontal": "LEFT",
+            "vertical": "TOP"
+          },
+          "textCase": "ORIGINAL",
+          "textDecoration": "NONE"
+        },
+        "resource": null
+      },
+      "figma-node-566-116": {
+        "id": "figma-node-566-116",
+        "type": "text",
+        "tag": "span",
+        "name": "figma-node-566-116",
+        "parentId": "figma-node-566-113",
+        "order": 2,
+        "childIds": [],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-116\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:116",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 190,
+          "height": 14,
+          "x": 0,
+          "y": 46,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": {
+            "color": "#FF6B57",
+            "opacity": 1
+          },
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": null,
+        "layoutItem": {
+          "align": "stretch",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": {
+          "characters": "24 tracks",
+          "font": {
+            "family": "Outfit",
+            "style": "Medium",
+            "size": 11,
+            "lineHeight": {
+              "unit": "AUTO"
+            },
+            "letterSpacing": {
+              "unit": "PERCENT",
+              "value": 1
+            }
+          },
+          "align": {
+            "horizontal": "LEFT",
+            "vertical": "TOP"
+          },
+          "textCase": "ORIGINAL",
+          "textDecoration": "NONE"
+        },
+        "resource": null
+      },
+      "figma-node-566-117": {
+        "id": "figma-node-566-117",
+        "type": "frame",
+        "tag": "div",
+        "name": "figma-node-566-117",
+        "parentId": "figma-node-566-111",
+        "order": 2,
+        "childIds": [
+          "figma-node-566-118"
+        ],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-117\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:117",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 36,
+          "height": 36,
+          "x": 302,
+          "y": 30,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": {
+            "color": "#FF6B57",
+            "opacity": 0.13333333333333333
+          },
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 18,
+          "effects": []
+        },
+        "layout": {
+          "kind": "flex",
+          "direction": "horizontal",
+          "wrap": false,
+          "gap": 0,
+          "counterGap": 0,
+          "padding": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "align": "center",
+          "justify": "center",
+          "primarySizing": "fixed",
+          "counterSizing": "fixed",
+          "grid": null
+        },
+        "layoutItem": {
+          "align": "auto",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": null
+      },
+      "figma-node-566-118": {
+        "id": "figma-node-566-118",
+        "type": "image",
+        "tag": "img",
+        "name": "play-circle",
+        "parentId": "figma-node-566-117",
+        "order": 0,
+        "childIds": [],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-118\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": 100
+        },
+        "figma": {
+          "nodeId": "566:118",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 16,
+          "height": 16,
+          "x": 10,
+          "y": 10,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": null,
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": null,
+        "layoutItem": {
+          "align": "auto",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": {
+          "kind": "image",
+          "mimeType": "image/png",
+          "bytes": 571,
+          "sha256": "e3034274b9c88448df8ae8aa51291a41ca5251590e73be3e54cd1fb6539940fe"
+        }
+      },
+      "figma-node-566-120": {
+        "id": "figma-node-566-120",
+        "type": "frame",
+        "tag": "div",
+        "name": "figma-node-566-120",
+        "parentId": "figma-node-566-110",
+        "order": 1,
+        "childIds": [
+          "figma-node-566-121",
+          "figma-node-566-122",
+          "figma-node-566-126"
+        ],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-120\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:120",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 354,
+          "height": 96,
+          "x": 0,
+          "y": 108,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": {
+            "color": "#131317",
+            "opacity": 1
+          },
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 16,
+          "effects": []
+        },
+        "layout": {
+          "kind": "flex",
+          "direction": "horizontal",
+          "wrap": false,
+          "gap": 16,
+          "counterGap": 0,
+          "padding": {
+            "top": 16,
+            "right": 16,
+            "bottom": 16,
+            "left": 16
+          },
+          "align": "center",
+          "justify": "start",
+          "primarySizing": "fixed",
+          "counterSizing": "fixed",
+          "grid": null
+        },
+        "layoutItem": {
+          "align": "stretch",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": null
+      },
+      "figma-node-566-121": {
+        "id": "figma-node-566-121",
+        "type": "image",
+        "tag": "img",
+        "name": "playlist-art",
+        "parentId": "figma-node-566-120",
+        "order": 0,
+        "childIds": [],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-121\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": 100
+        },
+        "figma": {
+          "nodeId": "566:121",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 64,
+          "height": 64,
+          "x": 16,
+          "y": 16,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": null,
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": null,
+        "layoutItem": {
+          "align": "auto",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": {
+          "kind": "image",
+          "mimeType": "image/png",
+          "bytes": 9451,
+          "sha256": "5c95110ad78cb083b63b611bbe732aecd2fb0828eeb27b27241e51985772e5e7"
+        }
+      },
+      "figma-node-566-122": {
+        "id": "figma-node-566-122",
+        "type": "frame",
+        "tag": "div",
+        "name": "figma-node-566-122",
+        "parentId": "figma-node-566-120",
+        "order": 1,
+        "childIds": [
+          "figma-node-566-123",
+          "figma-node-566-124",
+          "figma-node-566-125"
+        ],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-122\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:122",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 190,
+          "height": 60,
+          "x": 96,
+          "y": 18,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": null,
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": {
+          "kind": "flex",
+          "direction": "vertical",
+          "wrap": false,
+          "gap": 4,
+          "counterGap": 0,
+          "padding": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "align": "start",
+          "justify": "start",
+          "primarySizing": "fixed",
+          "counterSizing": "fixed",
+          "grid": null
+        },
+        "layoutItem": {
+          "align": "auto",
+          "grow": 1,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fill",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": null
+      },
+      "figma-node-566-123": {
+        "id": "figma-node-566-123",
+        "type": "text",
+        "tag": "span",
+        "name": "figma-node-566-123",
+        "parentId": "figma-node-566-122",
+        "order": 0,
+        "childIds": [],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-123\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:123",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 190,
+          "height": 20,
+          "x": 0,
+          "y": 0,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": {
+            "color": "#F5F5FA",
+            "opacity": 1
+          },
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": null,
+        "layoutItem": {
+          "align": "stretch",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": {
+          "characters": "Sunset Horizon",
+          "font": {
+            "family": "Outfit",
+            "style": "Semi Bold",
+            "size": 14,
+            "lineHeight": {
+              "unit": "PERCENT",
+              "value": 140
+            },
+            "letterSpacing": {
+              "unit": "PERCENT",
+              "value": 0
+            }
+          },
+          "align": {
+            "horizontal": "LEFT",
+            "vertical": "TOP"
+          },
+          "textCase": "ORIGINAL",
+          "textDecoration": "NONE"
+        },
+        "resource": null
+      },
+      "figma-node-566-124": {
+        "id": "figma-node-566-124",
+        "type": "text",
+        "tag": "span",
+        "name": "figma-node-566-124",
+        "parentId": "figma-node-566-122",
+        "order": 1,
+        "childIds": [],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-124\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:124",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 190,
+          "height": 18,
+          "x": 0,
+          "y": 24,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": {
+            "color": "#8E8E9C",
+            "opacity": 1
+          },
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": null,
+        "layoutItem": {
+          "align": "stretch",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": {
+          "characters": "Deep synth progressives for the late drive",
+          "font": {
+            "family": "Outfit",
+            "style": "Regular",
+            "size": 12,
+            "lineHeight": {
+              "unit": "PERCENT",
+              "value": 150
+            },
+            "letterSpacing": {
+              "unit": "PERCENT",
+              "value": 0
+            }
+          },
+          "align": {
+            "horizontal": "LEFT",
+            "vertical": "TOP"
+          },
+          "textCase": "ORIGINAL",
+          "textDecoration": "NONE"
+        },
+        "resource": null
+      },
+      "figma-node-566-125": {
+        "id": "figma-node-566-125",
+        "type": "text",
+        "tag": "span",
+        "name": "figma-node-566-125",
+        "parentId": "figma-node-566-122",
+        "order": 2,
+        "childIds": [],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-125\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:125",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 190,
+          "height": 14,
+          "x": 0,
+          "y": 46,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": {
+            "color": "#FF6B57",
+            "opacity": 1
+          },
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": null,
+        "layoutItem": {
+          "align": "stretch",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": {
+          "characters": "40 tracks",
+          "font": {
+            "family": "Outfit",
+            "style": "Medium",
+            "size": 11,
+            "lineHeight": {
+              "unit": "AUTO"
+            },
+            "letterSpacing": {
+              "unit": "PERCENT",
+              "value": 1
+            }
+          },
+          "align": {
+            "horizontal": "LEFT",
+            "vertical": "TOP"
+          },
+          "textCase": "ORIGINAL",
+          "textDecoration": "NONE"
+        },
+        "resource": null
+      },
+      "figma-node-566-126": {
+        "id": "figma-node-566-126",
+        "type": "frame",
+        "tag": "div",
+        "name": "figma-node-566-126",
+        "parentId": "figma-node-566-120",
+        "order": 2,
+        "childIds": [
+          "figma-node-566-127"
+        ],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-126\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:126",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 36,
+          "height": 36,
+          "x": 302,
+          "y": 30,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": {
+            "color": "#FF6B57",
+            "opacity": 0.13333333333333333
+          },
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 18,
+          "effects": []
+        },
+        "layout": {
+          "kind": "flex",
+          "direction": "horizontal",
+          "wrap": false,
+          "gap": 0,
+          "counterGap": 0,
+          "padding": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "align": "center",
+          "justify": "center",
+          "primarySizing": "fixed",
+          "counterSizing": "fixed",
+          "grid": null
+        },
+        "layoutItem": {
+          "align": "auto",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": null
+      },
+      "figma-node-566-127": {
+        "id": "figma-node-566-127",
+        "type": "image",
+        "tag": "img",
+        "name": "play-circle",
+        "parentId": "figma-node-566-126",
+        "order": 0,
+        "childIds": [],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-127\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": 100
+        },
+        "figma": {
+          "nodeId": "566:127",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 16,
+          "height": 16,
+          "x": 10,
+          "y": 10,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": null,
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": null,
+        "layoutItem": {
+          "align": "auto",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": {
+          "kind": "image",
+          "mimeType": "image/png",
+          "bytes": 571,
+          "sha256": "e3034274b9c88448df8ae8aa51291a41ca5251590e73be3e54cd1fb6539940fe"
+        }
+      },
+      "figma-node-566-129": {
+        "id": "figma-node-566-129",
+        "type": "frame",
+        "tag": "div",
+        "name": "figma-node-566-129",
+        "parentId": "page-root",
+        "order": 1,
+        "childIds": [
+          "figma-node-566-130",
+          "figma-node-566-147"
+        ],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-129\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:129",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 402,
+          "height": 80,
+          "x": 0,
+          "y": 794,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": {
+            "color": "#0A0A0C",
+            "opacity": 1
+          },
+          "fills": [],
+          "stroke": {
+            "color": "#1A1A22",
+            "opacity": 1
+          },
+          "strokes": [],
+          "strokeWeight": 1,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": {
+          "kind": "flex",
+          "direction": "vertical",
+          "wrap": false,
+          "gap": 0,
+          "counterGap": 0,
+          "padding": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "align": "start",
+          "justify": "start",
+          "primarySizing": "fixed",
+          "counterSizing": "fixed",
+          "grid": null
+        },
+        "layoutItem": {
+          "align": "stretch",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": null
+      },
+      "figma-node-566-130": {
+        "id": "figma-node-566-130",
+        "type": "frame",
+        "tag": "div",
+        "name": "figma-node-566-130",
+        "parentId": "figma-node-566-129",
+        "order": 0,
+        "childIds": [
+          "figma-node-566-131",
+          "figma-node-566-135",
+          "figma-node-566-139",
+          "figma-node-566-143"
+        ],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-130\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:130",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 402,
+          "height": 62,
+          "x": 1,
+          "y": 1,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": null,
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": {
+          "kind": "flex",
+          "direction": "horizontal",
+          "wrap": false,
+          "gap": 0,
+          "counterGap": 0,
+          "padding": {
+            "top": 0,
+            "right": 16,
+            "bottom": 0,
+            "left": 16
+          },
+          "align": "center",
+          "justify": "space-between",
+          "primarySizing": "fixed",
+          "counterSizing": "fixed",
+          "grid": null
+        },
+        "layoutItem": {
+          "align": "stretch",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": null
+      },
+      "figma-node-566-131": {
+        "id": "figma-node-566-131",
+        "type": "frame",
+        "tag": "div",
+        "name": "figma-node-566-131",
+        "parentId": "figma-node-566-130",
+        "order": 0,
+        "childIds": [
+          "figma-node-566-132",
+          "figma-node-566-134"
+        ],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-131\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:131",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 64,
+          "height": 37,
+          "x": 16,
+          "y": 12.5,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": null,
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": {
+          "kind": "flex",
+          "direction": "vertical",
+          "wrap": false,
+          "gap": 4,
+          "counterGap": 0,
+          "padding": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "align": "center",
+          "justify": "center",
+          "primarySizing": "fixed",
+          "counterSizing": "fixed",
+          "grid": null
+        },
+        "layoutItem": {
+          "align": "auto",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": null
+      },
+      "figma-node-566-132": {
+        "id": "figma-node-566-132",
+        "type": "image",
+        "tag": "img",
+        "name": "home",
+        "parentId": "figma-node-566-131",
+        "order": 0,
+        "childIds": [],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-132\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": 100
+        },
+        "figma": {
+          "nodeId": "566:132",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 20,
+          "height": 20,
+          "x": 22,
+          "y": 0,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": null,
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": null,
+        "layoutItem": {
+          "align": "auto",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": {
+          "kind": "image",
+          "mimeType": "image/png",
+          "bytes": 506,
+          "sha256": "b2f2d99d1c0c2fe97a3aeb55d682d07775818ed855e6f334f1448e78cc67c59c"
+        }
+      },
+      "figma-node-566-134": {
+        "id": "figma-node-566-134",
+        "type": "text",
+        "tag": "span",
+        "name": "figma-node-566-134",
+        "parentId": "figma-node-566-131",
+        "order": 1,
+        "childIds": [],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-134\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:134",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 27,
+          "height": 13,
+          "x": 18.5,
+          "y": 24,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": {
+            "color": "#FF6B57",
+            "opacity": 1
+          },
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": null,
+        "layoutItem": {
+          "align": "auto",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": {
+          "characters": "Home",
+          "font": {
+            "family": "Outfit",
+            "style": "Semi Bold",
+            "size": 10,
+            "lineHeight": {
+              "unit": "AUTO"
+            },
+            "letterSpacing": {
+              "unit": "PERCENT",
+              "value": 0
+            }
+          },
+          "align": {
+            "horizontal": "LEFT",
+            "vertical": "TOP"
+          },
+          "textCase": "ORIGINAL",
+          "textDecoration": "NONE"
+        },
+        "resource": null
+      },
+      "figma-node-566-135": {
+        "id": "figma-node-566-135",
+        "type": "frame",
+        "tag": "div",
+        "name": "figma-node-566-135",
+        "parentId": "figma-node-566-130",
+        "order": 1,
+        "childIds": [
+          "figma-node-566-136",
+          "figma-node-566-138"
+        ],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-135\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:135",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 64,
+          "height": 37,
+          "x": 118,
+          "y": 12.5,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": null,
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": {
+          "kind": "flex",
+          "direction": "vertical",
+          "wrap": false,
+          "gap": 4,
+          "counterGap": 0,
+          "padding": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "align": "center",
+          "justify": "center",
+          "primarySizing": "fixed",
+          "counterSizing": "fixed",
+          "grid": null
+        },
+        "layoutItem": {
+          "align": "auto",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": null
+      },
+      "figma-node-566-136": {
+        "id": "figma-node-566-136",
+        "type": "image",
+        "tag": "img",
+        "name": "search",
+        "parentId": "figma-node-566-135",
+        "order": 0,
+        "childIds": [],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-136\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": 100
+        },
+        "figma": {
+          "nodeId": "566:136",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 20,
+          "height": 20,
+          "x": 22,
+          "y": 0,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": null,
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": null,
+        "layoutItem": {
+          "align": "auto",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": {
+          "kind": "image",
+          "mimeType": "image/png",
+          "bytes": 550,
+          "sha256": "66ede85477dc57dfcf29fbf35fed702f5bb11d8e4cae631abf05f41291e0bef7"
+        }
+      },
+      "figma-node-566-138": {
+        "id": "figma-node-566-138",
+        "type": "text",
+        "tag": "span",
+        "name": "figma-node-566-138",
+        "parentId": "figma-node-566-135",
+        "order": 1,
+        "childIds": [],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-138\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:138",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 31,
+          "height": 13,
+          "x": 16.5,
+          "y": 24,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": {
+            "color": "#8E8E9C",
+            "opacity": 1
+          },
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": null,
+        "layoutItem": {
+          "align": "auto",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": {
+          "characters": "Search",
+          "font": {
+            "family": "Outfit",
+            "style": "Regular",
+            "size": 10,
+            "lineHeight": {
+              "unit": "AUTO"
+            },
+            "letterSpacing": {
+              "unit": "PERCENT",
+              "value": 0
+            }
+          },
+          "align": {
+            "horizontal": "LEFT",
+            "vertical": "TOP"
+          },
+          "textCase": "ORIGINAL",
+          "textDecoration": "NONE"
+        },
+        "resource": null
+      },
+      "figma-node-566-139": {
+        "id": "figma-node-566-139",
+        "type": "frame",
+        "tag": "div",
+        "name": "figma-node-566-139",
+        "parentId": "figma-node-566-130",
+        "order": 2,
+        "childIds": [
+          "figma-node-566-140",
+          "figma-node-566-142"
+        ],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-139\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:139",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 64,
+          "height": 37,
+          "x": 220,
+          "y": 12.5,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": null,
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": {
+          "kind": "flex",
+          "direction": "vertical",
+          "wrap": false,
+          "gap": 4,
+          "counterGap": 0,
+          "padding": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "align": "center",
+          "justify": "center",
+          "primarySizing": "fixed",
+          "counterSizing": "fixed",
+          "grid": null
+        },
+        "layoutItem": {
+          "align": "auto",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": null
+      },
+      "figma-node-566-140": {
+        "id": "figma-node-566-140",
+        "type": "image",
+        "tag": "img",
+        "name": "library-square",
+        "parentId": "figma-node-566-139",
+        "order": 0,
+        "childIds": [],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-140\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": 100
+        },
+        "figma": {
+          "nodeId": "566:140",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 20,
+          "height": 20,
+          "x": 22,
+          "y": 0,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": null,
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": null,
+        "layoutItem": {
+          "align": "auto",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": {
+          "kind": "image",
+          "mimeType": "image/png",
+          "bytes": 485,
+          "sha256": "5eebec1ae3a61c3a1e28e5d7398220ed76b1d0ef1c2b4fd3b3b572b450c4080f"
+        }
+      },
+      "figma-node-566-142": {
+        "id": "figma-node-566-142",
+        "type": "text",
+        "tag": "span",
+        "name": "figma-node-566-142",
+        "parentId": "figma-node-566-139",
+        "order": 1,
+        "childIds": [],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-142\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:142",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 33,
+          "height": 13,
+          "x": 15.5,
+          "y": 24,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": {
+            "color": "#8E8E9C",
+            "opacity": 1
+          },
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": null,
+        "layoutItem": {
+          "align": "auto",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": {
+          "characters": "Library",
+          "font": {
+            "family": "Outfit",
+            "style": "Regular",
+            "size": 10,
+            "lineHeight": {
+              "unit": "AUTO"
+            },
+            "letterSpacing": {
+              "unit": "PERCENT",
+              "value": 0
+            }
+          },
+          "align": {
+            "horizontal": "LEFT",
+            "vertical": "TOP"
+          },
+          "textCase": "ORIGINAL",
+          "textDecoration": "NONE"
+        },
+        "resource": null
+      },
+      "figma-node-566-143": {
+        "id": "figma-node-566-143",
+        "type": "frame",
+        "tag": "div",
+        "name": "figma-node-566-143",
+        "parentId": "figma-node-566-130",
+        "order": 3,
+        "childIds": [
+          "figma-node-566-144",
+          "figma-node-566-146"
+        ],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-143\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:143",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 64,
+          "height": 37,
+          "x": 322,
+          "y": 12.5,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": null,
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": {
+          "kind": "flex",
+          "direction": "vertical",
+          "wrap": false,
+          "gap": 4,
+          "counterGap": 0,
+          "padding": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "align": "center",
+          "justify": "center",
+          "primarySizing": "fixed",
+          "counterSizing": "fixed",
+          "grid": null
+        },
+        "layoutItem": {
+          "align": "auto",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": null
+      },
+      "figma-node-566-144": {
+        "id": "figma-node-566-144",
+        "type": "image",
+        "tag": "img",
+        "name": "user",
+        "parentId": "figma-node-566-143",
+        "order": 0,
+        "childIds": [],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-144\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": 100
+        },
+        "figma": {
+          "nodeId": "566:144",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 20,
+          "height": 20,
+          "x": 22,
+          "y": 0,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": null,
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": null,
+        "layoutItem": {
+          "align": "auto",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": {
+          "kind": "image",
+          "mimeType": "image/png",
+          "bytes": 521,
+          "sha256": "b837431bd276b7df6bc7e35ae11ec7bad10ee706ffdf1f2e1e0dd38f4cc5dfd9"
+        }
+      },
+      "figma-node-566-146": {
+        "id": "figma-node-566-146",
+        "type": "text",
+        "tag": "span",
+        "name": "figma-node-566-146",
+        "parentId": "figma-node-566-143",
+        "order": 1,
+        "childIds": [],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-146\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:146",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 29,
+          "height": 13,
+          "x": 17.5,
+          "y": 24,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": {
+            "color": "#8E8E9C",
+            "opacity": 1
+          },
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": null,
+        "layoutItem": {
+          "align": "auto",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": {
+          "characters": "Profile",
+          "font": {
+            "family": "Outfit",
+            "style": "Regular",
+            "size": 10,
+            "lineHeight": {
+              "unit": "AUTO"
+            },
+            "letterSpacing": {
+              "unit": "PERCENT",
+              "value": 0
+            }
+          },
+          "align": {
+            "horizontal": "LEFT",
+            "vertical": "TOP"
+          },
+          "textCase": "ORIGINAL",
+          "textDecoration": "NONE"
+        },
+        "resource": null
+      },
+      "figma-node-566-147": {
+        "id": "figma-node-566-147",
+        "type": "frame",
+        "tag": "div",
+        "name": "figma-node-566-147",
+        "parentId": "figma-node-566-129",
+        "order": 1,
+        "childIds": [
+          "figma-node-566-148"
+        ],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-147\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:147",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 402,
+          "height": 16,
+          "x": 1,
+          "y": 63,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": null,
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": {
+          "kind": "flex",
+          "direction": "horizontal",
+          "wrap": false,
+          "gap": 0,
+          "counterGap": 0,
+          "padding": {
+            "top": 4,
+            "right": 0,
+            "bottom": 8,
+            "left": 0
+          },
+          "align": "start",
+          "justify": "center",
+          "primarySizing": "fixed",
+          "counterSizing": "fixed",
+          "grid": null
+        },
+        "layoutItem": {
+          "align": "stretch",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": null
+      },
+      "figma-node-566-148": {
+        "id": "figma-node-566-148",
+        "type": "svg",
+        "tag": "svg",
+        "name": "indicator",
+        "parentId": "figma-node-566-147",
+        "order": 0,
+        "childIds": [],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-148\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": 100
+        },
+        "figma": {
+          "nodeId": "566:148",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 120,
+          "height": 4,
+          "x": 141,
+          "y": 4,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": null,
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": null,
+        "layoutItem": {
+          "align": "auto",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": {
+          "kind": "svg",
+          "mimeType": "image/svg+xml",
+          "bytes": 861,
+          "sha256": "83fd2bd896cdb6c8d1f10dffea6f0ba9ced6a07b7f42856d0f866955d0c44982"
+        }
+      },
+      "figma-node-566-72": {
+        "id": "figma-node-566-72",
+        "type": "frame",
+        "tag": "div",
+        "name": "figma-node-566-72",
+        "parentId": "page-root",
+        "order": 0,
+        "childIds": [
+          "figma-node-566-73",
+          "figma-node-566-82",
+          "figma-node-566-87",
+          "figma-node-566-108"
+        ],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-72\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:72",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 402,
+          "height": 657,
+          "x": 0,
+          "y": 0,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": null,
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": {
+          "kind": "flex",
+          "direction": "vertical",
+          "wrap": false,
+          "gap": 0,
+          "counterGap": 0,
+          "padding": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "align": "start",
+          "justify": "start",
+          "primarySizing": "fixed",
+          "counterSizing": "fixed",
+          "grid": null
+        },
+        "layoutItem": {
+          "align": "stretch",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": null
+      },
+      "figma-node-566-73": {
+        "id": "figma-node-566-73",
+        "type": "frame",
+        "tag": "div",
+        "name": "figma-node-566-73",
+        "parentId": "figma-node-566-72",
+        "order": 0,
+        "childIds": [
+          "figma-node-566-74",
+          "figma-node-566-75"
+        ],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-73\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:73",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 402,
+          "height": 44,
+          "x": 0,
+          "y": 0,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": null,
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": {
+          "kind": "flex",
+          "direction": "horizontal",
+          "wrap": false,
+          "gap": 0,
+          "counterGap": 0,
+          "padding": {
+            "top": 12,
+            "right": 24,
+            "bottom": 0,
+            "left": 24
+          },
+          "align": "center",
+          "justify": "space-between",
+          "primarySizing": "fixed",
+          "counterSizing": "fixed",
+          "grid": null
+        },
+        "layoutItem": {
+          "align": "stretch",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": null
+      },
+      "figma-node-566-74": {
+        "id": "figma-node-566-74",
+        "type": "text",
+        "tag": "span",
+        "name": "figma-node-566-74",
+        "parentId": "figma-node-566-73",
+        "order": 0,
+        "childIds": [],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-74\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:74",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 26,
+          "height": 18,
+          "x": 24,
+          "y": 19,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": {
+            "color": "#F5F5FA",
+            "opacity": 1
+          },
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": null,
+        "layoutItem": {
+          "align": "auto",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": {
+          "characters": "9:41",
+          "font": {
+            "family": "Outfit",
+            "style": "Semi Bold",
+            "size": 14,
+            "lineHeight": {
+              "unit": "AUTO"
+            },
+            "letterSpacing": {
+              "unit": "PERCENT",
+              "value": 0
+            }
+          },
+          "align": {
+            "horizontal": "LEFT",
+            "vertical": "TOP"
+          },
+          "textCase": "ORIGINAL",
+          "textDecoration": "NONE"
+        },
+        "resource": null
+      },
+      "figma-node-566-75": {
+        "id": "figma-node-566-75",
+        "type": "frame",
+        "tag": "div",
+        "name": "figma-node-566-75",
+        "parentId": "figma-node-566-73",
+        "order": 1,
+        "childIds": [
+          "figma-node-566-76",
+          "figma-node-566-78",
+          "figma-node-566-80"
+        ],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-75\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:75",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 80,
+          "height": 20,
+          "x": 298,
+          "y": 18,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": null,
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": {
+          "kind": "flex",
+          "direction": "horizontal",
+          "wrap": false,
+          "gap": 6,
+          "counterGap": 0,
+          "padding": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "align": "center",
+          "justify": "start",
+          "primarySizing": "fixed",
+          "counterSizing": "fixed",
+          "grid": null
+        },
+        "layoutItem": {
+          "align": "auto",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": null
+      },
+      "figma-node-566-76": {
+        "id": "figma-node-566-76",
+        "type": "image",
+        "tag": "img",
+        "name": "ios-signal",
+        "parentId": "figma-node-566-75",
+        "order": 0,
+        "childIds": [],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-76\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": 100
+        },
+        "figma": {
+          "nodeId": "566:76",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 20,
+          "height": 20,
+          "x": 0,
+          "y": 0,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": null,
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": null,
+        "layoutItem": {
+          "align": "auto",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": {
+          "kind": "image",
+          "mimeType": "image/png",
+          "bytes": 377,
+          "sha256": "d6f55b603b79c0474776df056b83521482f8df73f9246fc987059282bca14e77"
+        }
+      },
+      "figma-node-566-78": {
+        "id": "figma-node-566-78",
+        "type": "image",
+        "tag": "img",
+        "name": "ios-wifi-signal",
+        "parentId": "figma-node-566-75",
+        "order": 1,
+        "childIds": [],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-78\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": 100
+        },
+        "figma": {
+          "nodeId": "566:78",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 20,
+          "height": 20,
+          "x": 26,
+          "y": 0,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": null,
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": null,
+        "layoutItem": {
+          "align": "auto",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": {
+          "kind": "image",
+          "mimeType": "image/png",
+          "bytes": 466,
+          "sha256": "0c082397bc8d8fe5c79f2403850f51c1b26d9cd848b9d9a6df2f000fdfed6161"
+        }
+      },
+      "figma-node-566-80": {
+        "id": "figma-node-566-80",
+        "type": "image",
+        "tag": "img",
+        "name": "ios-battery-full",
+        "parentId": "figma-node-566-75",
+        "order": 2,
+        "childIds": [],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-80\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": 100
+        },
+        "figma": {
+          "nodeId": "566:80",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 28,
+          "height": 20,
+          "x": 52,
+          "y": 0,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": null,
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": null,
+        "layoutItem": {
+          "align": "auto",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": {
+          "kind": "image",
+          "mimeType": "image/png",
+          "bytes": 432,
+          "sha256": "9d717741761d6491ac45395a763b67f46528c647c968a8cc90d23de6a31f6d4b"
+        }
+      },
+      "figma-node-566-82": {
+        "id": "figma-node-566-82",
+        "type": "frame",
+        "tag": "div",
+        "name": "figma-node-566-82",
+        "parentId": "figma-node-566-72",
+        "order": 1,
+        "childIds": [
+          "figma-node-566-83",
+          "figma-node-566-86"
+        ],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-82\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:82",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 402,
+          "height": 91,
+          "x": 0,
+          "y": 44,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": null,
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": {
+          "kind": "flex",
+          "direction": "horizontal",
+          "wrap": false,
+          "gap": 0,
+          "counterGap": 0,
+          "padding": {
+            "top": 24,
+            "right": 24,
+            "bottom": 20,
+            "left": 24
+          },
+          "align": "center",
+          "justify": "space-between",
+          "primarySizing": "fixed",
+          "counterSizing": "fixed",
+          "grid": null
+        },
+        "layoutItem": {
+          "align": "stretch",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": null
+      },
+      "figma-node-566-83": {
+        "id": "figma-node-566-83",
+        "type": "frame",
+        "tag": "div",
+        "name": "figma-node-566-83",
+        "parentId": "figma-node-566-82",
+        "order": 0,
+        "childIds": [
+          "figma-node-566-84",
+          "figma-node-566-85"
+        ],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-83\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:83",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 314,
+          "height": 47,
+          "x": 24,
+          "y": 24,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": null,
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": {
+          "kind": "flex",
+          "direction": "vertical",
+          "wrap": false,
+          "gap": 4,
+          "counterGap": 0,
+          "padding": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "align": "start",
+          "justify": "start",
+          "primarySizing": "fixed",
+          "counterSizing": "fixed",
+          "grid": null
+        },
+        "layoutItem": {
+          "align": "auto",
+          "grow": 1,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fill",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": null
+      },
+      "figma-node-566-84": {
+        "id": "figma-node-566-84",
+        "type": "text",
+        "tag": "span",
+        "name": "figma-node-566-84",
+        "parentId": "figma-node-566-83",
+        "order": 0,
+        "childIds": [],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-84\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:84",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 103,
+          "height": 14,
+          "x": 0,
+          "y": 0,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": {
+            "color": "#FF6B57",
+            "opacity": 1
+          },
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": null,
+        "layoutItem": {
+          "align": "auto",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": {
+          "characters": "Your sonic space",
+          "font": {
+            "family": "Outfit",
+            "style": "Medium",
+            "size": 11,
+            "lineHeight": {
+              "unit": "AUTO"
+            },
+            "letterSpacing": {
+              "unit": "PERCENT",
+              "value": 1
+            }
+          },
+          "align": {
+            "horizontal": "LEFT",
+            "vertical": "TOP"
+          },
+          "textCase": "ORIGINAL",
+          "textDecoration": "NONE"
+        },
+        "resource": null
+      },
+      "figma-node-566-85": {
+        "id": "figma-node-566-85",
+        "type": "text",
+        "tag": "span",
+        "name": "figma-node-566-85",
+        "parentId": "figma-node-566-83",
+        "order": 1,
+        "childIds": [],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-85\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:85",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 230,
+          "height": 29,
+          "x": 0,
+          "y": 18,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": {
+            "color": "#F5F5FA",
+            "opacity": 1
+          },
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": null,
+        "layoutItem": {
+          "align": "auto",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": {
+          "characters": "Good evening, Sarah",
+          "font": {
+            "family": "Outfit",
+            "style": "Bold",
+            "size": 24,
+            "lineHeight": {
+              "unit": "PERCENT",
+              "value": 120
+            },
+            "letterSpacing": {
+              "unit": "PERCENT",
+              "value": 0
+            }
+          },
+          "align": {
+            "horizontal": "LEFT",
+            "vertical": "TOP"
+          },
+          "textCase": "ORIGINAL",
+          "textDecoration": "NONE"
+        },
+        "resource": null
+      },
+      "figma-node-566-86": {
+        "id": "figma-node-566-86",
+        "type": "frame",
+        "tag": "div",
+        "name": "figma-node-566-86",
+        "parentId": "figma-node-566-82",
+        "order": 1,
+        "childIds": [],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-86\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:86",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 40,
+          "height": 40,
+          "x": 338,
+          "y": 27.5,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": {
+            "color": "#FFFFFF",
+            "opacity": 1
+          },
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 20,
+          "effects": []
+        },
+        "layout": {
+          "kind": "flex",
+          "direction": "horizontal",
+          "wrap": false,
+          "gap": 0,
+          "counterGap": 0,
+          "padding": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "align": "start",
+          "justify": "start",
+          "primarySizing": "fixed",
+          "counterSizing": "fixed",
+          "grid": null
+        },
+        "layoutItem": {
+          "align": "auto",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": null
+      },
+      "figma-node-566-87": {
+        "id": "figma-node-566-87",
+        "type": "frame",
+        "tag": "div",
+        "name": "figma-node-566-87",
+        "parentId": "figma-node-566-72",
+        "order": 2,
+        "childIds": [
+          "figma-node-566-88",
+          "figma-node-566-91"
+        ],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-87\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:87",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 402,
+          "height": 255,
+          "x": 0,
+          "y": 135,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": null,
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": {
+          "kind": "flex",
+          "direction": "vertical",
+          "wrap": false,
+          "gap": 16,
+          "counterGap": 0,
+          "padding": {
+            "top": 0,
+            "right": 0,
+            "bottom": 28,
+            "left": 0
+          },
+          "align": "start",
+          "justify": "start",
+          "primarySizing": "fixed",
+          "counterSizing": "fixed",
+          "grid": null
+        },
+        "layoutItem": {
+          "align": "stretch",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": null
+      },
+      "figma-node-566-88": {
+        "id": "figma-node-566-88",
+        "type": "frame",
+        "tag": "div",
+        "name": "figma-node-566-88",
+        "parentId": "figma-node-566-87",
+        "order": 0,
+        "childIds": [
+          "figma-node-566-89",
+          "figma-node-566-90"
+        ],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-88\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:88",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 402,
+          "height": 23,
+          "x": 0,
+          "y": 0,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": null,
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": {
+          "kind": "flex",
+          "direction": "horizontal",
+          "wrap": false,
+          "gap": 0,
+          "counterGap": 0,
+          "padding": {
+            "top": 0,
+            "right": 24,
+            "bottom": 0,
+            "left": 24
+          },
+          "align": "start",
+          "justify": "space-between",
+          "primarySizing": "fixed",
+          "counterSizing": "fixed",
+          "grid": null
+        },
+        "layoutItem": {
+          "align": "stretch",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": null
+      },
+      "figma-node-566-89": {
+        "id": "figma-node-566-89",
+        "type": "text",
+        "tag": "span",
+        "name": "figma-node-566-89",
+        "parentId": "figma-node-566-88",
+        "order": 0,
+        "childIds": [],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-89\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:89",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 130,
+          "height": 23,
+          "x": 24,
+          "y": 0,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": {
+            "color": "#F5F5FA",
+            "opacity": 1
+          },
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": null,
+        "layoutItem": {
+          "align": "auto",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": {
+          "characters": "Recently Played",
+          "font": {
+            "family": "Outfit",
+            "style": "Semi Bold",
+            "size": 18,
+            "lineHeight": {
+              "unit": "PERCENT",
+              "value": 130
+            },
+            "letterSpacing": {
+              "unit": "PERCENT",
+              "value": 0
+            }
+          },
+          "align": {
+            "horizontal": "LEFT",
+            "vertical": "TOP"
+          },
+          "textCase": "ORIGINAL",
+          "textDecoration": "NONE"
+        },
+        "resource": null
+      },
+      "figma-node-566-90": {
+        "id": "figma-node-566-90",
+        "type": "text",
+        "tag": "span",
+        "name": "figma-node-566-90",
+        "parentId": "figma-node-566-88",
+        "order": 1,
+        "childIds": [],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-90\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:90",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 40,
+          "height": 14,
+          "x": 338,
+          "y": 0,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": {
+            "color": "#8E8E9C",
+            "opacity": 1
+          },
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": null,
+        "layoutItem": {
+          "align": "auto",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": {
+          "characters": "View All",
+          "font": {
+            "family": "Outfit",
+            "style": "Medium",
+            "size": 11,
+            "lineHeight": {
+              "unit": "AUTO"
+            },
+            "letterSpacing": {
+              "unit": "PERCENT",
+              "value": 1
+            }
+          },
+          "align": {
+            "horizontal": "LEFT",
+            "vertical": "TOP"
+          },
+          "textCase": "ORIGINAL",
+          "textDecoration": "NONE"
+        },
+        "resource": null
+      },
+      "figma-node-566-91": {
+        "id": "figma-node-566-91",
+        "type": "frame",
+        "tag": "div",
+        "name": "figma-node-566-91",
+        "parentId": "figma-node-566-87",
+        "order": 1,
+        "childIds": [
+          "figma-node-566-92"
+        ],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-91\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:91",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 402,
+          "height": 188,
+          "x": 0,
+          "y": 39,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": true
+        },
+        "appearance": {
+          "fill": null,
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": {
+          "kind": "flex",
+          "direction": "horizontal",
+          "wrap": false,
+          "gap": 0,
+          "counterGap": 0,
+          "padding": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 24
+          },
+          "align": "start",
+          "justify": "start",
+          "primarySizing": "fixed",
+          "counterSizing": "fixed",
+          "grid": null
+        },
+        "layoutItem": {
+          "align": "stretch",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": null
+      },
+      "figma-node-566-92": {
+        "id": "figma-node-566-92",
+        "type": "frame",
+        "tag": "div",
+        "name": "figma-node-566-92",
+        "parentId": "figma-node-566-91",
+        "order": 0,
+        "childIds": [
+          "figma-node-566-93",
+          "figma-node-566-98",
+          "figma-node-566-103"
+        ],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-92\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:92",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 452,
+          "height": 188,
+          "x": 24,
+          "y": 0,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": null,
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": {
+          "kind": "flex",
+          "direction": "horizontal",
+          "wrap": false,
+          "gap": 16,
+          "counterGap": 0,
+          "padding": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "align": "start",
+          "justify": "start",
+          "primarySizing": "fixed",
+          "counterSizing": "fixed",
+          "grid": null
+        },
+        "layoutItem": {
+          "align": "auto",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": null
+      },
+      "figma-node-566-93": {
+        "id": "figma-node-566-93",
+        "type": "frame",
+        "tag": "div",
+        "name": "figma-node-566-93",
+        "parentId": "figma-node-566-92",
+        "order": 0,
+        "childIds": [
+          "figma-node-566-94",
+          "figma-node-566-95"
+        ],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-93\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:93",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 140,
+          "height": 188,
+          "x": 0,
+          "y": 0,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": {
+            "color": "#131317",
+            "opacity": 1
+          },
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 16,
+          "effects": []
+        },
+        "layout": {
+          "kind": "flex",
+          "direction": "vertical",
+          "wrap": false,
+          "gap": 12,
+          "counterGap": 0,
+          "padding": {
+            "top": 12,
+            "right": 12,
+            "bottom": 12,
+            "left": 12
+          },
+          "align": "start",
+          "justify": "start",
+          "primarySizing": "fixed",
+          "counterSizing": "fixed",
+          "grid": null
+        },
+        "layoutItem": {
+          "align": "auto",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": null
+      },
+      "figma-node-566-94": {
+        "id": "figma-node-566-94",
+        "type": "image",
+        "tag": "img",
+        "name": "art",
+        "parentId": "figma-node-566-93",
+        "order": 0,
+        "childIds": [],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-94\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": 100
+        },
+        "figma": {
+          "nodeId": "566:94",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 116,
+          "height": 116,
+          "x": 12,
+          "y": 12,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": null,
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": null,
+        "layoutItem": {
+          "align": "auto",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": {
+          "kind": "image",
+          "mimeType": "image/png",
+          "bytes": 20726,
+          "sha256": "6d30365e2a6d88c7bdd366c1f987fa08eb5faf1fb267a5a969e4b715ac6d0250"
+        }
+      },
+      "figma-node-566-95": {
+        "id": "figma-node-566-95",
+        "type": "frame",
+        "tag": "div",
+        "name": "figma-node-566-95",
+        "parentId": "figma-node-566-93",
+        "order": 1,
+        "childIds": [
+          "figma-node-566-96",
+          "figma-node-566-97"
+        ],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-95\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:95",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 116,
+          "height": 36,
+          "x": 12,
+          "y": 140,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": null,
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": {
+          "kind": "flex",
+          "direction": "vertical",
+          "wrap": false,
+          "gap": 2,
+          "counterGap": 0,
+          "padding": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "align": "start",
+          "justify": "start",
+          "primarySizing": "fixed",
+          "counterSizing": "fixed",
+          "grid": null
+        },
+        "layoutItem": {
+          "align": "stretch",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": null
+      },
+      "figma-node-566-96": {
+        "id": "figma-node-566-96",
+        "type": "text",
+        "tag": "span",
+        "name": "figma-node-566-96",
+        "parentId": "figma-node-566-95",
+        "order": 0,
+        "childIds": [],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-96\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:96",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 116,
+          "height": 20,
+          "x": 0,
+          "y": 0,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": {
+            "color": "#F5F5FA",
+            "opacity": 1
+          },
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": null,
+        "layoutItem": {
+          "align": "stretch",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": {
+          "characters": "Sonder",
+          "font": {
+            "family": "Outfit",
+            "style": "Semi Bold",
+            "size": 14,
+            "lineHeight": {
+              "unit": "PERCENT",
+              "value": 140
+            },
+            "letterSpacing": {
+              "unit": "PERCENT",
+              "value": 0
+            }
+          },
+          "align": {
+            "horizontal": "LEFT",
+            "vertical": "TOP"
+          },
+          "textCase": "ORIGINAL",
+          "textDecoration": "NONE"
+        },
+        "resource": null
+      },
+      "figma-node-566-97": {
+        "id": "figma-node-566-97",
+        "type": "text",
+        "tag": "span",
+        "name": "figma-node-566-97",
+        "parentId": "figma-node-566-95",
+        "order": 1,
+        "childIds": [],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-97\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:97",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 116,
+          "height": 14,
+          "x": 0,
+          "y": 22,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": {
+            "color": "#8E8E9C",
+            "opacity": 1
+          },
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": null,
+        "layoutItem": {
+          "align": "stretch",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": {
+          "characters": "Kiasmos",
+          "font": {
+            "family": "Outfit",
+            "style": "Medium",
+            "size": 11,
+            "lineHeight": {
+              "unit": "AUTO"
+            },
+            "letterSpacing": {
+              "unit": "PERCENT",
+              "value": 1
+            }
+          },
+          "align": {
+            "horizontal": "LEFT",
+            "vertical": "TOP"
+          },
+          "textCase": "ORIGINAL",
+          "textDecoration": "NONE"
+        },
+        "resource": null
+      },
+      "figma-node-566-98": {
+        "id": "figma-node-566-98",
+        "type": "frame",
+        "tag": "div",
+        "name": "figma-node-566-98",
+        "parentId": "figma-node-566-92",
+        "order": 1,
+        "childIds": [
+          "figma-node-566-99",
+          "figma-node-566-100"
+        ],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-98\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:98",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 140,
+          "height": 188,
+          "x": 156,
+          "y": 0,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": {
+            "color": "#131317",
+            "opacity": 1
+          },
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 16,
+          "effects": []
+        },
+        "layout": {
+          "kind": "flex",
+          "direction": "vertical",
+          "wrap": false,
+          "gap": 12,
+          "counterGap": 0,
+          "padding": {
+            "top": 12,
+            "right": 12,
+            "bottom": 12,
+            "left": 12
+          },
+          "align": "start",
+          "justify": "start",
+          "primarySizing": "fixed",
+          "counterSizing": "fixed",
+          "grid": null
+        },
+        "layoutItem": {
+          "align": "auto",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": null
+      },
+      "figma-node-566-99": {
+        "id": "figma-node-566-99",
+        "type": "image",
+        "tag": "img",
+        "name": "art",
+        "parentId": "figma-node-566-98",
+        "order": 0,
+        "childIds": [],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"figma-node-566-99\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": 100
+        },
+        "figma": {
+          "nodeId": "566:99",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 116,
+          "height": 116,
+          "x": 12,
+          "y": 12,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": null,
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": null,
+        "layoutItem": {
+          "align": "auto",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": {
+          "kind": "image",
+          "mimeType": "image/png",
+          "bytes": 15369,
+          "sha256": "b98c5d6991447d28f18c63771893631a75aa41fa56cd4b55b6fceed157af3121"
+        }
+      },
+      "page-root": {
+        "id": "page-root",
+        "type": "frame",
+        "tag": "div",
+        "name": "page-root",
+        "parentId": null,
+        "order": 0,
+        "childIds": [
+          "figma-node-566-72",
+          "figma-node-566-129"
+        ],
+        "sourceRef": {
+          "file": "index.html",
+          "selector": "[data-codex-id=\"page-root\"]",
+          "component": ""
+        },
+        "semantics": {
+          "role": "",
+          "ariaLabel": "",
+          "landmark": ""
+        },
+        "interaction": {
+          "href": "",
+          "target": "",
+          "action": ""
+        },
+        "responsive": {
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "objectFit": "cover",
+          "minWidth": null,
+          "maxWidth": null
+        },
+        "figma": {
+          "nodeId": "566:71",
+          "componentKey": "",
+          "componentSetKey": ""
+        },
+        "geometry": {
+          "width": 402,
+          "height": 874,
+          "x": 0,
+          "y": 0,
+          "rotation": 0
+        },
+        "visibility": {
+          "visible": true,
+          "opacity": 1,
+          "clipsContent": false
+        },
+        "appearance": {
+          "fill": {
+            "color": "#0A0A0C",
+            "opacity": 1
+          },
+          "fills": [],
+          "stroke": null,
+          "strokes": [],
+          "strokeWeight": 0,
+          "strokeWidths": null,
+          "cornerRadius": 0,
+          "effects": []
+        },
+        "layout": {
+          "kind": "flex",
+          "direction": "vertical",
+          "wrap": false,
+          "gap": 0,
+          "counterGap": 0,
+          "padding": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "align": "start",
+          "justify": "space-between",
+          "primarySizing": "fixed",
+          "counterSizing": "fixed",
+          "grid": null
+        },
+        "layoutItem": {
+          "align": "auto",
+          "grow": 0,
+          "shrink": 1,
+          "basis": "auto",
+          "positioning": "auto",
+          "horizontalSizing": "fixed",
+          "verticalSizing": "fixed",
+          "gridRow": "auto",
+          "gridColumn": "auto"
+        },
+        "content": null,
+        "resource": null
+      }
+    },
+    "degradations": [],
+    "irHash": "d4635a3ac7bff7853b485f4d43dc7ae94baf6e4921e3b5ab6c4209ea02da46d3"
+  }
+}

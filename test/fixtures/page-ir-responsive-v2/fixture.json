@@ -1,0 +1,250 @@
+{
+  "fixtureVersion": 1,
+  "frozenFromExactBuild": "0.8.0+codex.20260823004648",
+  "frozenAt": "2026-08-24T00:00:00.000Z",
+  "project": {
+    "id": "home",
+    "name": "home",
+    "sourceKind": "figma-payload",
+    "runtime": {
+      "dom": "static",
+      "spa": false
+    },
+    "mapping": {
+      "attribute": "data-codex-id",
+      "requireUnique": true
+    }
+  },
+  "contract": {
+    "pageIrBaselineSchemaVersion": 1,
+    "targetPageIrSchemaVersion": 2,
+    "previewScaleIsDisplayOnly": true,
+    "legacyIdentityAccepted": false
+  },
+  "pages": [
+    {
+      "id": "offer-1787412575818-967f75a56e2ad8",
+      "name": "home",
+      "entry": "index.html",
+      "cssEntry": "styles.css",
+      "route": "/",
+      "designViewport": {
+        "width": 402,
+        "height": 874
+      },
+      "runtimeViewports": [
+        {
+          "id": "design-402",
+          "width": 402,
+          "height": 874
+        }
+      ],
+      "previewScale": {
+        "mode": "one-to-one",
+        "value": 1
+      },
+      "figma": {
+        "fileKey": "figma-1786551086085-07125f6b878af",
+        "pageId": "",
+        "rootNodeId": "566:71",
+        "rootNodeName": "home"
+      },
+      "projectKey": "90a812eedcf25059d3101d48",
+      "sourceHash": "c5cbee6ab43b4ba7ee145a79e9c8960896e302bdd202b7e2f56d9ca69f8ab09c",
+      "pageIrHash": "d4635a3ac7bff7853b485f4d43dc7ae94baf6e4921e3b5ab6c4209ea02da46d3",
+      "nodeCount": 69,
+      "mappingCount": 69,
+      "workspaceNodeCount": 69,
+      "files": {
+        "html": {
+          "file": "pages/home/index.html",
+          "bytes": 16016,
+          "sha256": "75f3011aa25e4b64eeb6e4179987f08a7da3c344443c87aa77e892eebedccab8"
+        },
+        "css": {
+          "file": "pages/home/styles.css",
+          "bytes": 24754,
+          "sha256": "cf8a6ad8e28dc0421f71a7c5a3de76db7fc7a0c1ef4f9a283e7a3db4b5298108"
+        },
+        "pageIr": {
+          "file": "pages/home/page-ir-v1-baseline.json",
+          "bytes": 178606,
+          "sha256": "0c2ff225cdba239345c881625f4c8b91b0fa74557b932e92618a604515b2c5e2"
+        },
+        "nodeMappings": {
+          "file": "pages/home/node-mappings.json",
+          "bytes": 16376,
+          "sha256": "879135735c0484f1a75e3e8a8dc8ff8350219a747cafe14cd8a1f30e312b5ac4"
+        },
+        "screenshot": {
+          "file": "screenshots/home-402x874.png",
+          "bytes": 164502,
+          "sha256": "42fbde907cb95abdf83d5089082d9a65575e548e69ae3ce26fdcd2abff54c08a"
+        }
+      }
+    },
+    {
+      "id": "offer-1787413803900-0df7ca7e88164",
+      "name": "search-explore",
+      "entry": "search-explore.html",
+      "cssEntry": "search-explore.css",
+      "route": "/search-explore.html",
+      "designViewport": {
+        "width": 402,
+        "height": 905
+      },
+      "runtimeViewports": [
+        {
+          "id": "design-402",
+          "width": 402,
+          "height": 905
+        }
+      ],
+      "previewScale": {
+        "mode": "one-to-one",
+        "value": 1
+      },
+      "figma": {
+        "fileKey": "figma-1786551086085-07125f6b878af",
+        "pageId": "",
+        "rootNodeId": "566:149",
+        "rootNodeName": "search-explore"
+      },
+      "projectKey": "90a812eedcf25059d3101d48",
+      "sourceHash": "74a19400351e0091392ee7c21cf4bdf5132d9e60e841757edd671d4cb774ec63",
+      "pageIrHash": "86fa1889fd727c0459913c0608bc291b380639f936a58ca1cf18fe0c02e345fc",
+      "nodeCount": 69,
+      "mappingCount": 69,
+      "workspaceNodeCount": 0,
+      "files": {
+        "html": {
+          "file": "pages/search-explore/search-explore.html",
+          "bytes": 15872,
+          "sha256": "7f3c330642a66511bb97497d703003c2e3b04dc14e34c54327de3b61bf46fc39"
+        },
+        "css": {
+          "file": "pages/search-explore/search-explore.css",
+          "bytes": 24288,
+          "sha256": "cf965ded929fea3f9c76c5c4a73a67769655f40b97cbedb9d2aa26bd6e0d5e36"
+        },
+        "pageIr": {
+          "file": "pages/search-explore/page-ir-v1-baseline.json",
+          "bytes": 180543,
+          "sha256": "bd7ff97ae8174f0a5cfcb56bc02e028123bcccc88a12d1ba24db92c68c809fea"
+        },
+        "nodeMappings": {
+          "file": "pages/search-explore/node-mappings.json",
+          "bytes": 17072,
+          "sha256": "a26197c3e92c66072f26ca9bf61a32bd4395dabaff84de8d1fcbee0a32cf9a1b"
+        },
+        "screenshot": {
+          "file": "screenshots/search-explore-402x905.png",
+          "bytes": 255031,
+          "sha256": "f095e23e3c60328470ae24ed450b8453fc4dc8f0fd41648067dd8af3e17508c0"
+        }
+      }
+    }
+  ],
+  "assets": [
+    {
+      "file": "assets/06de5bf5ae34e2ea302151e06f1871f2.png",
+      "bytes": 525,
+      "sha256": "06de5bf5ae34e2ea302151e06f1871f241a43c73886f374eacddf1b601c80318"
+    },
+    {
+      "file": "assets/0b4e61573320be3e9206e97b5becb4d6.png",
+      "bytes": 9969,
+      "sha256": "0b4e61573320be3e9206e97b5becb4d616155916fc894ef387daeba8de1315f1"
+    },
+    {
+      "file": "assets/0c082397bc8d8fe5c79f2403850f51c1.png",
+      "bytes": 466,
+      "sha256": "0c082397bc8d8fe5c79f2403850f51c1b26d9cd848b9d9a6df2f000fdfed6161"
+    },
+    {
+      "file": "assets/2dd1af58b3dccee37febdb5cb3a01536.png",
+      "bytes": 14120,
+      "sha256": "2dd1af58b3dccee37febdb5cb3a01536dd0e332621501fd8630f279e5bdf7972"
+    },
+    {
+      "file": "assets/5c95110ad78cb083b63b611bbe732aec.png",
+      "bytes": 9451,
+      "sha256": "5c95110ad78cb083b63b611bbe732aecd2fb0828eeb27b27241e51985772e5e7"
+    },
+    {
+      "file": "assets/5eebec1ae3a61c3a1e28e5d7398220ed.png",
+      "bytes": 485,
+      "sha256": "5eebec1ae3a61c3a1e28e5d7398220ed76b1d0ef1c2b4fd3b3b572b450c4080f"
+    },
+    {
+      "file": "assets/66ede85477dc57dfcf29fbf35fed702f.png",
+      "bytes": 550,
+      "sha256": "66ede85477dc57dfcf29fbf35fed702f5bb11d8e4cae631abf05f41291e0bef7"
+    },
+    {
+      "file": "assets/6d30365e2a6d88c7bdd366c1f987fa08.png",
+      "bytes": 20726,
+      "sha256": "6d30365e2a6d88c7bdd366c1f987fa08eb5faf1fb267a5a969e4b715ac6d0250"
+    },
+    {
+      "file": "assets/7865860460e0119a23f235c0869b40ef.png",
+      "bytes": 521,
+      "sha256": "7865860460e0119a23f235c0869b40efe52bceb4235fa558e2df442751d73290"
+    },
+    {
+      "file": "assets/86f50cddf0720236d926aaa4b3bffd71.png",
+      "bytes": 38145,
+      "sha256": "86f50cddf0720236d926aaa4b3bffd719a41a5925e68dfe3ed372245100bebeb"
+    },
+    {
+      "file": "assets/8db31c1556d87d5a73f31416e8fd4482.png",
+      "bytes": 62098,
+      "sha256": "8db31c1556d87d5a73f31416e8fd44822f1b6e6e4b74772c7a083c8df4c1aedb"
+    },
+    {
+      "file": "assets/9d717741761d6491ac45395a763b67f4.png",
+      "bytes": 432,
+      "sha256": "9d717741761d6491ac45395a763b67f46528c647c968a8cc90d23de6a31f6d4b"
+    },
+    {
+      "file": "assets/b2f2d99d1c0c2fe97a3aeb55d682d077.png",
+      "bytes": 506,
+      "sha256": "b2f2d99d1c0c2fe97a3aeb55d682d07775818ed855e6f334f1448e78cc67c59c"
+    },
+    {
+      "file": "assets/b837431bd276b7df6bc7e35ae11ec7ba.png",
+      "bytes": 521,
+      "sha256": "b837431bd276b7df6bc7e35ae11ec7bad10ee706ffdf1f2e1e0dd38f4cc5dfd9"
+    },
+    {
+      "file": "assets/b98c5d6991447d28f18c63771893631a.png",
+      "bytes": 15369,
+      "sha256": "b98c5d6991447d28f18c63771893631a75aa41fa56cd4b55b6fceed157af3121"
+    },
+    {
+      "file": "assets/cd27e244d5b8d7fd6784522a00f7a9e2.png",
+      "bytes": 52192,
+      "sha256": "cd27e244d5b8d7fd6784522a00f7a9e222a5bbc779db6d115249be15e4c1ef0d"
+    },
+    {
+      "file": "assets/d6f55b603b79c0474776df056b835214.png",
+      "bytes": 377,
+      "sha256": "d6f55b603b79c0474776df056b83521482f8df73f9246fc987059282bca14e77"
+    },
+    {
+      "file": "assets/e3034274b9c88448df8ae8aa51291a41.png",
+      "bytes": 571,
+      "sha256": "e3034274b9c88448df8ae8aa51291a41ca5251590e73be3e54cd1fb6539940fe"
+    },
+    {
+      "file": "assets/e31b9fae21bd691b02c1fe624417eb71.png",
+      "bytes": 555,
+      "sha256": "e31b9fae21bd691b02c1fe624417eb7186e0a2e5372e0861d210254c3626d0a8"
+    },
+    {
+      "file": "assets/ea1635fa2c173950cab96112f0f96063.png",
+      "bytes": 39596,
+      "sha256": "ea1635fa2c173950cab96112f0f960632f0b3acc930bfb98d913a4f58c0ce8da"
+    }
+  ]
+}

@@ -1,5 +1,8 @@
 import { createHash } from "node:crypto";
-import { DOMParser, XMLSerializer } from "@xmldom/xmldom";
+import {
+  DOMParser,
+  XMLSerializer,
+} from "../codex-plugin/codex-design-bridge/vendor/xmldom/lib/index.js";
 
 const ELEMENT_NODE = 1;
 const SAFE_ROOT_CHILDREN = new Set([

@@ -1,14 +1,17 @@
 import { createHash } from "node:crypto";
 import {
   mkdir,
+  mkdtemp,
   readFile,
   readdir,
   rename,
+  rm,
   stat,
   writeFile,
 } from "node:fs/promises";
 import path from "node:path";
 import { commitPatchTransaction, hashContent } from "./patch-transaction.mjs";
+import { renderStandalonePageSeed } from "./fast-page-patch.mjs";
 
 const MANIFEST_VERSION = 1;
 const DEFAULT_VIEWPORT = Object.freeze({ width: 1440, height: 900 });
@@ -45,6 +48,7 @@ export async function createDesignProject({
   projectName = "design-draft",
 }) {
   const workspace = await normalizeDirectory(workspaceDir, "没有可写入设计的位置。");
+  await recoverAbandonedProjectStaging(workspace);
   const requested = sanitizeProjectName(projectName || "design-draft");
   const targetDir = await nextAvailableDirectory(workspace, requested);
   const stagingDir = path.join(
@@ -79,7 +83,6 @@ export async function createDesignProject({
     ]);
     await rename(stagingDir, targetDir);
   } catch (error) {
-    const { rm } = await import("node:fs/promises");
     await rm(stagingDir, { recursive: true, force: true });
     throw error;
   }
@@ -95,6 +98,7 @@ export async function createFigmaSeedProject({
   projectName = "figma-design",
 }) {
   const workspace = await normalizeDirectory(workspaceDir, "没有可写入设计的位置。");
+  await recoverAbandonedProjectStaging(workspace);
   const requested = sanitizeProjectName(projectName || "figma-design");
   const targetDir = await nextAvailableDirectory(workspace, requested);
   const stagingDir = path.join(
@@ -124,7 +128,6 @@ export async function createFigmaSeedProject({
     ]);
     await rename(stagingDir, targetDir);
   } catch (error) {
-    const { rm } = await import("node:fs/promises");
     await rm(stagingDir, { recursive: true, force: true });
     throw error;
   }
@@ -132,6 +135,319 @@ export async function createFigmaSeedProject({
   return {
     projectDir: targetDir,
     descriptor: await loadProjectDescriptor(targetDir),
+  };
+}
+
+export async function createProjectFromFigmaPayload({
+  workspaceDir,
+  projectName = "figma-design",
+  pageId = "figma-page",
+  pageName = "Figma Page",
+  pageSeed,
+}) {
+  if (!pageSeed?.node || typeof pageSeed.node !== "object") {
+    throw new Error("Figma payload 缺少可生成的 pageSeed。");
+  }
+  const workspace = await normalizeDirectory(workspaceDir, "没有可写入设计的位置。");
+  await recoverAbandonedProjectStaging(workspace);
+  const requested = sanitizeProjectName(projectName || pageName || "figma-design");
+  const targetDir = await nextAvailableDirectory(workspace, requested);
+  const stagingDir = path.join(
+    workspace,
+    `.${path.basename(targetDir)}.cdb-create-${process.pid}-${Date.now()}`,
+  );
+  const generated = renderStandalonePageSeed(pageSeed.node, { title: pageName });
+  const manifest = createManifest({
+    name: pageName,
+    projectId: stableId(path.basename(targetDir)),
+    htmlPages: [{
+      id: stableId(pageId),
+      entry: "index.html",
+      name: pageName,
+      route: "/",
+      viewport: viewportFromFigmaRoot(pageSeed.node),
+    }],
+    sourceKind: "figma-payload",
+  });
+  const binding = {
+    version: 2,
+    figmaReady: false,
+    changeCount: 0,
+    appliedChangeCount: 0,
+    pendingChangeCount: 0,
+    activePageId: manifest.pages[0].id,
+    pages: [{
+      id: manifest.pages[0].id,
+      name: pageName,
+      path: "index.html",
+      entry: "index.html",
+      route: "/",
+      acceptsFigmaSeed: true,
+      syncState: "not_imported",
+      figmaReady: false,
+      nodeCount: generated.nodeCount,
+    }],
+    updatedAt: new Date().toISOString(),
+  };
+
+  await mkdir(path.join(stagingDir, "assets"), { recursive: true });
+  await mkdir(path.join(stagingDir, ".cdb"), { recursive: true });
+  await mkdir(path.join(stagingDir, ".codex"), { recursive: true });
+  try {
+    await Promise.all([
+      writeFile(path.join(stagingDir, "index.html"), generated.html, "utf8"),
+      writeFile(path.join(stagingDir, "styles.css"), generated.css, "utf8"),
+      writeFile(path.join(stagingDir, "AGENTS.md"), designAgents(), "utf8"),
+      writeFile(path.join(stagingDir, ".cdb", "manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`, "utf8"),
+      writeFile(path.join(stagingDir, ".codex", "design-bridge.json"), `${JSON.stringify(binding, null, 2)}\n`, "utf8"),
+      ...generated.assets.map((asset) =>
+        writeFile(path.join(stagingDir, "assets", asset.fileName), asset.bytes),
+      ),
+    ]);
+    const report = await preflightDesignProject(stagingDir);
+    if (["blocker", "safe_fix"].includes(report.status)) {
+      throw Object.assign(new Error("Figma 项目生成后未通过预检。"), {
+        code: "generated_project_preflight_failed",
+        report,
+      });
+    }
+    await rename(stagingDir, targetDir);
+    return {
+      projectDir: targetDir,
+      descriptor: await loadProjectDescriptor(targetDir),
+      report,
+      generated: {
+        nodeCount: generated.nodeCount,
+        resourceCount: generated.assets.length,
+        resourceBytes: generated.assets.reduce((sum, asset) => sum + asset.bytes.length, 0),
+        pageId: manifest.pages[0].id,
+      },
+    };
+  } catch (error) {
+    await rm(stagingDir, { recursive: true, force: true });
+    throw error;
+  }
+}
+
+export async function addPageFromFigmaPayload({
+  projectDir,
+  pageId = "figma-page",
+  pageName = "Figma Page",
+  pageSeed,
+}) {
+  if (!pageSeed?.node || typeof pageSeed.node !== "object") {
+    throw codedProjectError("figma_payload_missing", "Figma payload 缺少可生成的 pageSeed。");
+  }
+  const root = await normalizeDirectory(projectDir, "要加入页面的本地项目不可用。");
+  await recoverAbandonedProjectStaging(path.dirname(root));
+  const before = await preflightDesignProject(root);
+  if (!["pass", "warning"].includes(before.status)) {
+    throw Object.assign(
+      codedProjectError("project_preflight_required", "现有项目必须先通过预检，才能加入 Figma 页面。"),
+      { report: before },
+    );
+  }
+
+  const normalizedName = String(pageName || "Figma Page").trim().slice(0, 80) || "Figma Page";
+  const normalizedPageId = stablePageId(pageId || normalizedName);
+  const pageSlug = stableId(normalizedName || normalizedPageId);
+  const entry = `${pageSlug}.html`;
+  const stylesheet = `${pageSlug}.css`;
+  const route = `/${entry}`;
+  const pages = before.descriptor.manifest.pages;
+  if (pages.some((page) => page.id === normalizedPageId)) {
+    throw codedProjectError("page_identity_conflict", `项目中已经存在页面 ID：${normalizedPageId}`);
+  }
+  if (pages.some((page) => page.name.localeCompare(normalizedName, undefined, { sensitivity: "accent" }) === 0)) {
+    throw codedProjectError("page_name_conflict", `项目中已经存在同名页面：${normalizedName}`);
+  }
+  if (pages.some((page) => page.entry.toLowerCase() === entry.toLowerCase())) {
+    throw codedProjectError("page_entry_conflict", `项目中已经登记页面文件：${entry}`);
+  }
+  if (pages.some((page) => page.route === route)) {
+    throw codedProjectError("page_route_conflict", `项目中已经登记页面路由：${route}`);
+  }
+  for (const relative of [entry, stylesheet]) {
+    if (await exists(path.join(root, relative))) {
+      throw codedProjectError("page_file_conflict", `项目中已经存在目标文件：${relative}`);
+    }
+  }
+
+  const generated = renderStandalonePageSeed(pageSeed.node, {
+    title: normalizedName,
+    assetBasePath: "./assets",
+    stylesheetHref: `./${stylesheet}`,
+  });
+  const addedPage = {
+    id: normalizedPageId,
+    name: normalizedName,
+    entry,
+    route,
+    captureRoot: "[data-codex-root]",
+    viewport: viewportFromFigmaRoot(pageSeed.node),
+  };
+  const candidateManifest = validateManifest(
+    {
+      ...before.descriptor.manifest,
+      pages: [...pages, addedPage],
+    },
+    root,
+  );
+
+  const validationDir = await mkdtemp(
+    path.join(path.dirname(root), `.cdb-add-page-check-${process.pid}-`),
+  );
+  try {
+    const validationManifest = createManifest({
+      name: before.descriptor.manifest.name,
+      projectId: before.descriptor.manifest.projectId,
+      htmlPages: [addedPage],
+      sourceKind: before.descriptor.manifest.source.kind,
+    });
+    await mkdir(path.join(validationDir, ".cdb"), { recursive: true });
+    await mkdir(path.join(validationDir, "assets"), { recursive: true });
+    await Promise.all([
+      writeFile(path.join(validationDir, entry), generated.html, "utf8"),
+      writeFile(path.join(validationDir, stylesheet), generated.css, "utf8"),
+      writeFile(
+        path.join(validationDir, ".cdb", "manifest.json"),
+        `${JSON.stringify(validationManifest, null, 2)}\n`,
+        "utf8",
+      ),
+      ...generated.assets.map((asset) =>
+        writeFile(path.join(validationDir, "assets", asset.fileName), asset.bytes),
+      ),
+    ]);
+    const candidateReport = await preflightDesignProject(validationDir);
+    if (!["pass", "warning"].includes(candidateReport.status)) {
+      throw Object.assign(
+        codedProjectError("generated_page_preflight_failed", "Figma 页面生成后未通过候选预检。"),
+        { report: candidateReport },
+      );
+    }
+  } finally {
+    await rm(validationDir, { recursive: true, force: true });
+  }
+
+  const manifestPath = path.join(root, ".cdb", "manifest.json");
+  const manifestBefore = before.descriptor.manifestOrigin === "file"
+    ? await readFile(manifestPath)
+    : null;
+  const writes = [
+    { file: path.join(root, entry), content: generated.html, expectedHash: null },
+    { file: path.join(root, stylesheet), content: generated.css, expectedHash: null },
+    {
+      file: manifestPath,
+      content: `${JSON.stringify(candidateManifest, null, 2)}\n`,
+      expectedHash: manifestBefore ? hashContent(manifestBefore) : null,
+    },
+  ];
+  for (const asset of generated.assets) {
+    const assetPath = path.join(root, "assets", asset.fileName);
+    if (await exists(assetPath)) {
+      const existing = await readFile(assetPath);
+      if (hashContent(existing) !== asset.sha256) {
+        throw codedProjectError("asset_hash_collision", `资源哈希文件内容冲突：assets/${asset.fileName}`);
+      }
+      continue;
+    }
+    writes.push({ file: assetPath, content: asset.bytes, expectedHash: null });
+  }
+
+  const transaction = await commitPatchTransaction({
+    projectDir: root,
+    kind: "figma-add-page",
+    writes,
+  });
+  const report = await preflightDesignProject(root);
+  if (!["pass", "warning"].includes(report.status)) {
+    throw Object.assign(
+      codedProjectError("added_page_verification_failed", "页面已写入，但项目回读预检未通过，可从工作台撤销本次事务。"),
+      { report, transaction },
+    );
+  }
+  const page = report.pages.find((candidate) => candidate.id === normalizedPageId);
+  return {
+    projectDir: root,
+    descriptor: report.descriptor,
+    report,
+    transaction,
+    generated: {
+      pageId: normalizedPageId,
+      pageName: normalizedName,
+      entry,
+      stylesheet,
+      route,
+      sourceHash: page?.sourceHash || "",
+      nodeCount: generated.nodeCount,
+      resourceCount: generated.assets.length,
+      resourceBytes: generated.assets.reduce((sum, asset) => sum + asset.bytes.length, 0),
+    },
+  };
+}
+
+export async function removeProjectPage({ projectDir, pageId }) {
+  const root = await normalizeDirectory(projectDir, "当前项目目录不可用。");
+  const before = await preflightDesignProject(root);
+  if (before.descriptor.manifestOrigin !== "file") {
+    throw codedProjectError(
+      "manifest_required",
+      "项目必须先建立 .cdb/manifest.json，才能清除页面列表项。",
+    );
+  }
+  const pages = before.descriptor.manifest.pages;
+  if (pages.length <= 1) {
+    throw codedProjectError(
+      "last_page_required",
+      "CDB 项目必须至少保留一个页面。",
+    );
+  }
+  const removedPage = pages.find((page) => page.id === String(pageId || ""));
+  if (!removedPage) {
+    throw codedProjectError("page_not_found", "没有找到要清除的当前页面。");
+  }
+
+  const remainingPages = pages.filter((page) => page.id !== removedPage.id);
+  const currentEntry = before.descriptor.manifest.entry;
+  const candidateManifest = validateManifest(
+    {
+      ...before.descriptor.manifest,
+      entry: remainingPages.some((page) => page.entry === currentEntry)
+        ? currentEntry
+        : remainingPages[0].entry,
+      pages: remainingPages,
+    },
+    root,
+  );
+  const manifestPath = path.join(root, ".cdb", "manifest.json");
+  const manifestBefore = await readFile(manifestPath);
+  const transaction = await commitPatchTransaction({
+    projectDir: root,
+    kind: "manifest-remove-page",
+    writes: [
+      {
+        file: manifestPath,
+        content: `${JSON.stringify(candidateManifest, null, 2)}\n`,
+        expectedHash: hashContent(manifestBefore),
+      },
+    ],
+  });
+  const report = await preflightDesignProject(root);
+  if (!["pass", "warning"].includes(report.status)) {
+    throw Object.assign(
+      codedProjectError(
+        "removed_page_verification_failed",
+        "页面列表已修改，但项目回读预检未通过；可从工作台撤销本次事务。",
+      ),
+      { report, transaction },
+    );
+  }
+  return {
+    projectDir: root,
+    removedPage,
+    descriptor: report.descriptor,
+    report,
+    transaction,
   };
 }
 
@@ -258,6 +574,8 @@ export async function preflightDesignProject(projectDir) {
       continue;
     }
     sourceParts.push(page.entry, html);
+    const pageDependencyParts = [];
+    const pageDependencies = new Set();
     const rootCount = (html.match(/\bdata-codex-root(?:\s|=|>)/gi) || []).length;
     const ids = [...html.matchAll(/\bdata-codex-id\s*=\s*(["'])(.*?)\1/gi)]
       .map((match) => match[2].trim())
@@ -363,7 +681,8 @@ export async function preflightDesignProject(projectDir) {
         path.posix.join(path.posix.dirname(page.entry), clean),
       );
       dependencies.add(relative);
-      if (!(await exists(safeProjectPath(descriptor.rootDir, relative)))) {
+      const dependencyPath = safeProjectPath(descriptor.rootDir, relative);
+      if (!(await exists(dependencyPath))) {
         issues.push(issue({
           code: "resource_missing",
           level: "blocker",
@@ -371,6 +690,11 @@ export async function preflightDesignProject(projectDir) {
           file: page.entry,
           message: `资源不存在：${relative}`,
         }));
+      } else if (!pageDependencies.has(relative)) {
+        pageDependencies.add(relative);
+        const dependencyHash = hashContent(await readFile(dependencyPath));
+        pageDependencyParts.push(relative, dependencyHash);
+        sourceParts.push(relative, dependencyHash);
       }
     }
 
@@ -384,7 +708,11 @@ export async function preflightDesignProject(projectDir) {
       ...(page.captureState ? { captureState: { ...page.captureState } } : {}),
       viewport: { ...page.viewport },
       sourceHash: hashContent(
-        `${html}\u0000${JSON.stringify(page.captureState || null)}`,
+        [
+          html,
+          JSON.stringify(page.captureState || null),
+          ...pageDependencyParts,
+        ].join("\u0000"),
       ),
       estimatedEditableLayers: Math.max(ids.length, rootCount),
     });
@@ -463,9 +791,19 @@ export function workspacePagesFromReport(report, previousPages = []) {
   );
   return report.pages.map((page) => {
     const old = previous.get(page.id) || {};
-    const sourceChanged = old.sourceHash && old.sourceHash !== page.sourceHash;
+    const previousProjectSourceHash = old.projectSourceHash || old.sourceHash || "";
+    const sourceChanged = Boolean(
+      old.figmaReady &&
+      previousProjectSourceHash &&
+      previousProjectSourceHash !== page.sourceHash,
+    );
     return {
       ...page,
+      projectSourceHash: page.sourceHash,
+      sourceHash:
+        old.figmaReady && !sourceChanged && old.sourceHash
+          ? old.sourceHash
+          : page.sourceHash,
       acceptsFigmaSeed:
         report.descriptor?.manifest?.source?.kind === "figma-seed",
       figmaReady: Boolean(old.figmaReady),
@@ -478,6 +816,27 @@ export function workspacePagesFromReport(report, previousPages = []) {
           : old.syncState || "synced",
     };
   });
+}
+
+export async function recoverAbandonedProjectStaging(workspaceDir) {
+  const workspace = await normalizeDirectory(
+    workspaceDir,
+    "没有可恢复项目生成临时目录的位置。",
+  );
+  const recovered = [];
+  const entries = await readdir(workspace, { withFileTypes: true });
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+    const ownerPid = stagingOwnerPid(entry.name);
+    if (!ownerPid || isProcessAlive(ownerPid)) continue;
+    const target = path.join(workspace, entry.name);
+    await rm(target, { recursive: true, force: true });
+    recovered.push(entry.name);
+  }
+  return {
+    recoveredCount: recovered.length,
+    removedDirectories: recovered,
+  };
 }
 
 function createManifest({ name, projectId, htmlPages, sourceKind }) {
@@ -495,7 +854,7 @@ function createManifest({ name, projectId, htmlPages, sourceKind }) {
         entry: normalizeRelativePath(page.entry),
         route: normalizeRoute(page.route),
         captureRoot: "[data-codex-root]",
-        viewport: { ...DEFAULT_VIEWPORT },
+        viewport: normalizeViewport(page.viewport),
         ...(captureState ? { captureState } : {}),
       };
     }),
@@ -824,6 +1183,13 @@ function normalizeViewport(value) {
   };
 }
 
+function viewportFromFigmaRoot(root) {
+  return normalizeViewport({
+    width: Math.round(Number(root?.width)),
+    height: Math.round(Number(root?.height)),
+  });
+}
+
 async function normalizeDirectory(value, message) {
   if (typeof value !== "string" || !value.trim()) throw new Error(message);
   const resolved = path.resolve(value.trim());
@@ -833,6 +1199,23 @@ async function normalizeDirectory(value, message) {
     throw new Error(message);
   }
   return resolved;
+}
+
+function stagingOwnerPid(name) {
+  const createMatch = String(name).match(/^\..+\.cdb-create-(\d+)-\d+$/u);
+  if (createMatch) return Number(createMatch[1]);
+  const pageCheckMatch = String(name).match(/^\.cdb-add-page-check-(\d+)-/u);
+  return pageCheckMatch ? Number(pageCheckMatch[1]) : 0;
+}
+
+function isProcessAlive(pid) {
+  if (!Number.isSafeInteger(pid) || pid <= 0) return true;
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch (error) {
+    return error?.code !== "ESRCH";
+  }
 }
 
 async function nextAvailableDirectory(root, requested) {
@@ -867,8 +1250,13 @@ function sanitizeProjectName(value) {
 }
 
 function uniquePageId(page, index) {
-  const base = stableId(page.route === "/" ? "home" : page.name || page.entry);
+  const base = stablePageId(page.id || (page.route === "/" ? "home" : page.name || page.entry));
   return index === 0 ? base : `${base}-${index + 1}`;
+}
+
+function stablePageId(value) {
+  const id = stableId(value);
+  return /^[A-Za-z]/u.test(id) ? id : `page-${id}`;
 }
 
 function stableId(value) {
@@ -879,6 +1267,10 @@ function stableId(value) {
     .replace(/-+/g, "-")
     .toLowerCase()
     .slice(0, 64) || "item";
+}
+
+function codedProjectError(code, message) {
+  return Object.assign(new Error(message), { code });
 }
 
 function htmlTitle(html) {

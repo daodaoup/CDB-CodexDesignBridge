@@ -15,10 +15,12 @@ REPORT_PATH=""
 REPORT_PATH_EXPLICIT=0
 CHECK_ONLY=0
 SKIP_PROCESS_CHECK=0
+CLEAN_INSTALL=0
 BOOTSTRAP_MARKETPLACE=0
 MARKETPLACE_ADDED=0
 NEEDS_MARKETPLACE_ADD=0
 LOCAL_MARKETPLACE_ROOT=""
+MCP_NODE_PATH=""
 
 SCRIPT_DIRECTORY="$(cd "$(dirname "$0")" && pwd -P)"
 PACKAGE_ROOT="$(cd "$SCRIPT_DIRECTORY/.." && pwd -P)"
@@ -29,15 +31,24 @@ CORE_FILES=(
   "assets/icon.png"
   "mcp/browser-capture.mjs"
   "mcp/workspace.html"
+  "mcp/gateway.mjs"
+  "mcp/daemon.mjs"
   "mcp/server.mjs"
   "mcp/fast-page-patch.mjs"
   "mcp/local-figma-bridge.mjs"
+  "mcp/local-workspace-server.mjs"
+  "mcp/design-offer-store.mjs"
+  "mcp/sync-baseline-store.mjs"
   "mcp/patch-transaction.mjs"
   "mcp/project-contract.mjs"
   "mcp/preview-process-guard.cjs"
   "mcp/workspace-lease.mjs"
   "shared/page-capture.mjs"
-  "shared/change-set-v14.schema.json"
+  "shared/change-set-v16.schema.json"
+  "shared/design-offer-v16.schema.json"
+  "shared/page-ir-responsive-v2.mjs"
+  "shared/page-ir-responsive-v2.schema.json"
+  "shared/runtime-contract.mjs"
   "shared/page.mjs"
   "shared/svg.mjs"
   "skills/start-design/SKILL.md"
@@ -59,6 +70,7 @@ Options:
   --report PATH              Install report destination.
   --check-only               Validate the release without installing it.
   --skip-process-check       Allow installation while Codex/ChatGPT is running.
+  --clean-install            Remove obsolete source backups after verification; keep runtime caches used by open tasks.
   -h, --help                 Show this help.
 EOF
 }
@@ -104,6 +116,10 @@ while [ "$#" -gt 0 ]; do
       ;;
     --skip-process-check)
       SKIP_PROCESS_CHECK=1
+      shift
+      ;;
+    --clean-install)
+      CLEAN_INSTALL=1
       shift
       ;;
     -h|--help)
@@ -179,6 +195,44 @@ assert_hashes_match() {
   fi
 }
 
+resolve_mcp_node() {
+  local candidate
+  for candidate in \
+    "$HOME/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node" \
+    "/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node" \
+    "/Applications/Codex.app/Contents/Resources/cua_node/bin/node"; do
+    if [ -x "$candidate" ]; then
+      absolute_path "$candidate"
+      return
+    fi
+  done
+  if command -v node >/dev/null 2>&1; then
+    absolute_path "$(command -v node)"
+    return
+  fi
+  fail "A Node.js runtime was not found. Reinstall or update Codex, then run this installer again."
+}
+
+configure_mcp_runtime() {
+  local plugin_path="$1"
+  MCP_NODE_PATH="$(resolve_mcp_node)"
+  "$PYTHON_COMMAND" - "$plugin_path/.mcp.json" "$MCP_NODE_PATH" <<'PY'
+import json
+import sys
+
+config_path, node_path = sys.argv[1:]
+with open(config_path, encoding="utf-8") as handle:
+    config = json.load(handle)
+server = config.get("mcpServers", {}).get("design_workspace")
+if not isinstance(server, dict):
+    raise SystemExit("design_workspace MCP configuration was not found.")
+server["command"] = node_path
+with open(config_path, "w", encoding="utf-8") as handle:
+    json.dump(config, handle, ensure_ascii=False, indent=2)
+    handle.write("\n")
+PY
+}
+
 assert_safe_managed_path() {
   local path_to_check expected_parent allowed_leaf actual_parent actual_leaf
   path_to_check="$(absolute_path "$1")"
@@ -190,6 +244,24 @@ assert_safe_managed_path() {
     fail "Refusing to operate on an unverified path: $path_to_check"
 }
 
+clean_previous_cdb_data() {
+  local entry leaf
+  [ "$CLEAN_INSTALL" -eq 1 ] || return 0
+
+  for entry in "$DESTINATION_ROOT/$PLUGIN_NAME.backup-"*; do
+    [ -d "$entry" ] || continue
+    leaf="$(basename "$entry")"
+    case "$leaf" in
+      "$PLUGIN_NAME.backup-"*)
+        assert_safe_managed_path "$entry" "$DESTINATION_ROOT" "$leaf"
+        rm -rf "$entry"
+        ;;
+    esac
+  done
+
+  BACKUP_PATH=""
+}
+
 write_report() {
   local status="$1"
   local check_only="$2"
@@ -198,13 +270,13 @@ write_report() {
   local backup_path="${5:-}"
   local previous_version="${6:-}"
   mkdir -p "$(dirname "$REPORT_PATH")"
-  "$PYTHON_COMMAND" - "$REPORT_PATH" "$PLUGIN_NAME" "$VERSION" "$status" "$check_only" "$SOURCE" "$HASH_FILE" "$target_path" "$cache_path" "$backup_path" "$previous_version" "$MARKETPLACE" <<'PY'
+  "$PYTHON_COMMAND" - "$REPORT_PATH" "$PLUGIN_NAME" "$VERSION" "$status" "$check_only" "$SOURCE" "$HASH_FILE" "$target_path" "$cache_path" "$backup_path" "$previous_version" "$MARKETPLACE" "$MCP_NODE_PATH" <<'PY'
 import datetime
 import json
 import sys
 
 (report_path, plugin, version, status, check_only, source_path, hash_path,
- target_path, cache_path, backup_path, previous_version, marketplace) = sys.argv[1:]
+ target_path, cache_path, backup_path, previous_version, marketplace, mcp_node_path) = sys.argv[1:]
 hashes = {}
 with open(hash_path, encoding="utf-8") as handle:
     for line in handle:
@@ -229,6 +301,7 @@ if check_only != "true":
         "pluginListConfirmed": True,
         "backupPath": backup_path,
         "previousVersion": previous_version,
+        "mcpNodePath": mcp_node_path,
     })
 with open(report_path, "w", encoding="utf-8") as handle:
     json.dump(report, handle, ensure_ascii=False, indent=2)
@@ -434,6 +507,9 @@ validate_plugin "$STAGING_PATH"
 [ "$(manifest_field "$STAGING_PATH" version)" = "$VERSION" ] || fail "Staged version does not match the release package."
 compute_hashes "$STAGING_PATH" "$STAGING_HASH_FILE"
 assert_hashes_match "$HASH_FILE" "$STAGING_HASH_FILE" "Staging"
+configure_mcp_runtime "$STAGING_PATH"
+compute_hashes "$STAGING_PATH" "$STAGING_HASH_FILE"
+cp "$STAGING_HASH_FILE" "$HASH_FILE"
 
 "$CODEX_COMMAND" plugin list --json > "$LIST_FILE"
 PREVIOUS_VERSION="$(plugin_version_from_list "$LIST_FILE")"
@@ -476,6 +552,7 @@ validate_plugin "$CACHE_PATH"
 compute_hashes "$CACHE_PATH" "$CACHE_HASH_FILE"
 assert_hashes_match "$HASH_FILE" "$CACHE_HASH_FILE" "Codex runtime cache"
 
+clean_previous_cdb_data
 write_report "installed" "false" "$TARGET_PATH" "$CACHE_PATH" "$BACKUP_PATH" "$PREVIOUS_VERSION"
 if [ "$BOOTSTRAP_MARKETPLACE" -eq 1 ] && [ -f "$LOCAL_MARKETPLACE_ROOT/marketplace.json" ]; then
   rm -f "$LOCAL_MARKETPLACE_ROOT/marketplace.json"

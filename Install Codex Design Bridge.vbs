@@ -12,7 +12,7 @@ If Not fileSystem.FileExists(installerPath) Then
   WScript.Quit 2
 End If
 
-MsgBox "CDB 0.7 will install automatically after Codex is fully closed. Save your work, click OK, then exit Codex. The installer will not force-close the app.", vbInformation, "Install Codex Design Bridge"
+MsgBox "CDB 0.9 beta will install automatically after Codex is fully closed. Save your work, click OK, then exit Codex. The installer will not force-close the app.", vbInformation, "Install Codex Design Bridge"
 
 command = "powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File """ & installerPath & """ -WaitForExit"
 exitCode = shell.Run(command, 0, True)

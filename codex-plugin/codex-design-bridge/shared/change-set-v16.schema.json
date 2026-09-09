@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cdb.local/schema/change-set-v16.json",
+  "title": "CDB page ChangeSet protocol 16",
+  "type": "object",
+  "required": ["protocolVersion", "runtimeIdentity", "changeSetId", "pageId", "sourceHash", "changes"],
+  "properties": {
+    "protocolVersion": { "const": 16 },
+    "runtimeIdentity": {
+      "type": "object",
+      "required": ["kind", "protocolVersion", "pageIrSchemaVersion", "exactBuild"],
+      "properties": {
+        "kind": { "const": "cdb-0.9-responsive-v2" },
+        "protocolVersion": { "const": 16 },
+        "pageIrSchemaVersion": { "const": 2 },
+        "exactBuild": { "const": "0.9.0+codex.20260829100031" }
+      },
+      "additionalProperties": false
+    },
+    "changeSetId": { "type": "string", "minLength": 1 },
+    "pageId": { "type": "string", "minLength": 1 },
+    "sourceHash": { "type": "string", "minLength": 1 },
+    "responsiveContract": { "type": "object" },
+    "changes": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          { "$ref": "#/$defs/nodeMove" },
+          { "$ref": "#/$defs/genericChange" }
+        ]
+      }
+    },
+    "annotations": { "type": "array" },
+    "pageSnapshot": {
+      "type": "object",
+      "required": ["pageSeed", "report", "responsiveContract", "referenceImage", "capturedAt"],
+      "properties": {
+        "pageSeed": {
+          "type": "object",
+          "required": ["node"],
+          "properties": { "node": { "type": "object" } },
+          "additionalProperties": false
+        },
+        "report": { "type": "object" },
+        "responsiveContract": { "type": "object" },
+        "referenceImage": { "$ref": "#/$defs/referenceImage" },
+        "capturedAt": { "type": "string", "format": "date-time" }
+      },
+      "additionalProperties": false
+    },
+    "figma": { "type": ["object", "null"] }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "referenceImage": {
+      "type": "object",
+      "required": ["mimeType", "base64", "width", "height"],
+      "properties": {
+        "mimeType": { "const": "image/png" },
+        "base64": { "type": "string", "minLength": 1 },
+        "width": { "type": "integer", "minimum": 1, "maximum": 4096 },
+        "height": { "type": "integer", "minimum": 1, "maximum": 4096 }
+      },
+      "additionalProperties": false
+    },
+    "sourceRef": {
+      "type": "object",
+      "required": ["selector"],
+      "properties": {
+        "selector": {
+          "type": "string",
+          "pattern": "^(\\[data-codex-id=(?:\\\"[^\\\"]+\\\"|'[^']+')\\]|#[A-Za-z_][A-Za-z0-9_-]*)$"
+        }
+      },
+      "additionalProperties": true
+    },
+    "nodeMove": {
+      "type": "object",
+      "required": [
+        "property", "nodeId", "sourceRef", "fromParentId", "toParentId",
+        "fromParentSourceRef", "toParentSourceRef", "fromIndex", "toIndex",
+        "beforeBounds", "afterBounds", "beforeWorldTransform", "afterWorldTransform",
+        "parentLayout", "positioning"
+      ],
+      "properties": {
+        "property": { "enum": ["nodeMove", "nodeReparent"] },
+        "nodeId": { "type": "string", "minLength": 1 },
+        "sourceRef": { "$ref": "#/$defs/sourceRef" },
+        "fromParentId": { "type": "string", "minLength": 1 },
+        "toParentId": { "type": "string", "minLength": 1 },
+        "fromParentSourceRef": { "$ref": "#/$defs/sourceRef" },
+        "toParentSourceRef": { "$ref": "#/$defs/sourceRef" },
+        "fromIndex": { "type": "integer", "minimum": 0 },
+        "toIndex": { "type": "integer", "minimum": 0 },
+        "beforeBounds": { "type": "object" },
+        "afterBounds": { "type": "object" },
+        "beforeWorldTransform": { "type": "array", "minItems": 6, "maxItems": 6 },
+        "afterWorldTransform": { "type": "array", "minItems": 6, "maxItems": 6 },
+        "parentLayout": { "enum": ["NONE", "HORIZONTAL", "VERTICAL", "GRID"] },
+        "positioning": { "enum": ["AUTO", "ABSOLUTE"] }
+      },
+      "additionalProperties": true
+    },
+    "genericChange": {
+      "type": "object",
+      "required": ["property", "nodeId"],
+      "properties": {
+        "property": { "type": "string", "minLength": 1, "not": { "enum": ["nodeMove", "nodeReparent"] } },
+        "nodeId": { "type": ["string", "null"] }
+      },
+      "additionalProperties": true
+    }
+  }
+}

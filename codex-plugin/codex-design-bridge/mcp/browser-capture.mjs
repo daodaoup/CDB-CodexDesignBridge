@@ -15,13 +15,21 @@ const CAPTURE_HEIGHT = 900;
 const START_TIMEOUT_MS = 12_000;
 const CDP_CALL_TIMEOUT_MS = 15_000;
 
-export async function captureLocalPreview({ previewUrl, projectDir, captureState }) {
+export async function captureLocalPreview({
+  previewUrl,
+  projectDir,
+  captureState,
+  width = CAPTURE_WIDTH,
+  height = CAPTURE_HEIGHT,
+}) {
+  const viewport = normalizeViewport(width, height);
   const playwright = await loadBundledPlaywright();
   if (playwright) {
     return captureWithPlaywright(playwright, {
       previewUrl,
       projectDir,
       captureState,
+      ...viewport,
     });
   }
 
@@ -49,7 +57,7 @@ export async function captureLocalPreview({ previewUrl, projectDir, captureState
       "--remote-debugging-address=127.0.0.1",
       `--remote-debugging-port=${port}`,
       `--user-data-dir=${profileDirectory}`,
-      `--window-size=${CAPTURE_WIDTH},${CAPTURE_HEIGHT}`,
+      `--window-size=${viewport.width},${viewport.height}`,
       "about:blank",
     ],
     {
@@ -69,10 +77,13 @@ export async function captureLocalPreview({ previewUrl, projectDir, captureState
       target.webSocketDebuggerUrl,
       previewUrl,
       captureState,
+      viewport,
     );
     const manifest = createCapturedPageManifest(snapshot, {
       projectName: path.basename(path.resolve(projectDir)),
       previewUrl,
+      designViewport: viewport,
+      runtimeViewport: viewport,
     });
     return {
       manifest,
@@ -155,7 +166,7 @@ export async function captureLocalPreviewImage({
 
 async function captureWithPlaywright(
   playwright,
-  { previewUrl, projectDir, captureState },
+  { previewUrl, projectDir, captureState, width, height },
 ) {
   const executablePath = await findBrowserExecutable();
   const browser = await playwright.chromium.launch({
@@ -165,7 +176,7 @@ async function captureWithPlaywright(
   });
   try {
     const page = await browser.newPage({
-      viewport: { width: CAPTURE_WIDTH, height: CAPTURE_HEIGHT },
+      viewport: { width, height },
       deviceScaleFactor: 1,
     });
     await page.goto(previewUrl, {
@@ -184,6 +195,8 @@ async function captureWithPlaywright(
     const manifest = createCapturedPageManifest(snapshot, {
       projectName: path.basename(path.resolve(projectDir)),
       previewUrl,
+      designViewport: { width, height },
+      runtimeViewport: { width, height },
     });
     return {
       manifest,
@@ -335,7 +348,12 @@ async function loadBundledPlaywright() {
   return null;
 }
 
-async function captureTarget(webSocketUrl, previewUrl, captureState) {
+async function captureTarget(
+  webSocketUrl,
+  previewUrl,
+  captureState,
+  { width, height },
+) {
   const socket = new WebSocket(webSocketUrl);
   const pending = new Map();
   let nextId = 0;
@@ -398,8 +416,8 @@ async function captureTarget(webSocketUrl, previewUrl, captureState) {
     await call("Page.enable");
     await call("Runtime.enable");
     await call("Emulation.setDeviceMetricsOverride", {
-      width: CAPTURE_WIDTH,
-      height: CAPTURE_HEIGHT,
+      width,
+      height,
       deviceScaleFactor: 1,
       mobile: false,
     });

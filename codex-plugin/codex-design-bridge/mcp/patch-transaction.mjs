@@ -61,8 +61,8 @@ export async function commitPatchTransaction({
     completedAt: "",
     files: [],
   };
-
   try {
+    await writeJournal(transactionRoot, journal);
     for (const [index, operation] of operations.entries()) {
       const before = await readFileState(operation.file);
       if (
@@ -95,13 +95,7 @@ export async function commitPatchTransaction({
             path.dirname(operation.file),
             `.${path.basename(operation.file)}.cdb-${transactionId}.tmp`,
           );
-      if (stagePath) {
-        await mkdir(path.dirname(operation.file), { recursive: true });
-        await writeFile(stagePath, operation.content);
-        staged.push(stagePath);
-      }
-
-      entries.push({
+      const entry = {
         absolutePath: operation.file,
         path: relativePath(root, operation.file),
         existedBefore: before.exists,
@@ -110,7 +104,15 @@ export async function commitPatchTransaction({
         backup: before.exists ? `backups/${backupName}` : "",
         delete: operation.delete,
         stagePath,
-      });
+      };
+      entries.push(entry);
+      journal = { ...journal, files: entries.map(publicEntry) };
+      await writeJournal(transactionRoot, journal);
+      if (stagePath) {
+        await mkdir(path.dirname(operation.file), { recursive: true });
+        await writeFile(stagePath, operation.content);
+        staged.push(stagePath);
+      }
     }
 
     if (entries.length === 0) {
@@ -195,7 +197,10 @@ export async function commitPatchTransaction({
   }
 }
 
-export async function undoLastPatchTransaction(projectDir) {
+export async function undoLastPatchTransaction(
+  projectDir,
+  { expectedTransactionId = "" } = {},
+) {
   const root = path.resolve(projectDir);
   const transaction = await latestUndoableTransaction(root);
   if (!transaction) {
@@ -206,6 +211,15 @@ export async function undoLastPatchTransaction(projectDir) {
       undoAvailable: false,
       status: "nothing_to_undo",
     };
+  }
+  if (
+    expectedTransactionId &&
+    transaction.journal.transactionId !== expectedTransactionId
+  ) {
+    throw transactionError(
+      "undo_transaction_not_latest",
+      "The requested transaction is no longer the latest undoable Design Bridge transaction.",
+    );
   }
 
   const writes = [];
@@ -252,6 +266,49 @@ export async function undoLastPatchTransaction(projectDir) {
   };
 }
 
+export async function recoverIncompletePatchTransactions(projectDir) {
+  const root = path.resolve(projectDir);
+  const directory = path.join(root, ".figma-sync", "transactions");
+  let names;
+  try {
+    names = (await readdir(directory)).sort();
+  } catch (error) {
+    if (error?.code === "ENOENT") return emptyRecoveryResult();
+    throw error;
+  }
+
+  const recovered = [];
+  for (const name of names) {
+    const transactionRoot = path.join(directory, name);
+    let journal;
+    try {
+      journal = JSON.parse(
+        await readFile(path.join(transactionRoot, "transaction.json"), "utf8"),
+      );
+    } catch {
+      // A crash before the first atomic journal rename cannot have changed a
+      // target file. Leave unrelated or historical corrupt records untouched.
+      continue;
+    }
+    if (
+      journal?.version !== TRANSACTION_VERSION ||
+      !["planning", "staged", "recovery_conflict"].includes(journal.status)
+    ) {
+      continue;
+    }
+    recovered.push(
+      await recoverIncompleteTransaction(root, transactionRoot, journal),
+    );
+  }
+
+  return {
+    status: recovered.length > 0 ? "recovered" : "clean",
+    recoveredCount: recovered.length,
+    changedFiles: [...new Set(recovered.flatMap((entry) => entry.changedFiles))],
+    transactions: recovered,
+  };
+}
+
 function normalizeWrites(root, writes) {
   const seen = new Set();
   const normalized = [];
@@ -292,6 +349,122 @@ async function rollbackEntries(entries, transactionRoot) {
     }
   }
   return errors;
+}
+
+async function recoverIncompleteTransaction(root, transactionRoot, journal) {
+  const entries = [];
+  const conflicts = [];
+  for (const entry of Array.isArray(journal.files) ? journal.files : []) {
+    const absolutePath = resolveInside(root, path.resolve(root, entry?.path || ""));
+    if (!absolutePath) {
+      conflicts.push({ path: String(entry?.path || ""), reason: "invalid_path" });
+      continue;
+    }
+    const normalized = { ...entry, absolutePath };
+    const current = await readFileState(absolutePath);
+    if (current.hash === entry.beforeHash) {
+      entries.push({ ...normalized, recoveryState: "untouched" });
+      continue;
+    }
+    if (current.hash === entry.afterHash) {
+      if (entry.existedBefore) {
+        const backupPath = resolveInside(
+          transactionRoot,
+          path.resolve(transactionRoot, entry.backup || ""),
+        );
+        if (!backupPath) {
+          conflicts.push({ path: entry.path, reason: "invalid_backup" });
+          continue;
+        }
+        try {
+          const backup = await readFile(backupPath);
+          if (hashContent(backup) !== entry.beforeHash) {
+            conflicts.push({ path: entry.path, reason: "backup_hash_mismatch" });
+            continue;
+          }
+        } catch {
+          conflicts.push({ path: entry.path, reason: "backup_missing" });
+          continue;
+        }
+      }
+      entries.push({ ...normalized, recoveryState: "applied" });
+      continue;
+    }
+    conflicts.push({ path: entry.path, reason: "target_changed" });
+  }
+
+  if (conflicts.length > 0) {
+    await writeJournal(transactionRoot, {
+      ...journal,
+      status: "recovery_conflict",
+      recoveryConflicts: conflicts,
+      recoveryCheckedAt: new Date().toISOString(),
+    });
+    throw Object.assign(
+      transactionError(
+        "transaction_recovery_conflict",
+        `未完成事务 ${journal.transactionId} 的文件在崩溃后又被修改，CDB 已保留当前文件。`,
+      ),
+      { transactionId: journal.transactionId, conflicts },
+    );
+  }
+
+  const applied = entries.filter((entry) => entry.recoveryState === "applied");
+  const rollbackErrors = await rollbackEntries(applied, transactionRoot);
+  await Promise.all(
+    entries.map((entry) =>
+      rm(stagePathFor(root, journal.transactionId, entry), { force: true }).catch(
+        () => undefined,
+      ),
+    ),
+  );
+  await rm(path.join(transactionRoot, "transaction.json.tmp"), { force: true });
+  if (rollbackErrors.length > 0) {
+    await writeJournal(transactionRoot, {
+      ...journal,
+      status: "rollback_failed",
+      completedAt: new Date().toISOString(),
+      rollbackErrors,
+    });
+    throw Object.assign(
+      transactionError(
+        "transaction_recovery_failed",
+        `未完成事务 ${journal.transactionId} 自动回滚失败。`,
+      ),
+      { transactionId: journal.transactionId, rollbackErrors },
+    );
+  }
+
+  const recoveredAt = new Date().toISOString();
+  await writeJournal(transactionRoot, {
+    ...journal,
+    status: "recovered_rolled_back",
+    completedAt: recoveredAt,
+    recoveredAt,
+    recoveryConflicts: [],
+  });
+  return {
+    transactionId: journal.transactionId,
+    status: "recovered_rolled_back",
+    changedFiles: applied.map((entry) => entry.path),
+  };
+}
+
+function stagePathFor(root, transactionId, entry) {
+  const absolutePath = resolveInside(root, path.resolve(root, entry.path));
+  return path.join(
+    path.dirname(absolutePath),
+    `.${path.basename(absolutePath)}.cdb-${transactionId}.tmp`,
+  );
+}
+
+function emptyRecoveryResult() {
+  return {
+    status: "clean",
+    recoveredCount: 0,
+    changedFiles: [],
+    transactions: [],
+  };
 }
 
 async function writeAtomically(file, content) {

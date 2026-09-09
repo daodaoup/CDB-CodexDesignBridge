@@ -11,10 +11,9 @@ Use one deterministic entry point. Do not scan or create anything unless the use
 
 When the user sends only `@CDB`, calls CDB without another instruction, or asks to open CDB itself:
 
-1. Check only whether the current writable workspace contains `.cdb/manifest.json`.
-2. If it does, call `open_design_workspace` with that workspace and resume its active page.
-3. Otherwise call `open_design_launcher` and pass the writable workspace as `workspaceDir`.
-4. Do not recursively scan project files, create a draft, or open an external browser.
+1. Call `open_cdb` once with `action: "auto"` and the current writable workspace as `workspaceDir`.
+2. The tool resumes that workspace only when it contains `.cdb/manifest.json`; otherwise it opens the launcher.
+3. Do not inspect the filesystem yourself, recursively scan project files, create a draft, or open an external browser.
 
 The launcher focuses on starting from Figma or a new-design description. Local HTML upload remains an internal capability but is hidden from the normal interface.
 

@@ -70,7 +70,7 @@ export class WorkspaceLeaseManager {
           this.leaseRoot,
         );
         await this.waitForRelease(current.leaseId);
-      } else if (!isExpired(current)) {
+      } else if (!isExpired(current) && isOwnerProcessAlive(current)) {
         return {
           acquired: false,
           confirmationRequired: false,
@@ -82,7 +82,12 @@ export class WorkspaceLeaseManager {
 
     const acquired = await this.withLock(async () => {
       const latest = await this.readLease();
-      if (latest && latest.leaseId !== current?.leaseId && !isExpired(latest)) {
+      if (
+        latest &&
+        latest.leaseId !== current?.leaseId &&
+        !isExpired(latest) &&
+        isOwnerProcessAlive(latest)
+      ) {
         return false;
       }
       this.projectKey = projectKey;
@@ -92,6 +97,7 @@ export class WorkspaceLeaseManager {
     if (!acquired) {
       return { acquired: false, confirmationRequired: false, reason: "lease_race" };
     }
+    await removeLeaseSecret(current, this.leaseRoot);
     this.startHeartbeat();
     return { acquired: true, lease: await this.readLease() };
   }
@@ -300,6 +306,24 @@ function publicLease(lease) {
 
 function isExpired(lease) {
   return !lease?.expiresAt || Date.parse(lease.expiresAt) <= Date.now();
+}
+
+function isOwnerProcessAlive(lease) {
+  const ownerPid = Number(lease?.ownerPid);
+  if (!Number.isSafeInteger(ownerPid) || ownerPid <= 0) return true;
+  try {
+    process.kill(ownerPid, 0);
+    return true;
+  } catch (error) {
+    return error?.code !== "ESRCH";
+  }
+}
+
+async function removeLeaseSecret(lease, leaseRoot) {
+  if (!lease?.leaseId || !lease?.controlSecretRef) return;
+  const expected = path.join(path.resolve(leaseRoot), `${lease.leaseId}.secret`);
+  if (path.resolve(lease.controlSecretRef) !== expected) return;
+  await rm(expected, { force: true });
 }
 
 async function requestControl(lease, route, { method, body } = {}, leaseRoot) {

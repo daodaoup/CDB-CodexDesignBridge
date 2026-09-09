@@ -1,6 +1,6 @@
 {
   "name": "codex-design-bridge",
-  "version": "0.7.0",
+  "version": "0.9.0",
   "private": true,
   "description": "A Codex-embedded design workspace with a local, quota-free Figma plugin round trip.",
   "type": "module",
@@ -11,9 +11,11 @@
   "scripts": {
     "start": "node ./bin/figma-sync.js start",
     "desktop": "electron .",
+    "workspace": "node ./scripts/open-local-workspace.mjs",
+    "verify:runtime": "node ./scripts/verify-local-runtime.mjs",
     "example": "node ./scripts/serve-example.js",
     "test": "node --test --test-concurrency=1",
-    "check": "node ./scripts/validate-repository.mjs && node --check ./bin/figma-sync.js && node --check ./src/server.js && node --check ./src/page.js && node --check ./src/page-change-store.js && node --check ./src/design-task-store.js && node --check ./src/codex-runner.js && node --check ./plugin/code.js && node --check ./scripts/serve-example.js && node --check ./desktop/main.js && node --check ./desktop/page-capture.js && node --check ./desktop/preview-service.js && node --check ./desktop/renderer.js && node --check ./desktop/preload.cjs && node --check ./codex-plugin/codex-design-bridge/mcp/browser-capture.mjs && node --check ./codex-plugin/codex-design-bridge/mcp/fast-page-patch.mjs && node --check ./codex-plugin/codex-design-bridge/mcp/local-figma-bridge.mjs && node --check ./codex-plugin/codex-design-bridge/mcp/patch-transaction.mjs && node --check ./codex-plugin/codex-design-bridge/mcp/project-contract.mjs && node --check ./codex-plugin/codex-design-bridge/mcp/workspace-lease.mjs && node --check ./codex-plugin/codex-design-bridge/mcp/preview-process-guard.cjs && node --check ./codex-plugin/codex-design-bridge/mcp/server.mjs && node --test --test-concurrency=1"
+    "check": "node ./scripts/validate-repository.mjs && node --check ./bin/figma-sync.js && node --check ./src/server.js && node --check ./src/page.js && node --check ./src/page-change-store.js && node --check ./src/design-task-store.js && node --check ./src/codex-runner.js && node --check ./plugin/code.js && node --check ./scripts/serve-example.js && node --check ./scripts/open-local-workspace.mjs && node --check ./scripts/verify-local-runtime.mjs && node --check ./scripts/freeze-responsive-v2-fixtures.mjs && node --check ./scripts/test-fixtures/fake-codex-plugin-cli.mjs && node --check ./desktop/main.js && node --check ./desktop/page-capture.js && node --check ./desktop/preview-service.js && node --check ./desktop/renderer.js && node --check ./desktop/preload.cjs && node --check ./codex-plugin/codex-design-bridge/shared/page-ir-responsive-v2.mjs && node --check ./codex-plugin/codex-design-bridge/mcp/browser-capture.mjs && node --check ./codex-plugin/codex-design-bridge/mcp/design-offer-store.mjs && node --check ./codex-plugin/codex-design-bridge/mcp/fast-page-patch.mjs && node --check ./codex-plugin/codex-design-bridge/mcp/local-figma-bridge.mjs && node --check ./codex-plugin/codex-design-bridge/mcp/local-workspace-server.mjs && node --check ./codex-plugin/codex-design-bridge/mcp/sync-baseline-store.mjs && node --check ./codex-plugin/codex-design-bridge/mcp/patch-transaction.mjs && node --check ./codex-plugin/codex-design-bridge/mcp/project-contract.mjs && node --check ./codex-plugin/codex-design-bridge/mcp/visual-verification.mjs && node --check ./codex-plugin/codex-design-bridge/mcp/workspace-lease.mjs && node --check ./codex-plugin/codex-design-bridge/mcp/preview-process-guard.cjs && node --check ./codex-plugin/codex-design-bridge/mcp/server.mjs && node --check ./codex-plugin/codex-design-bridge/mcp/daemon.mjs && node --check ./codex-plugin/codex-design-bridge/mcp/gateway.mjs && node --test --test-concurrency=1"
   },
   "engines": {
     "node": ">=20"

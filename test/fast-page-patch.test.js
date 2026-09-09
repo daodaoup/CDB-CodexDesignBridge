@@ -9,8 +9,20 @@ import {
 } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { applyFastPageChanges } from "../codex-plugin/codex-design-bridge/mcp/fast-page-patch.mjs";
+import { applyFastPageChanges, renderStandalonePageSeed } from "../codex-plugin/codex-design-bridge/mcp/fast-page-patch.mjs";
 import { undoLastPatchTransaction } from "../codex-plugin/codex-design-bridge/mcp/patch-transaction.mjs";
+import { currentRuntimeIdentity } from "../codex-plugin/codex-design-bridge/shared/runtime-contract.mjs";
+
+function applyCurrentFastPageChanges(args) {
+  return applyFastPageChanges({
+    ...args,
+    changeSet: {
+      protocolVersion: 16,
+      runtimeIdentity: currentRuntimeIdentity(),
+      ...args.changeSet,
+    },
+  });
+}
 
 test("fast page patch writes visual, size, opacity, and typography changes directly", async (t) => {
   const projectDir = await mkdtemp(path.join(os.tmpdir(), "fast-page-patch-"));
@@ -33,7 +45,7 @@ test("fast page patch writes visual, size, opacity, and typography changes direc
     "utf8",
   );
 
-  const result = await applyFastPageChanges({
+  const result = await applyCurrentFastPageChanges({
     projectDir,
     manifest: manifest(),
     changeSet: {
@@ -81,7 +93,7 @@ test("fast page patch writes visual, size, opacity, and typography changes direc
     /background: rgba\(16, 17, 20, 0\.8\) !important;/,
   );
 
-  const followUp = await applyFastPageChanges({
+  const followUp = await applyCurrentFastPageChanges({
     projectDir,
     manifest: manifest(),
     changeSet: {
@@ -123,7 +135,10 @@ test("fast page patch writes visual, size, opacity, and typography changes direc
   assert.match(updatedCss, /height: 240px !important;/);
   assert.match(updatedCss, /opacity: 0\.65 !important;/);
   assert.match(updatedCss, /display: none !important;/);
-  assert.match(updatedCss, /font-family: "Inter" !important;/);
+  assert.match(
+    updatedCss,
+    /font-family: "Inter", ui-sans-serif, system-ui, sans-serif !important;/,
+  );
   assert.match(updatedCss, /font-weight: 600 !important;/);
   assert.match(updatedCss, /font-style: italic !important;/);
   assert.match(updatedCss, /line-height: 64px !important;/);
@@ -138,7 +153,7 @@ test("fast page patch writes visual, size, opacity, and typography changes direc
     1,
   );
 
-  const restored = await applyFastPageChanges({
+  const restored = await applyCurrentFastPageChanges({
     projectDir,
     manifest: manifest(),
     changeSet: {
@@ -182,7 +197,7 @@ test("fast page patch replaces inline SVG contents and preserves source attribut
     "</svg>",
   ].join("");
 
-  const result = await applyFastPageChanges({
+  const result = await applyCurrentFastPageChanges({
     projectDir,
     manifest: manifest(),
     changeSet: {
@@ -213,7 +228,7 @@ test("fast page patch replaces inline SVG contents and preserves source attribut
   assert.match(source, /id="arrow"/);
   assert.doesNotMatch(source, /id="old-path"/);
 
-  const unsafe = await applyFastPageChanges({
+  const unsafe = await applyCurrentFastPageChanges({
     projectDir,
     manifest: manifest(),
     changeSet: {
@@ -258,7 +273,7 @@ test("fast page patch writes Frame stroke changes as CSS borders", async (t) => 
     "utf8",
   );
 
-  const removed = await applyFastPageChanges({
+  const removed = await applyCurrentFastPageChanges({
     projectDir,
     manifest: manifest(),
     changeSet: {
@@ -279,7 +294,7 @@ test("fast page patch writes Frame stroke changes as CSS borders", async (t) => 
     opacity: 0.5,
   });
   addedStroke.strokeWeight = 3;
-  const added = await applyFastPageChanges({
+  const added = await applyCurrentFastPageChanges({
     projectDir,
     manifest: manifest(),
     changeSet: {
@@ -317,7 +332,7 @@ test("fast page patch deletes mapped SVG, image, and container subtrees", async 
     "utf8",
   );
 
-  const result = await applyFastPageChanges({
+  const result = await applyCurrentFastPageChanges({
     projectDir,
     manifest: manifest(),
     changeSet: {
@@ -351,7 +366,7 @@ test("fast page patch retains a container deletion in unsafe JSX context", async
     'export function App() { return <section data-codex-id="content">Keep</section>; }\n',
     "utf8",
   );
-  const result = await applyFastPageChanges({
+  const result = await applyCurrentFastPageChanges({
     projectDir,
     manifest: manifest(),
     changeSet: {
@@ -426,7 +441,7 @@ test("fast page patch clones a mapped button before applying copied styles", asy
       ],
     },
   };
-  const result = await applyFastPageChanges({
+  const result = await applyCurrentFastPageChanges({
     projectDir,
     manifest: manifest(),
     changeSet: {
@@ -486,7 +501,7 @@ test("fast page patch keeps the original page when a replacement clone is pendin
   ].join("\n");
   await writeFile(path.join(projectDir, "index.html"), original, "utf8");
 
-  const result = await applyFastPageChanges({
+  const result = await applyCurrentFastPageChanges({
     projectDir,
     manifest: manifest(),
     changeSet: {
@@ -616,7 +631,7 @@ test("fast page patch inserts a generic subtree and reorders mapped siblings", a
       },
     ],
   };
-  const result = await applyFastPageChanges({
+  const result = await applyCurrentFastPageChanges({
     projectDir,
     manifest: manifest(),
     changeSet: {
@@ -668,7 +683,7 @@ test("fast page patch inserts a generic subtree and reorders mapped siblings", a
   const source = await readFile(path.join(projectDir, "index.html"), "utf8");
   assert.ok(source.indexOf('data-codex-id="second"') < source.indexOf('data-codex-id="figma-node-70-1"'));
   assert.ok(source.indexOf('data-codex-id="figma-node-70-1"') < source.indexOf('data-codex-id="first"'));
-  assert.match(source, /data-codex-id="figma-node-70-2">Checkout<\/span>/);
+  assert.match(source, /data-codex-id="figma-node-70-2"[^>]*>Checkout<\/span>/);
   assert.match(source, /src="\/codex-design-assets\/figma-node-70-3\.png"/);
   const css = await readFile(path.join(projectDir, "styles.css"), "utf8");
   assert.match(css, /\[data-codex-id="figma-node-70-1"\]/);
@@ -696,7 +711,7 @@ test("fast page patch replaces a Figma seed root and removes its placeholder sty
     '.figma-seed { background: linear-gradient(#f00, #00f); }\n',
     "utf8",
   );
-  const result = await applyFastPageChanges({
+  const result = await applyCurrentFastPageChanges({
     projectDir,
     manifest: manifest(),
     changeSet: {
@@ -766,12 +781,91 @@ test("fast page patch replaces a Figma seed root and removes its placeholder sty
   assert.equal(result.appliedCount, 1);
   assert.equal(result.pendingCount, 0);
   const source = await readFile(path.join(projectDir, "index.html"), "utf8");
-  assert.match(source, /<main data-codex-root data-codex-id="page-root">/);
-  assert.match(source, /data-codex-id="figma-node-title">From Figma<\/span>/);
+  assert.match(source, /<main data-codex-root data-codex-id="page-root"[^>]*>/);
+  assert.match(source, /data-codex-id="figma-node-title"[^>]*>From Figma<\/span>/);
   assert.doesNotMatch(source, /figma-seed-placeholder/);
   assert.doesNotMatch(source, /class="figma-seed"/);
   const css = await readFile(path.join(projectDir, "styles.css"), "utf8");
   assert.match(css, /background-color: #2D1FF2 !important;/);
+});
+
+test("fast page patch safely drops Figma background-blur foreignObject layers", async (t) => {
+  const projectDir = await mkdtemp(path.join(os.tmpdir(), "fast-page-seed-blur-"));
+  t.after(() => rm(projectDir, { recursive: true, force: true }));
+  await writeFile(
+    path.join(projectDir, "index.html"),
+    '<link rel="stylesheet" href="./styles.css"><main data-codex-root data-codex-id="page-root"></main>',
+    "utf8",
+  );
+  await writeFile(path.join(projectDir, "styles.css"), "", "utf8");
+  const svg = [
+    '<svg width="200" height="48" viewBox="0 0 200 48" xmlns="http://www.w3.org/2000/svg">',
+    '<foreignObject x="-8" y="-8" width="216" height="64"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(4px)"></div></foreignObject>',
+    '<path id="surface" d="M0 0h200v48H0z" fill="#404040"/>',
+    '</svg>',
+  ].join("");
+  const result = await applyCurrentFastPageChanges({
+    projectDir,
+    manifest: manifest(),
+    changeSet: {
+      protocolVersion: 16,
+      pageId: "sample-page",
+      sourceHash: "page-hash",
+      changes: [{
+        nodeId: "page-root",
+        nodeType: "FRAME",
+        property: "pageSeed",
+        sourceRef: { selector: '[data-codex-id="page-root"]' },
+        to: {
+          node: {
+            id: "page-root",
+            type: "frame",
+            tag: "main",
+            name: "Toolbar",
+            width: 200,
+            height: 48,
+            opacity: 1,
+            visible: true,
+            rotation: 0,
+            style: { fill: null, stroke: null, strokeWeight: 0, cornerRadius: 0 },
+            layout: { kind: "none", mode: "NONE", itemSpacing: 0, padding: { top: 0, right: 0, bottom: 0, left: 0 } },
+            children: [{
+              id: "figma-node-surface",
+              type: "svg",
+              tag: "svg",
+              name: "Blurred surface",
+              width: 200,
+              height: 48,
+              opacity: 1,
+              visible: true,
+              rotation: 0,
+              style: { fill: { color: "#404040", opacity: 1 }, stroke: null, strokeWeight: 0, cornerRadius: 0 },
+              svg: { mimeType: "image/svg+xml", base64: Buffer.from(svg).toString("base64") },
+            }, {
+              id: "figma-node-plain-frame",
+              type: "frame",
+              tag: "div",
+              name: "Plain rectangle",
+              width: 24,
+              height: 24,
+              opacity: 1,
+              visible: true,
+              rotation: 0,
+              style: { fill: { color: "#FFFFFF", opacity: 1 }, stroke: null, strokeWeight: 0, cornerRadius: 4 },
+              children: [],
+            }],
+          },
+        },
+      }],
+    },
+  });
+
+  assert.equal(result.appliedCount, 1);
+  assert.equal(result.pendingCount, 0);
+  const source = await readFile(path.join(projectDir, "index.html"), "utf8");
+  assert.match(source, /data-codex-id="figma-node-surface"/);
+  assert.match(source, /data-codex-id="figma-node-plain-frame"/);
+  assert.doesNotMatch(source, /foreignObject|backdrop-filter/);
 });
 
 test("fast page patch inserts, reorders, and deletes mapped JSX children", async (t) => {
@@ -821,7 +915,7 @@ test("fast page patch inserts, reorders, and deletes mapped JSX children", async
     textCase: "ORIGINAL",
     textDecoration: "NONE",
   };
-  const result = await applyFastPageChanges({
+  const result = await applyCurrentFastPageChanges({
     projectDir,
     manifest: manifest(),
     changeSet: {
@@ -888,7 +982,7 @@ test("fast page patch retains a reorder when unmapped source content is interlea
     "",
   ].join("\n");
   await writeFile(path.join(projectDir, "index.html"), original, "utf8");
-  const result = await applyFastPageChanges({
+  const result = await applyCurrentFastPageChanges({
     projectDir,
     manifest: manifest(),
     changeSet: {
@@ -961,7 +1055,7 @@ test("fast page patch writes a complex edited SVG back to its external source fi
   );
   externalChange.sourceRef.file = "assets/hero-art.svg";
 
-  const result = await applyFastPageChanges({
+  const result = await applyCurrentFastPageChanges({
     projectDir,
     manifest: manifest(),
     changeSet: {
@@ -999,7 +1093,7 @@ test("fast page patch writes a complex edited SVG back to its external source fi
     ),
   );
   unsafeChange.sourceRef.file = "assets/hero-art.svg";
-  const unsafe = await applyFastPageChanges({
+  const unsafe = await applyCurrentFastPageChanges({
     projectDir,
     manifest: manifest(),
     changeSet: {
@@ -1043,7 +1137,7 @@ test("fast page patch inserts a Figma vector as a mapped inline SVG", async (t) 
     rotation: 12,
   });
 
-  const result = await applyFastPageChanges({
+  const result = await applyCurrentFastPageChanges({
     projectDir,
     manifest: manifest(),
     changeSet: {
@@ -1066,7 +1160,7 @@ test("fast page patch inserts a Figma vector as a mapped inline SVG", async (t) 
   assert.match(source, /height: 140px/);
   assert.match(source, /rotate\(12deg\)/);
 
-  const retry = await applyFastPageChanges({
+  const retry = await applyCurrentFastPageChanges({
     projectDir,
     manifest: manifest(),
     changeSet: {
@@ -1084,7 +1178,7 @@ test("fast page patch inserts a Figma vector as a mapped inline SVG", async (t) 
     1,
   );
 
-  const replacement = await applyFastPageChanges({
+  const replacement = await applyCurrentFastPageChanges({
     projectDir,
     manifest: manifest(),
     changeSet: {
@@ -1129,7 +1223,7 @@ test("fast page patch follows a React component stylesheet import", async (t) =>
   );
   await writeFile(path.join(projectDir, "src", "App.css"), "", "utf8");
 
-  const result = await applyFastPageChanges({
+  const result = await applyCurrentFastPageChanges({
     projectDir,
     manifest: manifest(),
     changeSet: {
@@ -1156,7 +1250,7 @@ test("fast page patch retains an unexportable SVG as a pending difference", asyn
     "utf8",
   );
 
-  const result = await applyFastPageChanges({
+  const result = await applyCurrentFastPageChanges({
     projectDir,
     manifest: manifest(),
     changeSet: {
@@ -1195,7 +1289,7 @@ test("fast page patch writes same-parent Figma position changes as visual transl
   );
   await writeFile(path.join(projectDir, "styles.css"), "", "utf8");
 
-  const result = await applyFastPageChanges({
+  const result = await applyCurrentFastPageChanges({
     projectDir,
     manifest: manifest(),
     changeSet: {
@@ -1240,7 +1334,7 @@ test("fast page patch ignores imported project caches when resolving selectors",
   await writeFile(path.join(importedDir, "index.html"), html, "utf8");
   await writeFile(path.join(importedDir, "styles.css"), "", "utf8");
 
-  const result = await applyFastPageChanges({
+  const result = await applyCurrentFastPageChanges({
     projectDir,
     manifest: manifest(),
     changeSet: {
@@ -1285,7 +1379,7 @@ for (const property of ["nodeMove", "nodeReparent"]) {
     await writeFile(path.join(projectDir, "index.html"), original, "utf8");
     await writeFile(path.join(projectDir, "styles.css"), "", "utf8");
 
-    const result = await applyFastPageChanges({
+    const result = await applyCurrentFastPageChanges({
       projectDir,
       manifest: manifest(),
       changeSet: {
@@ -1347,7 +1441,7 @@ test("fast page patch rejects a reparent cycle without partial source or CSS wri
   ].join("\n");
   await writeFile(path.join(projectDir, "index.html"), original, "utf8");
   await writeFile(path.join(projectDir, "styles.css"), "", "utf8");
-  const result = await applyFastPageChanges({
+  const result = await applyCurrentFastPageChanges({
     projectDir,
     manifest: manifest(),
     changeSet: {
@@ -1358,9 +1452,16 @@ test("fast page patch rejects a reparent cycle without partial source or CSS wri
         nodeType: "FRAME",
         property: "nodeReparent",
         sourceRef: { selector: '[data-codex-id="hero-copy"]' },
+        fromParentId: "page-root",
+        toParentId: "daodao",
+        fromParentSourceRef: { selector: '[data-codex-id="page-root"]' },
         toParentSourceRef: { selector: '[data-codex-id="daodao"]' },
+        fromIndex: 0,
         toIndex: 0,
+        beforeBounds: { x: 0, y: 0, width: 800, height: 700 },
         afterBounds: { x: 0, y: 0, width: 800, height: 700 },
+        beforeWorldTransform: [1, 0, 0, 1, 0, 0],
+        afterWorldTransform: [1, 0, 0, 1, 0, 0],
         parentLayout: "NONE",
         positioning: "ABSOLUTE",
       }],
@@ -1413,7 +1514,7 @@ test("fast page patch maps Figma Auto Layout and item sizing back to CSS flex", 
     { ...change("card", "FRAME", "layoutSizingHorizontal", "FILL"), layoutContext },
     { ...change("card", "FRAME", "layoutSizingVertical", "HUG"), layoutContext },
   ];
-  const result = await applyFastPageChanges({
+  const result = await applyCurrentFastPageChanges({
     projectDir,
     manifest: manifest(),
     changeSet: {
@@ -1459,7 +1560,7 @@ test("fast page patch maps an atomic move into a CSS grid placement", async (t) 
     "utf8",
   );
   await writeFile(path.join(projectDir, "styles.css"), "", "utf8");
-  const result = await applyFastPageChanges({
+  const result = await applyCurrentFastPageChanges({
     projectDir,
     manifest: manifest(),
     changeSet: {
@@ -1470,9 +1571,16 @@ test("fast page patch maps an atomic move into a CSS grid placement", async (t) 
         nodeType: "FRAME",
         property: "nodeMove",
         sourceRef: { selector: '[data-codex-id="card"]' },
+        fromParentId: "source",
+        toParentId: "grid",
+        fromParentSourceRef: { selector: '[data-codex-id="source"]' },
         toParentSourceRef: { selector: '[data-codex-id="grid"]' },
+        fromIndex: 0,
         toIndex: 0,
+        beforeBounds: { x: 0, y: 0, width: 200, height: 120 },
         afterBounds: { x: 0, y: 0, width: 200, height: 120 },
+        beforeWorldTransform: [1, 0, 0, 1, 0, 0],
+        afterWorldTransform: [1, 0, 0, 1, 0, 0],
         parentLayout: "GRID",
         positioning: "AUTO",
         grid: { row: 2, column: 1 },
@@ -1519,11 +1627,11 @@ test("codex-landing daodao regression reparents without screenshots or regenerat
   await writeFile(path.join(projectDir, "index.html"), baseline, "utf8");
   await writeFile(path.join(projectDir, "styles.css"), liveCss, "utf8");
 
-  const result = await applyFastPageChanges({
+  const result = await applyCurrentFastPageChanges({
     projectDir,
     manifest: manifest(),
     changeSet: {
-      protocolVersion: 14,
+      protocolVersion: 16,
       pageId: "sample-page",
       sourceHash: "page-hash",
       changes: [{
@@ -1566,7 +1674,7 @@ test("fast page patch keeps a future structural protocol safely pending", async 
     '<main data-codex-id="page"></main>\n',
     "utf8",
   );
-  const result = await applyFastPageChanges({
+  const result = await applyCurrentFastPageChanges({
     projectDir,
     manifest: manifest(),
     changeSet: {
@@ -1582,8 +1690,8 @@ test("fast page patch keeps a future structural protocol safely pending", async 
   assert.equal(await readFile(path.join(projectDir, "index.html"), "utf8"), '<main data-codex-id="page"></main>\n');
 });
 
-test("protocol 14 rejects incomplete structural payloads without writing files", async (t) => {
-  const projectDir = await mkdtemp(path.join(os.tmpdir(), "fast-invalid-v14-"));
+test("protocol 16 rejects incomplete structural payloads without writing files", async (t) => {
+  const projectDir = await mkdtemp(path.join(os.tmpdir(), "fast-invalid-v15-"));
   t.after(() => rm(projectDir, { recursive: true, force: true }));
   const original = [
     '<link rel="stylesheet" href="./styles.css" />',
@@ -1596,11 +1704,11 @@ test("protocol 14 rejects incomplete structural payloads without writing files",
   await writeFile(path.join(projectDir, "index.html"), original, "utf8");
   await writeFile(path.join(projectDir, "styles.css"), "", "utf8");
 
-  const result = await applyFastPageChanges({
+  const result = await applyCurrentFastPageChanges({
     projectDir,
     manifest: manifest(),
     changeSet: {
-      protocolVersion: 14,
+      protocolVersion: 16,
       pageId: "sample-page",
       sourceHash: "page-hash",
       changes: [{
@@ -1621,23 +1729,24 @@ test("protocol 14 rejects incomplete structural payloads without writing files",
   assert.equal(result.pending[0].stage, "protocol");
   assert.equal(
     result.pending[0].reason,
-    "invalid_protocol14_structure:missing_fromParentId",
+    "invalid_protocol16_structure:missing_fromParentId",
   );
   assert.equal(await readFile(path.join(projectDir, "index.html"), "utf8"), original);
   assert.equal(await readFile(path.join(projectDir, "styles.css"), "utf8"), "");
 });
 
-test("protocol 14 schema keeps structural changes exclusive from the generic branch", async () => {
+test("protocol 16 schema keeps structural changes exclusive from the generic branch", async () => {
   const schema = JSON.parse(
     await readFile(
       new URL(
-        "../codex-plugin/codex-design-bridge/shared/change-set-v14.schema.json",
+        "../codex-plugin/codex-design-bridge/shared/change-set-v16.schema.json",
         import.meta.url,
       ),
       "utf8",
     ),
   );
-  assert.equal(schema.properties.protocolVersion.const, 14);
+  assert.equal(schema.properties.protocolVersion.const, 16);
+  assert.equal(schema.properties.runtimeIdentity.properties.pageIrSchemaVersion.const, 2);
   assert.deepEqual(
     schema.$defs.genericChange.properties.property.not.enum,
     ["nodeMove", "nodeReparent"],
@@ -1656,6 +1765,212 @@ test("protocol 14 schema keeps structural changes exclusive from the generic bra
   ]) {
     assert.ok(schema.$defs.nodeMove.required.includes(field), field);
   }
+});
+
+test("renders a standalone Figma page with stable markup and hash-deduplicated assets", () => {
+  const png = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]).toString("base64");
+  const image = (id) => ({
+    id,
+    type: "image",
+    tag: "img",
+    name: id,
+    width: 24,
+    height: 24,
+    opacity: 1,
+    visible: true,
+    rotation: 0,
+    style: {},
+    image: { mimeType: "image/png", base64: png },
+  });
+  const rendered = renderStandalonePageSeed({
+    id: "page-root",
+    type: "frame",
+    tag: "main",
+    name: "Page",
+    width: 390,
+    height: 844,
+    opacity: 1,
+    visible: true,
+    rotation: 0,
+    style: { fill: "#FFFFFF" },
+    constraints: { horizontal: "STRETCH", vertical: "MIN" },
+    responsive: { constraints: { horizontal: "STRETCH", vertical: "MIN" }, minWidth: 320, maxWidth: 960 },
+    layout: { kind: "grid", mode: "NONE", grid: { columns: "repeat(2, minmax(0, 1fr))", rows: "auto" }, itemSpacing: 12, counterAxisSpacing: 8, padding: { top: 20, right: 20, bottom: 20, left: 20 } },
+    children: [image("logo-a"), image("logo-b")],
+  }, { title: "A & B" });
+
+  assert.match(rendered.html, /<main data-codex-root data-codex-id="page-root"/);
+  assert.match(rendered.html, /<title>A &amp; B<\/title>/);
+  assert.equal(rendered.assets.length, 1);
+  assert.match(rendered.assets[0].fileName, /^[a-f0-9]{32}\.png$/);
+  assert.equal(rendered.nodeCount, 3);
+  assert.match(rendered.html, /data-codex-constraint-horizontal="STRETCH"/);
+  assert.match(rendered.html, /data-codex-grid-columns="repeat\(2, minmax\(0, 1fr\)\)"/);
+  assert.match(rendered.css, /grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/);
+  assert.match(rendered.css, /min-width: 320px/);
+  assert.match(rendered.css, /max-width: 960px/);
+});
+
+test("renders freeform Figma coordinates and authored typography units", () => {
+  const rendered = renderStandalonePageSeed({
+    id: "page-root",
+    type: "frame",
+    tag: "main",
+    name: "Freeform",
+    x: 0,
+    y: 0,
+    width: 800,
+    height: 600,
+    opacity: 1,
+    visible: true,
+    rotation: 0,
+    clipsContent: true,
+    style: { fill: "#FFFFFF" },
+    layout: {
+      kind: "none",
+      mode: "NONE",
+      primaryAxisSizingMode: "AUTO",
+      counterAxisSizingMode: "FIXED",
+      padding: { top: 0, right: 0, bottom: 0, left: 0 },
+    },
+    children: [{
+      id: "headline",
+      type: "text",
+      tag: "span",
+      name: "Headline",
+      text: "Hello",
+      x: 80,
+      y: 120,
+      width: 120,
+      height: 24,
+      opacity: 1,
+      visible: true,
+      rotation: 0,
+      style: { fill: "#111111" },
+      layoutItem: {
+        positioning: "absolute",
+        horizontalSizing: "fixed",
+        verticalSizing: "fixed",
+      },
+      fontName: { family: "Inter", style: "Regular" },
+      fontSize: 16,
+      lineHeight: { unit: "AUTO" },
+      letterSpacing: { unit: "PERCENT", value: 0 },
+      textAlignHorizontal: "LEFT",
+      textAlignVertical: "TOP",
+      textCase: "ORIGINAL",
+      textDecoration: "NONE",
+    }],
+  });
+
+  assert.match(rendered.html, /data-codex-line-height-unit="AUTO"/);
+  assert.match(rendered.html, /data-codex-letter-spacing-unit="PERCENT"/);
+  assert.match(rendered.css, /\[data-codex-id="page-root"\][\s\S]*position: relative/);
+  assert.match(rendered.css, /\[data-codex-id="headline"\][\s\S]*position: absolute/);
+  assert.match(rendered.css, /left: 80px/);
+  assert.match(rendered.css, /top: 120px/);
+  assert.match(rendered.css, /white-space: pre-wrap/);
+  assert.match(rendered.css, /overflow: hidden/);
+  assert.doesNotMatch(rendered.css, /height: fit-content/);
+});
+
+test("preserves computed Figma sizes, text truncation, and SVG transparency in standalone pages", () => {
+  const svg = '<svg viewBox="0 0 20 20"><path d="M2 2h16v16H2Z" fill="#fff"/></svg>';
+  const rendered = renderStandalonePageSeed({
+    id: "page-root",
+    type: "frame",
+    tag: "main",
+    name: "Mobile",
+    width: 402,
+    height: 874,
+    opacity: 1,
+    visible: true,
+    rotation: 0,
+    style: { fill: "#0A0A0CCC" },
+    layout: {
+      kind: "flex",
+      mode: "VERTICAL",
+      primaryAxisSizingMode: "AUTO",
+      counterAxisSizingMode: "FIXED",
+      padding: { top: 0, right: 0, bottom: 0, left: 0 },
+    },
+    layoutItem: { horizontalSizing: "fixed", verticalSizing: "hug" },
+    children: [{
+      id: "single-line-title",
+      type: "text",
+      tag: "span",
+      name: "Title",
+      text: "Recently Played",
+      width: 130,
+      height: 23,
+      opacity: 1,
+      visible: true,
+      rotation: 0,
+      style: { fill: "#FFFFFF" },
+      layoutItem: { horizontalSizing: "fixed", verticalSizing: "hug" },
+      fontName: { family: "Outfit", style: "SemiBold" },
+      fontSize: 18,
+      lineHeight: { unit: "PERCENT", value: 130 },
+      letterSpacing: { unit: "PERCENT", value: 0 },
+      textAlignHorizontal: "LEFT",
+      textAlignVertical: "TOP",
+      textCase: "ORIGINAL",
+      textDecoration: "NONE",
+      textTruncation: "DISABLED",
+    }, {
+      id: "single-line-copy",
+      type: "text",
+      tag: "span",
+      name: "Copy",
+      text: "A line that must truncate",
+      width: 190,
+      height: 18,
+      opacity: 1,
+      visible: true,
+      rotation: 0,
+      style: { fill: "#FFFFFF" },
+      layoutItem: { horizontalSizing: "fill", verticalSizing: "hug" },
+      fontName: { family: "Inter", style: "Regular" },
+      fontSize: 12,
+      lineHeight: { unit: "PERCENT", value: 150 },
+      letterSpacing: { unit: "PERCENT", value: 0 },
+      textAlignHorizontal: "LEFT",
+      textAlignVertical: "TOP",
+      textCase: "ORIGINAL",
+      textDecoration: "NONE",
+      textTruncation: "ENDING",
+      maxLines: 1,
+    }, {
+      id: "status-icon",
+      type: "svg",
+      tag: "svg",
+      name: "Status",
+      width: 20,
+      height: 20,
+      opacity: 1,
+      visible: true,
+      rotation: 0,
+      style: { fill: "#FFFFFF" },
+      svg: { mimeType: "image/svg+xml", base64: Buffer.from(svg).toString("base64") },
+    }],
+  });
+
+  const rootRule = rendered.css.match(/\[data-codex-id="page-root"\] \{[\s\S]*?\n\}/)?.[0] || "";
+  const titleRule = rendered.css.match(/\[data-codex-id="single-line-title"\] \{[\s\S]*?\n\}/)?.[0] || "";
+  const textRule = rendered.css.match(/\[data-codex-id="single-line-copy"\] \{[\s\S]*?\n\}/)?.[0] || "";
+  const svgRule = rendered.css.match(/\[data-codex-id="status-icon"\] \{[\s\S]*?\n\}/)?.[0] || "";
+  assert.match(rootRule, /height: 874px/);
+  assert.doesNotMatch(rootRule, /fit-content/);
+  assert.match(titleRule, /white-space: nowrap/);
+  assert.doesNotMatch(titleRule, /text-overflow: ellipsis/);
+  assert.match(textRule, /width: 190px/);
+  assert.doesNotMatch(textRule, /width: 100%/);
+  assert.match(textRule, /text-overflow: ellipsis/);
+  assert.match(textRule, /white-space: nowrap/);
+  assert.match(textRule, /font-family: "Inter", ui-sans-serif, system-ui, sans-serif/);
+  assert.doesNotMatch(svgRule, /background-color/);
+  assert.match(rendered.css, /body \{ min-height: 100vh; background: #0A0A0CCC; \}/);
+  assert.match(rendered.css, /button \{[^}]*appearance: none/);
 });
 
 function change(nodeId, nodeType, property, to) {

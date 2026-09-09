@@ -27,11 +27,14 @@ test("development manifest and UI use Figma-compatible localhost URLs", async ()
     "ws://localhost:9847",
   ]);
   assert.equal(manifest.name, "CDB");
-  assert.match(ui, /发送修改给 Codex/);
+  assert.match(ui, /发送到 CDB 工作台/);
+  assert.match(ui, /提案已在本地工作台收件箱中/);
+  assert.match(ui, /figma\.design\.recovery\.clear/);
+  assert.doesNotMatch(ui, /正在恢复上次传输/);
   assert.match(ui, /http:\/\/localhost:9847\/api\/pair/);
   assert.match(ui, /ws:\/\/localhost:9847\/ws/);
   assert.equal(ui.match(/<button\b/g)?.length, 3);
-  assert.match(ui, /用选中稿创建页面/);
+  assert.match(ui, /用选中稿生成当前页面/);
   assert.match(ui, /id="reset-workspace"/);
   assert.match(ui, /Codex 项目、源码和 Figma 画布内容都会保持原样/);
   assert.doesNotMatch(ui, /<h1\b/);
@@ -86,6 +89,7 @@ test("plugin UI auto-connects and reports a fast update without settings UI", as
     constructor(url) {
       this.url = url;
       this.readyState = 0;
+      this.sent = [];
       sockets.push(this);
     }
 
@@ -93,6 +97,7 @@ test("plugin UI auto-connects and reports a fast update without settings UI", as
 
     send(value) {
       this.lastSent = value;
+      this.sent.push(value);
     }
   }
 
@@ -124,6 +129,10 @@ test("plugin UI auto-connects and reports a fast update without settings UI", as
         type: "plugin.settings",
         endpoint: "ws://localhost:9847/ws",
         token: "a".repeat(48),
+        designRecovery: {
+          sessionId: "session-recovery-ui",
+          offerId: "offer-recovery-ui",
+        },
       },
     },
   });
@@ -141,8 +150,50 @@ test("plugin UI auto-connects and reports a fast update without settings UI", as
     JSON.parse(sockets[0].lastSent).type,
     "plugin.hello",
   );
-  assert.equal(JSON.parse(sockets[0].lastSent).protocolVersion, 14);
-  assert.equal(JSON.parse(sockets[0].lastSent).pluginVersion, "0.7.0");
+  assert.equal(JSON.parse(sockets[0].lastSent).protocolVersion, 16);
+  assert.equal(JSON.parse(sockets[0].lastSent).pluginVersion, "0.9.0");
+  assert.equal(
+    JSON.parse(sockets[0].lastSent).sessionId,
+    "session-recovery-ui",
+  );
+  sockets[0].onmessage({
+    data: JSON.stringify({
+      type: "figma.design.inbox",
+      offers: [{
+        offerId: "offer-recovery-ui",
+        sessionId: "session-recovery-ui",
+        state: "completed",
+      }],
+    }),
+  });
+  assert.deepEqual(
+    JSON.parse(sockets[0].lastSent),
+    {
+      type: "figma.design.result.query",
+      protocolVersion: 16,
+      runtimeIdentity: {
+        kind: "cdb-0.9-responsive-v2",
+        exactBuild: "0.9.0+codex.20260829100031",
+        protocolVersion: 16,
+        pageIrSchemaVersion: 2,
+      },
+      offerId: "offer-recovery-ui",
+      sessionId: "session-recovery-ui",
+    },
+  );
+  sockets[0].onmessage({
+    data: JSON.stringify({
+      type: "figma.design.result",
+      offerId: "offer-recovery-ui",
+      state: "completed",
+      result: { pageId: "recovered-page", entry: "recovered.html" },
+    }),
+  });
+  assert.ok(parentMessages.some(
+    (message) =>
+      message.pluginMessage?.type === "figma.design.result.accepted" &&
+      message.pluginMessage.result.pageId === "recovered-page",
+  ));
   elements.get("capture").disabled = true;
   elements.get("capture").textContent = "Codex 正在更新…";
   sockets[0].onmessage({
@@ -152,13 +203,23 @@ test("plugin UI auto-connects and reports a fast update without settings UI", as
       codexRunner: { runningTaskId: null, queued: 0 },
     }),
   });
+  window.onmessage({
+    data: { pluginMessage: {
+      type: "figma.design.selection",
+      selection: {
+        supported: true,
+        rootName: "Home",
+        estimatedNodeCount: 12,
+      },
+    } },
+  });
   assert.equal(elements.get("capture").disabled, false);
-  assert.equal(elements.get("capture").textContent, "发送设计给 Codex");
-  assert.equal(elements.get("status-text").textContent, "已连接 · frontend");
+  assert.equal(elements.get("capture").textContent, "发送到 CDB 工作台");
+  assert.equal(elements.get("status-text").textContent, "已选择新页面 · Home");
   elements.get("capture").dispatch("click");
   assert.ok(
     parentMessages.some(
-      (message) => message.pluginMessage?.type === "design.capture",
+      (message) => message.pluginMessage?.type === "figma.design.offer.capture",
     ),
   );
   sockets[0].onmessage({
@@ -166,12 +227,56 @@ test("plugin UI auto-connects and reports a fast update without settings UI", as
       type: "plugin.ready",
       projectName: "frontend",
       localWorkspace: true,
+      projectKey: "current-project",
     }),
   });
+  assert.equal(elements.get("capture").textContent, "发送到 CDB 工作台");
+  assert.ok(parentMessages.some(
+    (message) =>
+      message.pluginMessage?.type === "workspace.identity" &&
+      message.pluginMessage.projectKey === "current-project",
+  ));
+  window.onmessage({
+    data: { pluginMessage: {
+      type: "plugin.ready",
+      importedPageIds: ["legacy-project-page"],
+    } },
+  });
+  const offerCountBeforeUnimported = parentMessages.filter(
+    (message) => message.pluginMessage?.type === "figma.design.offer.capture",
+  ).length;
+  window.onmessage({
+    data: { pluginMessage: {
+      type: "workspace.identity.ready",
+      projectKey: "current-project",
+      importedPageIds: [],
+      unsentChanges: false,
+      changedPageIds: [],
+    } },
+  });
   assert.equal(
-    elements.get("capture").textContent,
-    "发送修改给 Codex",
+    sockets[0].sent
+      .map((value) => JSON.parse(value))
+      .filter((message) => message.type === "plugin.hello").length,
+    2,
+    "workspace identity confirmation must not restart the hello handshake",
   );
+  sockets[0].onmessage({
+    data: JSON.stringify({
+      type: "page.catalog",
+      pages: [{
+        id: "preview-page",
+        name: "Preview",
+        entry: "index.html",
+        route: "/",
+        state: "not_imported",
+      }],
+    }),
+  });
+  elements.get("capture").dispatch("click");
+  assert.equal(parentMessages.filter(
+    (message) => message.pluginMessage?.type === "figma.design.offer.capture",
+  ).length, offerCountBeforeUnimported + 1);
   sockets[0].onmessage({
     data: JSON.stringify({
       type: "page.catalog",
@@ -186,12 +291,35 @@ test("plugin UI auto-connects and reports a fast update without settings UI", as
   });
   assert.equal(elements.get("catalog-count").textContent, "frontend · 1 个");
   assert.equal(elements.get("catalog-list").children.length, 1);
+  const offerCountBeforeSecondPage = parentMessages.filter(
+    (message) => message.pluginMessage?.type === "figma.design.offer.capture",
+  ).length;
+  const reviewCountBeforeSecondPage = parentMessages.filter(
+    (message) => message.pluginMessage?.type === "review.capture",
+  ).length;
   elements.get("capture").dispatch("click");
-  assert.ok(
-    parentMessages.some(
-      (message) => message.pluginMessage?.type === "review.capture",
-    ),
-  );
+  assert.equal(parentMessages.filter(
+    (message) => message.pluginMessage?.type === "figma.design.offer.capture",
+  ).length, offerCountBeforeSecondPage + 1);
+  assert.equal(parentMessages.filter(
+    (message) => message.pluginMessage?.type === "review.capture",
+  ).length, reviewCountBeforeSecondPage);
+  window.onmessage({
+    data: { pluginMessage: {
+      type: "figma.design.selection",
+      selection: {
+        supported: true,
+        rootName: "Preview",
+        estimatedNodeCount: 12,
+        linkedProjectKey: "current-project",
+        linkedPageId: "preview-page",
+      },
+    } },
+  });
+  elements.get("capture").dispatch("click");
+  assert.equal(parentMessages.filter(
+    (message) => message.pluginMessage?.type === "review.capture",
+  ).length, reviewCountBeforeSecondPage + 1);
   window.onmessage({
     data: {
       pluginMessage: {
@@ -206,6 +334,42 @@ test("plugin UI auto-connects and reports a fast update without settings UI", as
     JSON.parse(sockets[0].lastSent).type,
     "page.import.result",
   );
+  sockets[0].onmessage({
+    data: JSON.stringify({
+      type: "page.import.undo",
+      requestId: "undo-html-1",
+      pageId: "preview-page",
+      transactionId: "conflict-html:1:test",
+    }),
+  });
+  assert.ok(parentMessages.some(
+    (message) =>
+      message.pluginMessage?.type === "page.import.undo" &&
+      message.pluginMessage.requestId === "undo-html-1",
+  ));
+  window.onmessage({
+    data: { pluginMessage: {
+      type: "page.import.undo.result",
+      requestId: "undo-html-1",
+      pageId: "preview-page",
+      transactionId: "conflict-html:1:test",
+      ok: true,
+    } },
+  });
+  assert.equal(
+    JSON.parse(sockets[0].lastSent).type,
+    "page.import.undo.result",
+  );
+  const offerCountAfterImport = parentMessages.filter(
+    (message) => message.pluginMessage?.type === "figma.design.offer.capture",
+  ).length;
+  elements.get("capture").dispatch("click");
+  assert.ok(parentMessages.some(
+    (message) => message.pluginMessage?.type === "review.capture",
+  ));
+  assert.equal(parentMessages.filter(
+    (message) => message.pluginMessage?.type === "figma.design.offer.capture",
+  ).length, offerCountAfterImport);
   sockets[0].onmessage({
     data: JSON.stringify({
       type: "page.changes.ack",
@@ -263,6 +427,7 @@ test("Figma plugin handles SVG feedback and hybrid page ChangeSets without destr
   const zoomedNodes = [];
   const page = new MockNode("PAGE", "Review");
   page.selection = [];
+  let figmaUndoSnapshot = null;
   const figma = {
     root: new MockNode("DOCUMENT", "Document"),
     currentPage: page,
@@ -291,8 +456,34 @@ test("Figma plugin handles SVG feedback and hybrid page ChangeSets without destr
     },
     showUI() {},
     async loadAllPagesAsync() {},
+    async getNodeByIdAsync(nodeId) {
+      return figma.root.id === nodeId
+        ? figma.root
+        : figma.root.findOne((node) => node.id === nodeId);
+    },
     on(type, callback) {
       callbacks.set(type, callback);
+    },
+    commitUndo() {
+      if (figmaUndoSnapshot) return;
+      const root = findImportedPageRoot(figma.currentPage);
+      if (!root || !root.parent) return;
+      figmaUndoSnapshot = {
+        parent: root.parent,
+        index: root.parent.children.indexOf(root),
+        root: cloneMockSubtree(root),
+      };
+    },
+    triggerUndo() {
+      if (!figmaUndoSnapshot) {
+        throw new Error("No Figma undo checkpoint");
+      }
+      const current = findImportedPageRoot(figma.currentPage);
+      if (!current || current.removed) {
+        throw new Error("Imported page root is unavailable");
+      }
+      restoreMockSubtree(current, figmaUndoSnapshot.root);
+      figmaUndoSnapshot = null;
     },
     createFrame() {
       const frame = new MockNode("FRAME", "Frame");
@@ -381,7 +572,7 @@ test("Figma plugin handles SVG feedback and hybrid page ChangeSets without destr
     console,
   });
   await waitFor(() => typeof figma.ui.onmessage === "function");
-  assert.notEqual(
+  assert.equal(
     legacyPageRoot.getPluginData("figmaSyncPageBaseline"),
     "",
   );
@@ -391,30 +582,10 @@ test("Figma plugin handles SVG feedback and hybrid page ChangeSets without destr
   legacyPageRoot.x += 120;
   legacyPageRoot.y += 80;
   figma.ui.onmessage({ type: "review.capture" });
-  await waitFor(
-    () =>
-      messages.filter((message) => message.type === "page.changes.emit")
-        .length > migrationChangeSetCount,
-  );
-  const migrationChangeSet = messages
-    .filter((message) => message.type === "page.changes.emit")
-    .at(-1).changeSet;
-  assert.ok(
-    migrationChangeSet.changes.some(
-      (change) =>
-        change.nodeId === "legacy-root" &&
-        change.property === "svgInsert" &&
-        Buffer.from(change.to.base64, "base64")
-          .toString("utf8")
-          .includes('id="existing-star"'),
-    ),
-  );
+  await new Promise((resolve) => setTimeout(resolve, 20));
   assert.equal(
-    migrationChangeSet.changes.some(
-      (change) =>
-        change.nodeId === "legacy-root" && ["x", "y"].includes(change.property),
-    ),
-    false,
+    messages.filter((message) => message.type === "page.changes.emit").length,
+    migrationChangeSetCount,
   );
   legacyPageRoot.remove();
 
@@ -778,6 +949,24 @@ test("Figma plugin handles SVG feedback and hybrid page ChangeSets without destr
   );
   let pageRoot = findImportedPageRoot(page);
   assert.ok(pageRoot);
+  const firstPageResult = messages.find(
+    (message) => message.type === "page.result" && message.pageId === "landing-page" && message.ok,
+  );
+  assert.equal(
+    firstPageResult.nodeMappings.find((mapping) => mapping.pageNodeId === "hero-title").figmaNodeId,
+    findImportedPageNode(pageRoot, "hero-title").id,
+  );
+  const focusedTitle = findImportedPageNode(pageRoot, "hero-title");
+  page.selection = [];
+  figma.ui.onmessage({
+    type: "page.node.locate",
+    pageId: "landing-page",
+    figmaNodeId: focusedTitle.id,
+  });
+  await delay(0);
+  assert.equal(page.selection.length, 1);
+  assert.equal(page.selection[0], focusedTitle);
+  assert.equal(zoomedNodes.at(-1), focusedTitle);
   const currentAssetRoot = findAssetRoot(page);
   assert.ok(
     pageRoot.x >= currentAssetRoot.x + currentAssetRoot.width + 160,
@@ -930,6 +1119,103 @@ test("Figma plugin handles SVG feedback and hybrid page ChangeSets without destr
   assert.equal(protectedResult.code, "unsent_figma_changes");
   assert.equal(findImportedPageRoot(page), protectedRoot);
   assert.equal(protectedRoot.getPluginData("figmaSyncSourceHash"), "page-hash-1");
+
+  const sameHashResolutionManifest = pageManifest("page-hash-1");
+  sameHashResolutionManifest.conflictResolution = {
+    direction: "html",
+    transactionId: "conflict-html:same-hash-plugin-test",
+  };
+  const sameHashResolutionResultCount = messages.filter(
+    (message) => message.type === "page.result",
+  ).length;
+  figma.ui.onmessage({
+    type: "page.upsert",
+    page: sameHashResolutionManifest,
+  });
+  await waitFor(
+    () =>
+      messages.filter((message) => message.type === "page.result").length >
+      sameHashResolutionResultCount,
+  );
+  const sameHashResolutionResult = messages
+    .filter((message) => message.type === "page.result")
+    .at(-1);
+  assert.equal(sameHashResolutionResult.ok, true);
+  assert.equal(
+    sameHashResolutionResult.transactionId,
+    "conflict-html:same-hash-plugin-test",
+  );
+  assert.equal(titleNode.fontSize, 48);
+
+  figma.ui.onmessage({
+    type: "page.import.undo",
+    requestId: "undo-html-same-hash-plugin-test",
+    pageId: "landing-page",
+    transactionId: "conflict-html:same-hash-plugin-test",
+  });
+  await waitFor(() => messages.some(
+    (message) =>
+      message.type === "page.import.undo.result" &&
+      message.requestId === "undo-html-same-hash-plugin-test",
+  ));
+  const sameHashUndoResult = messages.find(
+    (message) =>
+      message.type === "page.import.undo.result" &&
+      message.requestId === "undo-html-same-hash-plugin-test",
+  );
+  assert.equal(sameHashUndoResult.ok, true, sameHashUndoResult.error);
+  assert.equal(pageRoot.itemSpacing, 40);
+  assert.equal(titleNode.fontSize, 56);
+
+  const htmlResolutionManifest = pageManifest("page-hash-html-resolution");
+  htmlResolutionManifest.conflictResolution = {
+    direction: "html",
+    transactionId: "conflict-html:plugin-test",
+  };
+  const htmlResolutionResultCount = messages.filter(
+    (message) => message.type === "page.result",
+  ).length;
+  figma.ui.onmessage({
+    type: "page.upsert",
+    page: htmlResolutionManifest,
+  });
+  await waitFor(
+    () =>
+      messages.filter((message) => message.type === "page.result").length >
+      htmlResolutionResultCount,
+  );
+  const htmlResolutionResult = messages
+    .filter((message) => message.type === "page.result")
+    .at(-1);
+  assert.equal(htmlResolutionResult.ok, true);
+  assert.equal(
+    htmlResolutionResult.transactionId,
+    "conflict-html:plugin-test",
+  );
+  assert.equal(pageRoot.getPluginData("figmaSyncSourceHash"), "page-hash-html-resolution");
+  assert.equal(titleNode.fontSize, 48);
+
+  figma.ui.onmessage({
+    type: "page.import.undo",
+    requestId: "undo-html-plugin-test",
+    pageId: "landing-page",
+    transactionId: "conflict-html:plugin-test",
+  });
+  await waitFor(() => messages.some(
+    (message) =>
+      message.type === "page.import.undo.result" &&
+      message.requestId === "undo-html-plugin-test",
+  ));
+  const htmlUndoResult = messages.find(
+    (message) =>
+      message.type === "page.import.undo.result" &&
+      message.requestId === "undo-html-plugin-test",
+  );
+  assert.equal(htmlUndoResult.ok, true, htmlUndoResult.error);
+  assert.equal(pageRoot.getPluginData("figmaSyncSourceHash"), "page-hash-1");
+  assert.equal(pageRoot.itemSpacing, 40);
+  assert.equal(titleNode.fontSize, 56);
+
   const initialPageChangeSetCount = messages.filter(
     (message) => message.type === "page.changes.emit",
   ).length;
@@ -949,7 +1235,8 @@ test("Figma plugin handles SVG feedback and hybrid page ChangeSets without destr
     ),
   );
   assert.equal(pageChangeSet.pageId, "landing-page");
-  assert.equal(pageChangeSet.protocolVersion, 14);
+  assert.equal(pageChangeSet.protocolVersion, 16);
+  assert.equal(pageChangeSet.runtimeIdentity.pageIrSchemaVersion, 2);
   assert.ok(
     pageChangeSet.changes.some(
       (change) =>
@@ -1617,7 +1904,7 @@ test("Figma plugin handles SVG feedback and hybrid page ChangeSets without destr
           message.type === "page.result" &&
           message.pageId === "landing-page" &&
           message.ok,
-      ).length === 3,
+      ).length === 5,
   );
   pageRoot = findImportedPageRoot(page);
   assert.equal(pageRoot, stablePageRoot);
@@ -1746,7 +2033,7 @@ test("Figma plugin handles SVG feedback and hybrid page ChangeSets without destr
           message.type === "page.result" &&
           message.pageId === "landing-page" &&
           message.ok,
-      ).length === 4,
+      ).length === 6,
   );
   pageRoot = findImportedPageRoot(page);
   titleNode = findImportedPageNode(pageRoot, "hero-title");
@@ -2042,6 +2329,7 @@ test("Figma plugin handles SVG feedback and hybrid page ChangeSets without destr
         primarySizing: "fixed",
         counterSizing: "fixed",
       },
+      constraints: { horizontal: "STRETCH", vertical: "MAX" },
       children: [],
     },
   ];
@@ -2064,6 +2352,8 @@ test("Figma plugin handles SVG feedback and hybrid page ChangeSets without destr
   assert.equal(absoluteChild.layoutPositioning, "AUTO");
   assert.equal(absoluteChild.x, 80);
   assert.equal(absoluteChild.y, 120);
+  assert.equal(absoluteChild.constraints.horizontal, "STRETCH");
+  assert.equal(absoluteChild.constraints.vertical, "MAX");
 
   const failedPage = new MockNode("PAGE", "Failed import");
   figma.root.appendChild(failedPage);
@@ -2110,6 +2400,7 @@ test("Figma plugin seeds an empty Codex page from one selected frame", async () 
   const source = await readFile(new URL("../plugin/code.js", import.meta.url), "utf8");
   const messages = [];
   const callbacks = new Map();
+  const storage = new Map();
   const page = new MockNode("PAGE", "Figma source");
   page.selection = [];
   const figma = {
@@ -2131,13 +2422,20 @@ test("Figma plugin seeds an empty Codex page from one selected frame", async () 
       },
     },
     clientStorage: {
-      async getAsync() {
-        return undefined;
+      async getAsync(key) {
+        return storage.get(key);
       },
-      async setAsync() {},
+      async setAsync(key, value) {
+        storage.set(key, value);
+      },
     },
     showUI() {},
     async loadAllPagesAsync() {},
+    async getNodeByIdAsync(nodeId) {
+      return figma.root.id === nodeId
+        ? figma.root
+        : figma.root.findOne((node) => node.id === nodeId);
+    },
     on(type, callback) {
       callbacks.set(type, callback);
     },
@@ -2145,8 +2443,8 @@ test("Figma plugin seeds an empty Codex page from one selected frame", async () 
   };
   figma.root.appendChild(page);
   const frame = new MockNode("FRAME", "Landing page");
-  frame.width = 390;
-  frame.height = 844;
+  frame.width = 402;
+  frame.height = 874;
   frame.layoutMode = "VERTICAL";
   frame.itemSpacing = 16;
   frame.paddingTop = 24;
@@ -2178,6 +2476,22 @@ test("Figma plugin seeds an empty Codex page from one selected frame", async () 
     visible: true,
   }];
   frame.appendChild(title);
+  const atomicIcon = new MockNode("FRAME", "Play circle");
+  atomicIcon.width = 16;
+  atomicIcon.height = 16;
+  const atomicIconVector = new MockNode("VECTOR", "Play glyph");
+  atomicIconVector.width = 16;
+  atomicIconVector.height = 16;
+  atomicIcon.appendChild(atomicIconVector);
+  frame.appendChild(atomicIcon);
+  const hiddenVector = new MockNode("VECTOR", "Hidden decoration");
+  hiddenVector.width = 24;
+  hiddenVector.height = 24;
+  hiddenVector.visible = false;
+  hiddenVector.exportError = new Error(
+    "Failed to export node. This node may not have any visible layers.",
+  );
+  frame.appendChild(hiddenVector);
   page.appendChild(frame);
   page.selection = [frame];
 
@@ -2194,6 +2508,7 @@ test("Figma plugin seeds an empty Codex page from one selected frame", async () 
     pageId: "seed-page",
     sourceHash: "seed-hash",
     requestId: "seed-request",
+    projectKey: "seed-project",
   });
   await waitFor(() => messages.some((message) => message.type === "page.changes.emit"));
   const emitted = messages.find((message) => message.type === "page.changes.emit");
@@ -2201,13 +2516,166 @@ test("Figma plugin seeds an empty Codex page from one selected frame", async () 
   assert.equal(emitted.changeSet.pageId, "seed-page");
   assert.equal(emitted.changeSet.changes[0].property, "pageSeed");
   assert.equal(emitted.changeSet.changes[0].to.node.id, "page-root");
+  assert.equal(emitted.changeSet.changes[0].to.node.figmaNodeId, frame.id);
+  assert.equal(emitted.changeSet.changes[0].to.node.children[0].figmaNodeId, title.id);
+  assert.equal(emitted.changeSet.figma.fileKey, "figma-seed-file");
   assert.equal(
     emitted.changeSet.changes[0].to.node.children[0].text,
     "From Figma",
   );
+  assert.equal(
+    emitted.changeSet.changes[0].to.node.children[2].degradation.reason,
+    "图层不可见或无法导出",
+  );
+  assert.equal(emitted.changeSet.changes[0].to.node.children[1].type, "image");
   assert.equal(frame.getPluginData("figmaSyncRole"), "page-root");
   assert.equal(frame.getPluginData("figmaSyncPageNodeId"), "page-root");
+  assert.equal(frame.getPluginData("figmaSyncProjectKey"), "seed-project");
   assert.equal(title.getPluginData("figmaSyncRole"), "page-node");
+  assert.equal(hiddenVector.getPluginData("figmaSyncPageNodeType"), "frame");
+
+  figma.ui.onmessage({
+    type: "page.changes.accepted",
+    pageId: "seed-page",
+    sourceHash: "seed-hash-after",
+    changeSetId: emitted.changeSet.changeSetId,
+  });
+  assert.equal(frame.getPluginData("figmaSyncSourceHash"), "seed-hash-after");
+  assert.equal(title.getPluginData("figmaSyncSourceHash"), "seed-hash-after");
+
+  figma.ui.onmessage({
+    type: "figma.design.offer.capture",
+    offerId: "offer-linked-page",
+    sessionId: "session-linked-page",
+    projectKey: "",
+  });
+  await waitFor(() => messages.some(
+    (message) => message.type === "figma.design.offer.emit",
+  ));
+  const linkedOffer = messages.find(
+    (message) => message.type === "figma.design.offer.emit",
+  ).offer;
+  const designRecovery = storage.get("cdbDesignRecovery");
+  assert.equal(designRecovery.sessionId, "session-linked-page");
+  assert.equal(designRecovery.offerId, "offer-linked-page");
+  assert.ok(Number.isFinite(Date.parse(designRecovery.updatedAt)));
+  assert.equal(linkedOffer.linkedProjectKey, "seed-project");
+  assert.equal(linkedOffer.linkedPageId, "seed-page");
+
+  frame.setPluginData("figmaSyncPageLayout", JSON.stringify({
+    kind: "grid",
+    direction: "none",
+    gap: 16,
+    counterGap: 12,
+    padding: { top: 24, right: 24, bottom: 24, left: 24 },
+    align: "start",
+    justify: "start",
+    wrap: false,
+    primarySizing: "fixed",
+    counterSizing: "fixed",
+    grid: { columns: "repeat(2, minmax(0, 1fr))", rows: "auto" },
+  }));
+  title.setPluginData("figmaSyncPageLayoutItem", JSON.stringify({
+    align: "auto",
+    grow: 0,
+    shrink: 1,
+    basis: "auto",
+    order: 0,
+    positioning: "auto",
+    horizontalSizing: "fixed",
+    verticalSizing: "fixed",
+    gridRow: "1",
+    gridColumn: "2",
+  }));
+  title.constraints = { horizontal: "MAX", vertical: "CENTER" };
+  frame.x = 321;
+  frame.y = 654;
+  title.x = 80;
+  title.y = 120;
+
+  const errorCount = messages.filter((message) => message.type === "plugin.error").length;
+  figma.ui.onmessage({
+    type: "figma.design.payload.capture",
+    offerId: "offer-hidden-vector",
+    sessionId: "session-hidden-vector",
+    rootNodeId: frame.id,
+    estimatedNodeCount: 5,
+  });
+  await waitFor(() => messages.some((message) => message.type === "figma.design.payload.emit"));
+  const payload = messages.find((message) => message.type === "figma.design.payload.emit").payload;
+  assert.equal(payload.report.nodeCount, 4);
+  assert.equal(payload.report.degradations.length, 1);
+  assert.equal(payload.report.degradations[0].reason, "resource_export_failed");
+  assert.equal(payload.pageSeed.node.children[1].type, "image");
+  assert.equal(payload.pageSeed.node.children[1].tag, "img");
+  assert.equal(payload.pageSeed.node.children[1].children, undefined);
+  assert.equal(payload.pageSeed.node.children[1].image.mimeType, "image/png");
+  assert.equal(payload.pageSeed.node.children[2].type, "frame");
+  assert.equal(payload.pageSeed.node.children[2].tag, "div");
+  assert.equal(payload.pageSeed.node.children[2].degradation.reason, "图层不可见或无法导出");
+  assert.equal(payload.pageSeed.node.layout.kind, "grid");
+  assert.equal(payload.pageSeed.node.layout.grid.columns, "repeat(2, minmax(0, 1fr))");
+  assert.equal(payload.pageSeed.node.children[0].layoutItem.gridColumn, "2");
+  assert.equal(payload.pageSeed.node.children[0].constraints.horizontal, "MAX");
+  assert.equal(payload.pageSeed.node.children[0].constraints.vertical, "CENTER");
+  assert.equal(payload.pageSeed.node.children[0].textCase, "ORIGINAL");
+  assert.equal(payload.pageSeed.node.children[0].textDecoration, "NONE");
+  assert.equal(payload.pageSeed.node.x, 0);
+  assert.equal(payload.pageSeed.node.y, 0);
+  assert.equal(payload.pageSeed.node.children[0].x, 80);
+  assert.equal(payload.pageSeed.node.children[0].y, 120);
+  assert.equal(messages.filter((message) => message.type === "plugin.error").length, errorCount);
+
+  frame.maxPluginDataValueLength = 25_000;
+  for (let index = 0; index < 180; index += 1) {
+    const decoration = new MockNode(
+      "RECTANGLE",
+      `Large page decoration ${index} ${"x".repeat(160)}`,
+    );
+    decoration.width = 12;
+    decoration.height = 12;
+    frame.appendChild(decoration);
+  }
+
+  figma.ui.onmessage({
+    type: "figma.design.result.accepted",
+    result: {
+      pageId: "offer-page",
+      projectKey: "offer-project",
+      sourceHash: "offer-source-hash",
+      rootNodeId: frame.id,
+      nodeMappings: [
+        {
+          pageNodeId: "page-root",
+          figmaNodeId: frame.id,
+          nodeType: "frame",
+          sourceRef: { selector: '[data-codex-id="page-root"]' },
+        },
+        {
+          pageNodeId: "offer-title",
+          figmaNodeId: title.id,
+          nodeType: "text",
+          sourceRef: { selector: '[data-codex-id="offer-title"]' },
+        },
+      ],
+    },
+  });
+  await waitFor(() => frame.getPluginData("figmaSyncPageId") === "offer-page");
+  await waitFor(() => storage.get("cdbDesignRecovery") === null);
+  assert.equal(frame.getPluginData("figmaSyncProjectKey"), "offer-project");
+  assert.equal(frame.getPluginData("figmaSyncSourceHash"), "offer-source-hash");
+  assert.equal(title.getPluginData("figmaSyncPageNodeId"), "offer-title");
+  assert.equal(title.getPluginData("figmaSyncSourceHash"), "offer-source-hash");
+  const structureMeta = JSON.parse(
+    frame.getPluginData("figmaSyncPageStructureBaselineMeta"),
+  );
+  assert.equal(structureMeta.format, 2);
+  assert.ok(structureMeta.chunkCount > 1);
+  assert.equal(frame.getPluginData("figmaSyncPageStructureBaseline"), "");
+  assert.equal(
+    messages.filter((message) => message.type === "page.changes.status").at(-1).unsentChanges,
+    false,
+  );
 });
 
 function asset(sourceHash, fragment) {
@@ -2529,6 +2997,29 @@ function cloneMockSubtree(node) {
   return clone;
 }
 
+function restoreMockSubtree(target, snapshot) {
+  for (const [key, value] of Object.entries(snapshot)) {
+    if (["id", "parent", "children", "removed", "pluginData"].includes(key)) {
+      continue;
+    }
+    target[key] = value && typeof value === "object"
+      ? JSON.parse(JSON.stringify(value))
+      : value;
+  }
+  target.pluginData = new Map(snapshot.pluginData);
+  for (let index = 0; index < snapshot.children.length; index += 1) {
+    const snapshotChild = snapshot.children[index];
+    const pageNodeId = snapshotChild.getPluginData("figmaSyncPageNodeId");
+    const targetChild = pageNodeId
+      ? target.children.find(
+          (child) =>
+            child.getPluginData("figmaSyncPageNodeId") === pageNodeId,
+        )
+      : target.children[index];
+    if (targetChild) restoreMockSubtree(targetChild, snapshotChild);
+  }
+}
+
 class MockNode {
   static nextId = 1;
 
@@ -2576,6 +3067,7 @@ class MockNode {
     this.layoutPositioning = "AUTO";
     this.layoutSizingHorizontal = "FIXED";
     this.layoutSizingVertical = "FIXED";
+    this.constraints = { horizontal: "MIN", vertical: "MIN" };
     this.annotations = [];
     this.pluginData = new Map();
   }
@@ -2586,6 +3078,12 @@ class MockNode {
   }
 
   setPluginData(key, value) {
+    if (
+      Number.isInteger(this.maxPluginDataValueLength) &&
+      value.length > this.maxPluginDataValueLength
+    ) {
+      throw new Error(`Plugin data value exceeds ${this.maxPluginDataValueLength} characters`);
+    }
     this.pluginData.set(key, value);
   }
 

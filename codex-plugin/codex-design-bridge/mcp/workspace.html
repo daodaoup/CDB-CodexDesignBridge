@@ -261,6 +261,34 @@
         overflow: auto;
       }
 
+      .workspace-offers {
+        display: grid;
+        gap: 6px;
+      }
+
+      .workspace-offer {
+        display: grid;
+        gap: 6px;
+        padding: 8px;
+        border: 1px solid rgba(196, 167, 255, 0.28);
+        border-radius: 8px;
+        background: rgba(196, 167, 255, 0.08);
+      }
+
+      .workspace-offer strong {
+        overflow: hidden;
+        color: #e7ddff;
+        font-size: 10px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .workspace-offer .button {
+        min-height: 30px;
+        padding: 5px 7px;
+        font-size: 10px;
+      }
+
       .page-row {
         min-width: 0;
       }
@@ -1053,6 +1081,12 @@
         color: #84ffd5;
       }
 
+      .page-panel .clear-page {
+        border-color: rgba(239, 100, 117, 0.28);
+        background: rgba(239, 100, 117, 0.07);
+        color: #f6a2ad;
+      }
+
       .page-panel .button:hover { filter: brightness(1.08); }
 
       #importDialog {
@@ -1168,6 +1202,179 @@
         font-size: 10px;
       }
 
+      .verification-card {
+        position: absolute;
+        top: 58px;
+        left: 20px;
+        z-index: 5;
+        min-width: 210px;
+        max-width: min(420px, calc(100% - 40px));
+        padding: 9px 11px;
+        border: 1px solid rgba(49, 196, 141, 0.28);
+        border-radius: 9px;
+        background: rgba(13, 20, 18, 0.9);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.24);
+        backdrop-filter: blur(12px);
+        pointer-events: none;
+      }
+
+      .verification-card.failed {
+        border-color: rgba(239, 103, 94, 0.34);
+        background: rgba(31, 15, 16, 0.92);
+        pointer-events: auto;
+      }
+
+      .verification-card strong {
+        display: block;
+        margin-bottom: 3px;
+        color: #8ee2bd;
+        font-size: 11px;
+        font-weight: 680;
+      }
+
+      .verification-card.failed strong { color: #ff9d96; }
+
+      .verification-card span {
+        display: block;
+        color: #8a8a95;
+        font-size: 10px;
+        line-height: 1.45;
+      }
+
+      .verification-differences {
+        display: grid;
+        gap: 3px;
+        margin-top: 7px;
+      }
+
+      .verification-difference {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        width: 100%;
+        min-width: 0;
+        padding: 2px 0;
+      }
+
+      .verification-difference-main {
+        flex: 1;
+        min-width: 0;
+        padding: 0;
+        border: 0;
+        overflow: hidden;
+        background: transparent;
+        color: #b8b8c2;
+        cursor: pointer;
+        font-size: 9px;
+        line-height: 1.4;
+        text-align: left;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .verification-difference-main:hover { color: #ffffff; }
+
+      .verification-difference-actions {
+        display: flex;
+        flex: 0 0 auto;
+        gap: 3px;
+      }
+
+      .verification-difference-action {
+        padding: 2px 5px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.05);
+        color: #c9c9d2;
+        cursor: pointer;
+        font: inherit;
+        font-size: 8px;
+      }
+
+      .verification-difference-action:hover { color: #ffffff; }
+      .verification-difference-action:disabled { cursor: wait; opacity: 0.58; }
+
+      .verification-review-button {
+        margin-top: 8px;
+        padding: 5px 8px;
+        border: 1px solid rgba(255, 157, 150, 0.36);
+        border-radius: 6px;
+        background: rgba(255, 157, 150, 0.1);
+        color: #ffd0cc;
+        cursor: pointer;
+        font: inherit;
+        font-size: 9px;
+      }
+
+      .verification-node-highlight {
+        position: absolute;
+        z-index: 8;
+        border: 2px solid #ff5148;
+        background: rgba(255, 81, 72, 0.12);
+        box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.78), 0 0 22px rgba(255, 81, 72, 0.68);
+        pointer-events: none;
+      }
+
+      .verification-dialog {
+        width: min(920px, calc(100vw - 48px));
+        max-width: none;
+        padding: 0;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 14px;
+        background: #111116;
+        color: #ededf0;
+        box-shadow: 0 30px 90px rgba(0, 0, 0, 0.6);
+      }
+
+      .verification-dialog::backdrop { background: rgba(0, 0, 0, 0.72); }
+
+      .source-location-code {
+        box-sizing: border-box;
+        min-height: 220px;
+        max-height: 68vh;
+        margin: 0;
+        padding: 16px;
+        overflow: auto;
+        background: #08080b;
+        color: #d8d8df;
+        font: 11px/1.65 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        white-space: pre;
+      }
+
+      .verification-review-header,
+      .verification-review-controls {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 12px 14px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .verification-review-header h2 { margin: 0; font-size: 14px; }
+
+      .verification-review-canvas-wrap {
+        display: grid;
+        min-height: 280px;
+        max-height: 68vh;
+        padding: 14px;
+        overflow: auto;
+        background: #08080b;
+        place-items: center;
+      }
+
+      .verification-review-canvas {
+        display: block;
+        max-width: 100%;
+        max-height: 62vh;
+        background: #ffffff;
+      }
+
+      .verification-review-controls { border-top: 1px solid rgba(255, 255, 255, 0.08); border-bottom: 0; }
+      .verification-review-controls input[type="range"] { flex: 1; min-width: 120px; }
+      .verification-review-mode { display: flex; gap: 6px; }
+      .verification-review-mode button[aria-pressed="true"] { color: #fff; border-color: #6d5ef7; background: rgba(109, 94, 247, 0.2); }
+
       .viewport {
         position: absolute;
         top: 50%;
@@ -1254,6 +1461,19 @@
         font-size: 11px;
         font-weight: 650;
         letter-spacing: 0;
+      }
+
+      .canvas-zoom select {
+        height: 36px;
+        padding: 0 10px;
+        border: 0;
+        border-right: 1px solid var(--line);
+        outline: 0;
+        background: #15151a;
+        color: #a2a2ad;
+        font: inherit;
+        font-size: 10px;
+        cursor: pointer;
       }
 
       .close-session svg {
@@ -1378,6 +1598,15 @@
       }
       .launcher-actions { display: flex; gap: 8px; }
       .launcher-actions .button { flex: 1; }
+      .offer-list { display: grid; gap: 10px; margin-bottom: 12px; }
+      .offer-card {
+        padding: 14px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: var(--panel);
+      }
+      .offer-card strong { display: block; margin-bottom: 5px; }
+      .offer-card p { min-height: 0; margin: 0 0 12px; }
       .preflight-action { margin-top: 14px; }
 
       [hidden] { display: none !important; }
@@ -1405,9 +1634,10 @@
     <main class="app">
       <section class="launcher" id="launcherView" aria-label="CDB 启动器" hidden>
         <h1>CDB</h1>
-        <p>从现有 Figma 页面开始，或直接描述要创建的新设计。</p>
+        <p>从本地静态项目或现有 Figma 页面开始。</p>
+        <div class="offer-list" id="launcherOffers" aria-live="polite"></div>
         <div class="launcher-grid">
-          <div class="launcher-card" id="launcherDropZone" hidden>
+          <div class="launcher-card" id="launcherDropZone">
             <strong>打开项目</strong>
             <p>拖入 HTML 文件或完整文件夹，依赖会保留但不会成为页面。</p>
             <div class="launcher-actions">
@@ -1417,10 +1647,10 @@
           </div>
           <div class="launcher-card">
             <strong>从 Figma 开始</strong>
-            <p>创建一个空白页面工作台，再把 Figma 中选中的完整页面 Frame 生成到 Codex。</p>
-            <button class="button" id="launcherFigma" type="button">连接 Figma 页面</button>
+            <p>在 Figma 中发送完整页面 Frame；本地收件箱会自动接收并保留任务。</p>
+            <button class="button" id="launcherFigma" type="button">刷新 Figma 收件箱</button>
           </div>
-          <div class="launcher-card">
+          <div class="launcher-card" id="launcherCreateCard">
             <strong>新建设计</strong>
             <p>提交后会通过当前 Codex 任务按 CDB 规则创建，不需要选择框架。</p>
             <textarea id="launcherDescription" placeholder="例如：做一个面向独立摄影师的作品集首页"></textarea>
@@ -1483,10 +1713,15 @@
               <h2 class="page-panel-title">Pages</h2>
               <span class="page-count" id="pageCount">0 个</span>
             </div>
+            <div class="workspace-offers" id="workspaceOffers" aria-live="polite"></div>
             <div class="page-list" id="pageList"></div>
             <div class="sidebar-actions">
               <button class="import-project" id="importProjectButton" hidden>＋ 导入 HTML 项目</button>
               <button class="button receive-changes" id="receiveButton" hidden>让 Codex 处理</button>
+              <button class="button" id="acceptHtmlConflictButton" hidden>保留 HTML 并更新 Figma</button>
+              <button class="button" id="acceptFigmaConflictButton" hidden>接受 Figma 并更新源码</button>
+              <button class="button" id="copyFigmaConflictButton" hidden>复制 Figma 为新页面</button>
+              <button class="button" id="undoConflictResolutionButton" hidden>撤销冲突解决</button>
               <button class="button current-send" id="figmaButton" hidden>
                 <span class="sidebar-button-content">
                   <span id="figmaButtonLabel">更新当前页面</span>
@@ -1494,6 +1729,7 @@
                 </span>
               </button>
               <button class="button" id="undoButton" title="撤销上次修改" hidden>撤销上次修改</button>
+              <button class="button clear-page" id="removePageButton">清除当前页面</button>
               <button class="button current-send" id="primaryButton" disabled>
                 <span class="sidebar-button-content">
                   <span id="primaryButtonLabel">当前页面</span>
@@ -1514,6 +1750,12 @@
               <span class="canvas-title" id="canvasTitle">页面</span>
               <span class="canvas-subtitle" id="viewportLabel">视图缩放 · 100%</span>
             </div>
+            <div class="verification-card" id="verificationCard" hidden>
+              <strong id="verificationTitle">视觉验收通过</strong>
+              <span id="verificationCopy"></span>
+              <div class="verification-differences" id="verificationDifferences"></div>
+              <button class="verification-review-button" id="verificationReviewButton" type="button" hidden>查看视觉对比</button>
+            </div>
             <div class="viewport" id="viewport">
               <iframe
                 class="preview-frame"
@@ -1527,6 +1769,7 @@
                 aria-label="前端页面静态预览"
                 hidden
               ></canvas>
+              <div class="verification-node-highlight" id="verificationNodeHighlight" hidden></div>
               <div class="empty" id="emptyState">
                 <div class="empty-icon">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
@@ -1545,6 +1788,16 @@
             </div>
 
             <div class="canvas-zoom" id="zoomControl" aria-label="视图缩放">
+              <select id="previewModeSelect" aria-label="预览模式" title="选择 1:1、适应窗口或验收断点">
+                <option value="fit">适应窗口</option>
+                <option value="one-to-one">1:1</option>
+                <option value="breakpoint:320">验收 320</option>
+                <option value="breakpoint:375">验收 375</option>
+                <option value="breakpoint:402">验收 402</option>
+                <option value="breakpoint:430">验收 430</option>
+                <option value="breakpoint:768">验收 768</option>
+                <option value="breakpoint:1440">验收 1440</option>
+              </select>
               <button id="zoomOutButton" type="button" title="缩小视图" aria-label="缩小视图">−</button>
               <strong id="zoomValue">100%</strong>
               <button id="zoomInButton" type="button" title="放大视图" aria-label="放大视图">＋</button>
@@ -1574,6 +1827,32 @@
       </section>
     </main>
 
+    <dialog class="verification-dialog" id="verificationDialog" aria-labelledby="verificationDialogTitle">
+      <div class="verification-review-header">
+        <h2 id="verificationDialogTitle">Figma / HTML 视觉对比</h2>
+        <button class="button" id="closeVerificationDialogButton" type="button">关闭</button>
+      </div>
+      <div class="verification-review-canvas-wrap">
+        <canvas class="verification-review-canvas" id="verificationReviewCanvas"></canvas>
+      </div>
+      <div class="verification-review-controls">
+        <div class="verification-review-mode">
+          <button class="button" id="verificationOverlayModeButton" type="button" aria-pressed="true">叠加滑杆</button>
+          <button class="button" id="verificationHeatmapModeButton" type="button" aria-pressed="false">差异热区</button>
+        </div>
+        <input id="verificationMixRange" type="range" min="0" max="100" value="50" aria-label="HTML 覆盖比例" />
+        <span id="verificationMixLabel">HTML 50%</span>
+      </div>
+    </dialog>
+
+    <dialog class="verification-dialog" id="sourceLocationDialog" aria-labelledby="sourceLocationDialogTitle">
+      <div class="verification-review-header">
+        <h2 id="sourceLocationDialogTitle">源码位置</h2>
+        <button class="button" id="closeSourceLocationDialogButton" type="button">关闭</button>
+      </div>
+      <pre class="source-location-code" id="sourceLocationCode"></pre>
+    </dialog>
+
     <dialog id="endDialog" aria-labelledby="endDialogTitle">
       <div class="dialog-content">
         <h2 id="endDialogTitle">仍要关闭当前任务吗？</h2>
@@ -1581,6 +1860,17 @@
         <div class="dialog-actions">
           <button class="button" id="cancelEndButton">返回继续</button>
           <button class="button danger" id="confirmEndButton">仍要关闭</button>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="removePageDialog" aria-labelledby="removePageDialogTitle">
+      <div class="dialog-content">
+        <h2 id="removePageDialogTitle">清除当前页面？</h2>
+        <p id="removePageDialogCopy">页面只会从 CDB 页面列表移除；HTML、CSS、图片和 Figma 画布都会保留。</p>
+        <div class="dialog-actions">
+          <button class="button" id="cancelRemovePageButton">返回继续</button>
+          <button class="button danger" id="confirmRemovePageButton">清除页面</button>
         </div>
       </div>
     </dialog>
@@ -1637,15 +1927,35 @@
           launcherChooseFolder: document.getElementById("launcherChooseFolder"),
           launcherChooseHtml: document.getElementById("launcherChooseHtml"),
           launcherFigma: document.getElementById("launcherFigma"),
+          launcherCreateCard: document.getElementById("launcherCreateCard"),
           launcherDescription: document.getElementById("launcherDescription"),
           launcherCreate: document.getElementById("launcherCreate"),
           launcherStatus: document.getElementById("launcherStatus"),
+          launcherOffers: document.getElementById("launcherOffers"),
+          workspaceOffers: document.getElementById("workspaceOffers"),
           projectName: document.getElementById("projectName"),
           workspaceLabel: document.getElementById("workspaceLabel"),
           connectionPill: document.getElementById("connectionPill"),
           version: document.getElementById("versionLabel"),
           canvasTitle: document.getElementById("canvasTitle"),
           viewportLabel: document.getElementById("viewportLabel"),
+          verificationCard: document.getElementById("verificationCard"),
+          verificationTitle: document.getElementById("verificationTitle"),
+          verificationCopy: document.getElementById("verificationCopy"),
+          verificationDifferences: document.getElementById("verificationDifferences"),
+          verificationReview: document.getElementById("verificationReviewButton"),
+          verificationNodeHighlight: document.getElementById("verificationNodeHighlight"),
+          verificationDialog: document.getElementById("verificationDialog"),
+          closeVerificationDialog: document.getElementById("closeVerificationDialogButton"),
+          verificationReviewCanvas: document.getElementById("verificationReviewCanvas"),
+          verificationOverlayMode: document.getElementById("verificationOverlayModeButton"),
+          verificationHeatmapMode: document.getElementById("verificationHeatmapModeButton"),
+          verificationMixRange: document.getElementById("verificationMixRange"),
+          verificationMixLabel: document.getElementById("verificationMixLabel"),
+          sourceLocationDialog: document.getElementById("sourceLocationDialog"),
+          sourceLocationDialogTitle: document.getElementById("sourceLocationDialogTitle"),
+          sourceLocationCode: document.getElementById("sourceLocationCode"),
+          closeSourceLocationDialog: document.getElementById("closeSourceLocationDialogButton"),
           previewStage: document.getElementById("previewStage"),
           viewport: document.getElementById("viewport"),
           preview: document.getElementById("preview"),
@@ -1674,12 +1984,23 @@
           sendAll: document.getElementById("sendAllButton"),
           sendAllLabel: document.getElementById("sendAllButtonLabel"),
           zoomOut: document.getElementById("zoomOutButton"),
+          previewMode: document.getElementById("previewModeSelect"),
           zoomValue: document.getElementById("zoomValue"),
           zoomIn: document.getElementById("zoomInButton"),
           figma: document.getElementById("figmaButton"),
           figmaLabel: document.getElementById("figmaButtonLabel"),
           receive: document.getElementById("receiveButton"),
+          acceptHtmlConflict: document.getElementById("acceptHtmlConflictButton"),
+          acceptFigmaConflict: document.getElementById("acceptFigmaConflictButton"),
+          copyFigmaConflict: document.getElementById("copyFigmaConflictButton"),
+          undoConflictResolution: document.getElementById("undoConflictResolutionButton"),
           undo: document.getElementById("undoButton"),
+          removePage: document.getElementById("removePageButton"),
+          removePageDialog: document.getElementById("removePageDialog"),
+          removePageDialogTitle: document.getElementById("removePageDialogTitle"),
+          removePageDialogCopy: document.getElementById("removePageDialogCopy"),
+          cancelRemovePage: document.getElementById("cancelRemovePageButton"),
+          confirmRemovePage: document.getElementById("confirmRemovePageButton"),
           primary: document.getElementById("primaryButton"),
           primaryLabel: document.getElementById("primaryButtonLabel"),
           openHtml: document.getElementById("openHtmlButton"),
@@ -1705,21 +2026,31 @@
         let previewLoadTimer = null;
         let openingHtml = false;
         let importingProject = false;
+        let removingPage = false;
         const PREVIEW_MIN_ZOOM = 50;
         const PREVIEW_MAX_ZOOM = 300;
         const PREVIEW_PAN_GUTTER = 32;
         let previewZoom = 100;
+        let previewMode = "fit";
+        let previewBreakpointWidth = null;
         let previewFitScale = 1;
         let previewPanX = 0;
         let previewPanY = 0;
         let previewPointerId = null;
         let previewPointerX = 0;
         let previewPointerY = 0;
+        let verificationImages = null;
+        let verificationBitmaps = [];
+        let verificationReviewMode = "overlay";
+        let verificationHighlightTimer = null;
         let displayMode = normalizeDisplayMode(compatibilityBridge?.displayMode);
         let pollTimer = null;
         let polling = false;
         let handoffInFlight = false;
         let lastHandoffSnapshotPath = "";
+        let processingSnapshotPath = "";
+        let failedHandoffSnapshotPath = "";
+        let handoffTimer = null;
 
         window.addEventListener(
           "message",
@@ -1774,6 +2105,40 @@
         });
         elements.preview.addEventListener("error", () => {
           void loadPreviewFallback(previewRequestId);
+        });
+        elements.verificationReview.addEventListener("click", () => {
+          void openVerificationReview();
+        });
+        elements.closeVerificationDialog.addEventListener("click", () => {
+          elements.verificationDialog.close();
+        });
+        elements.closeSourceLocationDialog.addEventListener("click", () => {
+          elements.sourceLocationDialog.close();
+        });
+        elements.verificationOverlayMode.addEventListener("click", () => {
+          verificationReviewMode = "overlay";
+          renderVerificationReview();
+        });
+        elements.verificationHeatmapMode.addEventListener("click", () => {
+          verificationReviewMode = "heatmap";
+          renderVerificationReview();
+        });
+        elements.verificationMixRange.addEventListener("input", () => {
+          renderVerificationReview();
+        });
+
+        elements.previewMode.addEventListener("change", () => {
+          const selected = elements.previewMode.value;
+          previewMode = selected.startsWith("breakpoint:") ? "breakpoint" : selected;
+          previewBreakpointWidth = previewMode === "breakpoint"
+            ? Number.parseInt(selected.split(":")[1], 10)
+            : null;
+          previewZoom = 100;
+          resetPreviewPan();
+          updatePreviewGeometry(previewDimensions());
+          applyPreviewTransform();
+          if (previewUsingFallback) void loadPreviewFallback(previewRequestId);
+          render();
         });
 
         elements.refresh.addEventListener("click", async () => {
@@ -1878,13 +2243,11 @@
           elements.htmlInput.click(),
         );
         elements.launcherFigma.addEventListener("click", async () => {
-          if (!state.workspaceDir) return;
-          elements.launcherStatus.textContent = "正在创建 Figma 页面工作台…";
-          const result = await callTool(
-            "create_figma_seed_project",
-            { workspaceDir: state.workspaceDir },
-            { timeoutMs: 120_000 },
-          );
+          if (!state.launcherId) return;
+          elements.launcherStatus.textContent = "正在刷新 Figma 收件箱…";
+          const result = await callTool("get_figma_design_offers", {
+            launcherId: state.launcherId,
+          });
           if (result) applyToolResult(result);
         });
         elements.launcherCreate.addEventListener("click", async () => {
@@ -1971,10 +2334,41 @@
           }
         });
 
+        elements.removePage.addEventListener("click", () => {
+          const page = (state.pages || []).find(
+            (candidate) => candidate.id === state.activePageId,
+          );
+          if (!page || (state.pages || []).length <= 1) return;
+          elements.removePageDialogTitle.textContent = `清除 ${page.name}？`;
+          elements.removePageDialogCopy.textContent =
+            "页面只会从 CDB 页面列表移除；HTML、CSS、图片和 Figma 画布都会保留，并且可以撤销。";
+          elements.removePageDialog.showModal();
+        });
+        elements.cancelRemovePage.addEventListener("click", () =>
+          elements.removePageDialog.close(),
+        );
+        elements.confirmRemovePage.addEventListener("click", async () => {
+          const pageId = state.activePageId;
+          elements.removePageDialog.close();
+          if (!pageId || removingPage) return;
+          removingPage = true;
+          render();
+          try {
+            await managePage("remove", { pageId });
+          } finally {
+            removingPage = false;
+            render();
+          }
+        });
+
         elements.undo.addEventListener("click", () => startAction("undo"));
         elements.receive.addEventListener("click", () =>
           handoffPendingFigmaChanges(true),
         );
+        elements.acceptHtmlConflict.addEventListener("click", () => resolveConflict("html"));
+        elements.acceptFigmaConflict.addEventListener("click", () => resolveConflict("figma"));
+        elements.copyFigmaConflict.addEventListener("click", () => copyConflictPage());
+        elements.undoConflictResolution.addEventListener("click", () => undoConflictResolution());
         elements.figma.addEventListener("click", () =>
           startAction("send-to-figma"),
         );
@@ -2001,8 +2395,12 @@
 
         render();
         ensurePolling();
+        schedulePendingFigmaHandoff();
         void reportMounted();
-        window.addEventListener("beforeunload", () => clearInterval(pollTimer));
+        window.addEventListener("beforeunload", () => {
+          clearInterval(pollTimer);
+          clearTimeout(handoffTimer);
+        });
 
         async function startAction(action, pageIds) {
           if (!state.projectDir || isBusy(state.phase)) return;
@@ -2043,6 +2441,44 @@
           });
           if (result) applyToolResult(result);
           return result;
+        }
+
+        async function resolveConflict(resolution) {
+          if (!state.projectDir || isBusy(state.phase)) return;
+          elements.acceptHtmlConflict.disabled = true;
+          elements.acceptFigmaConflict.disabled = true;
+          elements.copyFigmaConflict.disabled = true;
+          const result = await callTool(
+            "resolve_design_sync_conflict",
+            { projectDir: state.projectDir, resolution },
+            { timeoutMs: 45_000 },
+          );
+          if (result) applyToolResult(result);
+          render();
+        }
+
+        async function copyConflictPage() {
+          if (!state.projectDir || isBusy(state.phase)) return;
+          elements.copyFigmaConflict.disabled = true;
+          const result = await callTool(
+            "copy_design_sync_conflict",
+            { projectDir: state.projectDir },
+            { timeoutMs: 45_000 },
+          );
+          if (result) applyToolResult(result);
+          render();
+        }
+
+        async function undoConflictResolution() {
+          if (!state.projectDir || isBusy(state.phase)) return;
+          elements.undoConflictResolution.disabled = true;
+          const result = await callTool(
+            "undo_design_sync_conflict_resolution",
+            { projectDir: state.projectDir },
+            { timeoutMs: 30_000 },
+          );
+          if (result) applyToolResult(result);
+          render();
         }
 
         async function importSelectedFiles(descriptors) {
@@ -2222,16 +2658,18 @@
         async function poll() {
           if (
             polling ||
-            !state.projectDir ||
-            state.sessionActive === false
+            (state.mode !== "launcher" && state.sessionActive === false)
           ) return;
+          if (!state.projectDir && !(state.mode === "launcher" && state.launcherId)) return;
           polling = true;
           try {
             const result = await callTool(
-              "get_design_workspace_state",
-              {
-                projectDir: state.projectDir,
-              },
+              state.mode === "launcher"
+                ? "get_figma_design_offers"
+                : "get_design_workspace_state",
+              state.mode === "launcher"
+                ? { launcherId: state.launcherId }
+                : { projectDir: state.projectDir },
               { silent: true, timeoutMs: 8_000 },
             );
             if (result) applyToolResult(result);
@@ -2306,8 +2744,30 @@
 
         function setState(next) {
           state = { ...state, ...next };
+          if ((Number(state.pendingChangeCount) || 0) === 0) {
+            processingSnapshotPath = "";
+            failedHandoffSnapshotPath = "";
+          }
           render();
           ensurePolling();
+          schedulePendingFigmaHandoff();
+        }
+
+        function schedulePendingFigmaHandoff() {
+          const pendingCount = Number(state.pendingChangeCount) || 0;
+          const snapshotPath = state.designSnapshotPath || "";
+          if (
+            !pendingCount ||
+            !snapshotPath ||
+            !bridge?.sendFollowUpMessage ||
+            handoffInFlight ||
+            lastHandoffSnapshotPath === snapshotPath
+          ) return;
+          clearTimeout(handoffTimer);
+          handoffTimer = window.setTimeout(() => {
+            handoffTimer = null;
+            void handoffPendingFigmaChanges();
+          }, 0);
         }
 
         async function handoffPendingFigmaChanges(force = false) {
@@ -2323,25 +2783,31 @@
 
           handoffInFlight = true;
           lastHandoffSnapshotPath = snapshotPath;
+          processingSnapshotPath = snapshotPath;
+          failedHandoffSnapshotPath = "";
           render();
           try {
             await bridge.sendFollowUpMessage({
               prompt: [
-                "CDB Figma→Codex 单向回传：请把这次 Figma 大改实现到当前项目源码。",
+                "CDB Figma→Codex 自动处理：Figma 修改已到达，请立即把这次大改实现到当前项目源码。",
                 `项目：${state.projectDir}`,
                 `差异快照：${snapshotPath}`,
                 `总变更：${Number(state.changeCount) || pendingCount}；已自动应用：${Number(state.appliedChangeCount) || 0}；待处理：${pendingCount}。`,
                 "读取差异快照和当前页面；将 nodeClone/结构变化视为原稿的大幅改版依据，并完成所有尚未自动应用的视觉与结构修改。",
                 "保留现有页面功能、文字和稳定 data-codex-id；不要为了通过回写而简化设计。",
-                "完成后验证预览并调用 update_design_workspace 发布结果，pendingChangeCount 设为 0。",
+                "当前 CDB 工作台已进入 loading。不要调用 open_design_launcher、open_design_workspace 或重新创建工作台。",
+                "完成后验证预览，并调用 update_design_workspace 发布结果：phase 设为 complete、pendingChangeCount 设为 0，message 明确写“处理完成”。",
                 "这是 Figma 到 Codex 的单向传输；不要自动再发送回 Figma。",
               ].join("\n"),
               scrollToBottom: true,
             });
           } catch {
+            processingSnapshotPath = "";
+            failedHandoffSnapshotPath = snapshotPath;
             state = {
               ...state,
-              message: "Figma 修改已保存，但交给 Codex 失败；请点击“让 Codex 处理”重试。",
+              phase: "error",
+              message: "自动处理未能启动，Figma 修改已安全保存；请重试。",
             };
           } finally {
             handoffInFlight = false;
@@ -2350,12 +2816,13 @@
         }
 
         function ensurePolling() {
-          if (state.sessionActive === false) {
+          if (state.mode !== "launcher" && state.sessionActive === false) {
             clearInterval(pollTimer);
             pollTimer = null;
             return;
           }
-          if (pollTimer || !bridge?.callTool || !state.projectDir) return;
+          const hasTarget = state.projectDir || (state.mode === "launcher" && state.launcherId);
+          if (pollTimer || !bridge?.callTool || !hasTarget) return;
           pollTimer = window.setInterval(poll, 2200);
         }
 
@@ -2364,14 +2831,14 @@
             PREVIEW_MAX_ZOOM,
             Math.max(PREVIEW_MIN_ZOOM, value),
           );
-          if (previewZoom <= 100) resetPreviewPan();
-          else clampPreviewPan();
+          if (previewZoom <= 100 && previewMode !== "one-to-one") resetPreviewPan();
+          clampPreviewPan();
           render();
         }
 
         function startPreviewPan(event) {
           if (
-            previewZoom <= 100 ||
+            !elements.previewStage.classList.contains("is-pannable") ||
             event.button !== 0 ||
             event.target.closest(".canvas-zoom")
           ) return;
@@ -2409,11 +2876,15 @@
         }
 
         function clampPreviewPan() {
-          if (previewZoom <= 100) {
+          const baseScale = previewMode === "one-to-one" ? 1 : previewFitScale;
+          const scale = baseScale * (previewZoom / 100);
+          const viewportFits =
+            elements.viewport.offsetWidth * scale <= elements.previewStage.clientWidth &&
+            elements.viewport.offsetHeight * scale <= elements.previewStage.clientHeight;
+          if (previewZoom <= 100 && viewportFits) {
             resetPreviewPan();
             return;
           }
-          const scale = previewZoom / 100;
           const stageStyle = getComputedStyle(elements.previewStage);
           const stageWidth = Math.max(
             1,
@@ -2427,10 +2898,8 @@
               parseFloat(stageStyle.paddingTop || "0") -
               parseFloat(stageStyle.paddingBottom || "0"),
           );
-          const scaledWidth =
-            elements.viewport.offsetWidth * previewFitScale * scale;
-          const scaledHeight =
-            elements.viewport.offsetHeight * previewFitScale * scale;
+          const scaledWidth = elements.viewport.offsetWidth * scale;
+          const scaledHeight = elements.viewport.offsetHeight * scale;
           const maxX = Math.max(
             PREVIEW_PAN_GUTTER,
             Math.abs(scaledWidth - stageWidth) / 2,
@@ -2477,12 +2946,17 @@
         }
 
         function applyPreviewTransform() {
-          const pannable = previewZoom > 100;
+          const baseScale = previewMode === "one-to-one" ? 1 : previewFitScale;
+          const appliedScale = baseScale * (previewZoom / 100);
+          const pannable =
+            previewZoom > 100 ||
+            elements.viewport.offsetWidth * appliedScale > elements.previewStage.clientWidth ||
+            elements.viewport.offsetHeight * appliedScale > elements.previewStage.clientHeight;
           elements.previewStage.classList.toggle("is-pannable", pannable);
           elements.previewStage.title = pannable ? "按住拖拽视图" : "";
           elements.viewport.style.setProperty(
             "--preview-scale",
-            String(previewFitScale * (previewZoom / 100)),
+            String(appliedScale),
           );
           elements.viewport.style.setProperty(
             "--preview-pan-x",
@@ -2499,25 +2973,38 @@
           elements.launcher.hidden = !launcherMode;
           elements.workspace.hidden = launcherMode;
           if (launcherMode) {
+            renderLauncherOffers();
+            elements.launcherCreateCard.hidden = Boolean(window.__CDB_STANDALONE__);
             elements.launcherChooseFolder.disabled = importingProject || !state.workspaceDir;
             elements.launcherChooseHtml.disabled = importingProject || !state.workspaceDir;
-            elements.launcherFigma.disabled = !state.workspaceDir;
+            elements.launcherFigma.disabled = !state.launcherId;
             elements.launcherCreate.disabled = !bridge?.sendFollowUpMessage;
-            if (!state.workspaceDir && !elements.launcherStatus.textContent) {
-              elements.launcherStatus.textContent =
-                "当前任务没有可写入位置；新建设计仍可交给 Codex 选择工作区。";
+            if (!importingProject) {
+              elements.launcherStatus.textContent = state.message ||
+                (!state.workspaceDir
+                  ? "没有可写入位置，请先选择项目来源。"
+                  : "本地工作台已就绪。");
             }
             return;
           }
           const busy = isBusy(state.phase);
           elements.projectName.textContent = state.projectName || "Design workspace";
+          renderWorkspaceOffers(busy);
           renderPageList(busy);
           const activePage = (state.pages || []).find(
             (page) => page.id === state.activePageId,
           );
-          updatePreviewGeometry(activePage?.viewport);
+          const previewViewport = previewDimensions();
+          updatePreviewGeometry(previewViewport);
           elements.canvasTitle.textContent = activePage?.name || "页面";
-          elements.viewportLabel.textContent = `视图缩放 · ${previewZoom}%`;
+          const modeLabel = previewMode === "one-to-one"
+            ? "1:1"
+            : previewMode === "breakpoint"
+              ? `验收断点 ${previewViewport.width}`
+              : "适应窗口";
+          const displayScale = (previewMode === "one-to-one" ? 1 : previewFitScale) * (previewZoom / 100);
+          elements.viewportLabel.textContent = `${previewViewport.width} × ${previewViewport.height} · ${modeLabel} · 展示 ${Math.round(displayScale * 100)}%`;
+          renderVerificationEvidence(activePage);
           elements.zoomValue.textContent = `${previewZoom}%`;
           elements.zoomOut.disabled = previewZoom <= PREVIEW_MIN_ZOOM;
           elements.zoomIn.disabled = previewZoom >= PREVIEW_MAX_ZOOM;
@@ -2606,6 +3093,7 @@
           elements.statusTitle.textContent = titleForState(state);
           elements.statusCopy.textContent = [
             state.message || "页面已就绪。",
+            conflictSummary(state),
             state.versionMessage || "",
             state.startupMs ? `启动 ${formatDuration(state.startupMs)}` : "",
           ]
@@ -2617,9 +3105,13 @@
           const activeLinked = Boolean(activePage?.figmaReady);
           const ended = state.phase === "ended";
           const pendingChangeCount = Number(state.pendingChangeCount) || 0;
+          const hasSyncConflicts = Array.isArray(state.syncConflicts) && state.syncConflicts.length > 0;
           const hasPendingFigmaChanges =
             pendingChangeCount > 0 &&
             Boolean(state.designSnapshotPath);
+          const failedFigmaHandoff =
+            hasPendingFigmaChanges &&
+            failedHandoffSnapshotPath === state.designSnapshotPath;
           elements.importProject.disabled = busy || importingProject || ended;
           elements.chooseFolder.disabled = importingProject;
           elements.chooseHtml.disabled = importingProject;
@@ -2636,21 +3128,58 @@
           elements.figma.hidden = !activeLinked || ended;
           elements.figma.disabled = busy || !state.previewUrl || ended;
           elements.figmaLabel.textContent = "更新当前页面";
-          elements.receive.hidden = !hasPendingFigmaChanges || ended;
+          elements.receive.hidden = !failedFigmaHandoff || ended;
           elements.receive.disabled =
-            busy || handoffInFlight || !bridge?.sendFollowUpMessage;
+            handoffInFlight || !bridge?.sendFollowUpMessage;
           elements.receive.textContent = handoffInFlight
             ? "正在交给 Codex…"
-            : `让 Codex 处理 ${pendingChangeCount} 处`;
+            : `重试处理 ${pendingChangeCount} 处`;
           elements.receive.title = bridge?.sendFollowUpMessage
             ? "由 Codex 根据已保存的 Figma 差异修改当前项目源码"
             : "请在最新版 Codex 中重新打开设计工作台";
+          elements.acceptHtmlConflict.hidden = !hasSyncConflicts || ended;
+          elements.acceptFigmaConflict.hidden = !hasSyncConflicts || ended;
+          elements.copyFigmaConflict.hidden = !hasSyncConflicts || ended;
+          elements.acceptHtmlConflict.disabled = busy || !state.figmaConnected;
+          elements.acceptFigmaConflict.disabled = busy;
+          elements.copyFigmaConflict.disabled = busy || !state.designSnapshotPath;
+          elements.acceptHtmlConflict.title = state.figmaConnected
+            ? "以当前 HTML 为准，并事务更新 Figma Frame 与共同基线"
+            : "请先重新连接 Figma 插件";
+          elements.acceptFigmaConflict.title = "以已保存的 Figma 快照为准，事务更新源码并回读验证";
+          elements.copyFigmaConflict.title = "把已保存的 Figma 完整快照生成独立 HTML 页面，不覆盖原页面或清除原冲突";
+          const canUndoConflictResolution = Boolean(
+            state.lastResolvedConflictPath &&
+            ["html", "figma"].includes(state.lastConflictResolution)
+          );
+          elements.undoConflictResolution.hidden = !canUndoConflictResolution || ended;
+          elements.undoConflictResolution.disabled = busy;
+          elements.undoConflictResolution.textContent = state.lastConflictResolution === "html"
+            ? "撤销接受 HTML"
+            : "撤销接受 Figma";
+          elements.undoConflictResolution.title = state.lastConflictResolution === "html"
+            ? "撤销最近一次接受 HTML 的 Figma 事务，恢复解决前共同基线并重新打开冲突"
+            : "撤销最近一次接受 Figma 的源码事务，恢复解决前共同基线并重新打开冲突";
           elements.sendAll.disabled =
             busy || !state.previewUrl || ended || !(state.pages || []).length;
           elements.sendAllLabel.textContent = linked
             ? "更新全部页面"
             : "全部页面";
-          elements.undo.hidden = !state.undoAvailable || ended;
+          elements.undo.hidden = !state.undoAvailable || canUndoConflictResolution || ended;
+          const pageRemovalBlocked =
+            pendingChangeCount > 0 ||
+            hasSyncConflicts ||
+            (state.pages || []).length <= 1;
+          elements.removePage.hidden = ended;
+          elements.removePage.disabled = busy || removingPage || pageRemovalBlocked;
+          elements.removePage.textContent = removingPage
+            ? "正在清除…"
+            : "清除当前页面";
+          elements.removePage.title = (state.pages || []).length <= 1
+            ? "CDB 项目必须至少保留一个页面"
+            : pendingChangeCount > 0 || hasSyncConflicts
+              ? "请先处理当前页面的 Figma 修改或冲突"
+              : "从 CDB 页面列表移除当前页面；不会删除源码或 Figma 画布";
           elements.primary.hidden =
             ended ||
             (!state.needsHandoffConfirmation && activeLinked && state.phase !== "error");
@@ -2673,6 +3202,320 @@
             Array.isArray(state.changedFiles) && state.changedFiles.length
               ? `已修改：${state.changedFiles.join("、")}`
               : "";
+        }
+
+        async function openVerificationReview() {
+          if (!state.projectDir || !state.activePageId || !bridge?.callTool) return;
+          elements.verificationReview.disabled = true;
+          elements.verificationReview.textContent = "正在准备对比…";
+          try {
+            const result = await callTool("get_design_verification_images", {
+              projectDir: state.projectDir,
+              pageId: state.activePageId,
+            }, { silent: true, timeoutMs: 15_000 });
+            const images = readVerificationImages(result);
+            if (!images?.reference?.dataUrl || !images?.actual?.dataUrl) {
+              throw new Error("视觉对比图不可用。");
+            }
+            for (const bitmap of verificationBitmaps) bitmap.close?.();
+            verificationImages = images;
+            verificationBitmaps = await Promise.all([
+              createImageBitmap(previewImageBlob(images.reference.dataUrl)),
+              createImageBitmap(previewImageBlob(images.actual.dataUrl)),
+            ]);
+            verificationReviewMode = "overlay";
+            elements.verificationMixRange.value = "50";
+            renderVerificationReview();
+            elements.verificationDialog.showModal();
+          } catch (error) {
+            elements.verificationReview.textContent = error?.message || "无法打开视觉对比";
+            return;
+          } finally {
+            elements.verificationReview.disabled = false;
+          }
+          elements.verificationReview.textContent = "查看视觉对比";
+        }
+
+        function renderVerificationReview() {
+          if (verificationBitmaps.length !== 2) return;
+          const [reference, actual] = verificationBitmaps;
+          const canvas = elements.verificationReviewCanvas;
+          const width = reference.width;
+          const height = reference.height;
+          canvas.width = width;
+          canvas.height = height;
+          const context = canvas.getContext("2d", { willReadFrequently: true });
+          context.clearRect(0, 0, width, height);
+          const mix = Math.max(0, Math.min(100, Number(elements.verificationMixRange.value) || 0));
+          const heatmap = verificationReviewMode === "heatmap";
+          elements.verificationOverlayMode.setAttribute("aria-pressed", String(!heatmap));
+          elements.verificationHeatmapMode.setAttribute("aria-pressed", String(heatmap));
+          elements.verificationMixRange.disabled = heatmap;
+          elements.verificationMixLabel.textContent = heatmap ? "红色 = 超阈值" : `HTML ${mix}%`;
+          if (!heatmap) {
+            context.drawImage(reference, 0, 0, width, height);
+            const split = Math.round(width * mix / 100);
+            context.save();
+            context.beginPath();
+            context.rect(0, 0, split, height);
+            context.clip();
+            context.drawImage(actual, 0, 0, width, height);
+            context.restore();
+            context.fillStyle = "rgba(255, 255, 255, 0.92)";
+            context.fillRect(Math.max(0, split - 1), 0, 2, height);
+            return;
+          }
+          const expectedPixels = verificationBitmapPixels(reference, width, height);
+          const actualPixels = verificationBitmapPixels(actual, width, height);
+          const output = context.createImageData(width, height);
+          const threshold = Number(verificationImages?.thresholds?.channelThreshold) || 32;
+          for (let offset = 0; offset < output.data.length; offset += 4) {
+            const error = Math.max(
+              Math.abs(expectedPixels[offset] - actualPixels[offset]),
+              Math.abs(expectedPixels[offset + 1] - actualPixels[offset + 1]),
+              Math.abs(expectedPixels[offset + 2] - actualPixels[offset + 2]),
+            );
+            const different = error > threshold;
+            output.data[offset] = different ? 255 : Math.round(expectedPixels[offset] * 0.28);
+            output.data[offset + 1] = different ? Math.max(0, 88 - error / 4) : Math.round(expectedPixels[offset + 1] * 0.28);
+            output.data[offset + 2] = different ? 70 : Math.round(expectedPixels[offset + 2] * 0.28);
+            output.data[offset + 3] = 255;
+          }
+          context.putImageData(output, 0, 0);
+        }
+
+        function verificationBitmapPixels(bitmap, width, height) {
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          const context = canvas.getContext("2d", { willReadFrequently: true });
+          context.drawImage(bitmap, 0, 0, width, height);
+          return context.getImageData(0, 0, width, height).data;
+        }
+
+        function focusVerificationDifference(difference) {
+          const bounds = difference.actualBounds || difference.expectedBounds;
+          if (bounds && [bounds.x, bounds.y, bounds.width, bounds.height].every(Number.isFinite)) {
+            clearTimeout(verificationHighlightTimer);
+            const highlight = elements.verificationNodeHighlight;
+            highlight.style.left = `${bounds.x}px`;
+            highlight.style.top = `${bounds.y}px`;
+            highlight.style.width = `${Math.max(1, bounds.width)}px`;
+            highlight.style.height = `${Math.max(1, bounds.height)}px`;
+            highlight.hidden = false;
+            verificationHighlightTimer = window.setTimeout(() => {
+              highlight.hidden = true;
+            }, 3_000);
+          }
+          if (!elements.preview.hidden && difference.nodeId) {
+            try {
+              const target = elements.preview.contentDocument?.querySelector(
+                `[data-codex-id="${CSS.escape(difference.nodeId)}"]`,
+              );
+              if (target) {
+                target.scrollIntoView({ block: "center", inline: "center" });
+                const previousOutline = target.style.outline;
+                target.style.outline = "3px solid #ff5148";
+                window.setTimeout(() => { target.style.outline = previousOutline; }, 3_000);
+              }
+            } catch {
+              // Static fallback highlight remains available when iframe access is unavailable.
+            }
+          }
+        }
+
+        function renderVerificationEvidence(activePage) {
+          const verification = state.verification;
+          const visual = verification?.visual;
+          elements.verificationCard.hidden = !verification;
+          if (!verification) {
+            elements.verificationReview.hidden = true;
+            elements.verificationNodeHighlight.hidden = true;
+            return;
+          }
+          const passed = verification.status === "passed" && (!visual || visual.status === "passed");
+          elements.verificationCard.classList.toggle("failed", !passed);
+          elements.verificationTitle.textContent = passed
+            ? "已通过真实渲染验收"
+            : "视觉验收未通过，未标记同步";
+          const metrics = [];
+          const width = visual?.expected?.width || activePage?.viewport?.width;
+          const height = visual?.expected?.height || activePage?.viewport?.height;
+          if (width && height) metrics.push(`${width} × ${height}`);
+          if (visual && Number.isFinite(visual.differentPixelRatio)) {
+            metrics.push(`差异 ${(visual.differentPixelRatio * 100).toFixed(2)}%`);
+          }
+          if (Number.isFinite(verification.maxPositionErrorPx)) {
+            metrics.push(`位置误差 ≤ ${verification.maxPositionErrorPx.toFixed(2)}px`);
+          }
+          if (verification.message) metrics.push(verification.message);
+          elements.verificationCopy.textContent = metrics.join(" · ") || "结构与浏览器回读已验证";
+          elements.verificationDifferences.replaceChildren();
+          elements.verificationReview.hidden = !visual;
+          for (const difference of (verification.differences || []).slice(0, 3)) {
+            const row = document.createElement("div");
+            row.className = "verification-difference";
+            row.title = [
+              difference.sourceRef?.file || "",
+              difference.sourceRef?.selector || "",
+              difference.figmaNodeId ? `Figma ${difference.figmaNodeId}` : "",
+            ].filter(Boolean).join(" · ");
+            const highlight = document.createElement("button");
+            highlight.type = "button";
+            highlight.className = "verification-difference-main";
+            highlight.textContent = `${difference.nodeId || "页面"} · ${difference.property || "visual"} · ${compactConflictValue(difference.expected)} → ${compactConflictValue(difference.actual)}`;
+            highlight.addEventListener("click", () => focusVerificationDifference(difference));
+            const actions = document.createElement("div");
+            actions.className = "verification-difference-actions";
+            if (difference.figmaNodeId) {
+              const figma = document.createElement("button");
+              figma.type = "button";
+              figma.className = "verification-difference-action";
+              figma.textContent = "Figma";
+              figma.title = "在 Figma 中选中并放大这个节点";
+              figma.addEventListener("click", () => void focusVerificationFigma(difference, figma));
+              actions.append(figma);
+            }
+            if (difference.sourceRef?.file || activePage?.entry) {
+              const source = document.createElement("button");
+              source.type = "button";
+              source.className = "verification-difference-action";
+              source.textContent = "源码";
+              source.title = "查看这个节点对应的项目源码";
+              source.addEventListener("click", () => void openVerificationSource(difference, source));
+              actions.append(source);
+            }
+            row.append(highlight, actions);
+            elements.verificationDifferences.append(row);
+          }
+        }
+
+        async function focusVerificationFigma(difference, button) {
+          if (!state.projectDir || !state.activePageId) return;
+          const original = button.textContent;
+          button.disabled = true;
+          button.textContent = "定位中";
+          const result = await callTool("focus_figma_design_node", {
+            projectDir: state.projectDir,
+            pageId: state.activePageId,
+            nodeId: difference.nodeId,
+          }, { silent: true, timeoutMs: 8_000 });
+          button.disabled = false;
+          button.textContent = result ? "已定位" : "重试";
+          window.setTimeout(() => { button.textContent = original; }, 1_800);
+        }
+
+        async function openVerificationSource(difference, button) {
+          if (!state.projectDir || !state.activePageId) return;
+          const original = button.textContent;
+          button.disabled = true;
+          button.textContent = "读取中";
+          const result = await callTool("get_design_source_location", {
+            projectDir: state.projectDir,
+            pageId: state.activePageId,
+            nodeId: difference.nodeId,
+          }, { silent: true, timeoutMs: 8_000 });
+          const sourceLocation = readSourceLocation(result);
+          button.disabled = false;
+          button.textContent = original;
+          if (!sourceLocation) return;
+          elements.sourceLocationDialogTitle.textContent = `${sourceLocation.file}:${sourceLocation.line}`;
+          elements.sourceLocationCode.textContent = sourceLocation.snippet || "没有可显示的源码片段。";
+          elements.sourceLocationDialog.showModal();
+        }
+
+        function renderLauncherOffers() {
+          elements.launcherOffers.replaceChildren();
+          for (const offer of state.designOffers || []) {
+            const card = document.createElement("div");
+            card.className = "offer-card";
+            const title = document.createElement("strong");
+            title.textContent = `来自 Figma：${offer.rootName || "未命名页面"}`;
+            const meta = document.createElement("p");
+            meta.textContent = `${Math.round(offer.width || 0)} × ${Math.round(offer.height || 0)} · ${offer.estimatedNodeCount || 0} 个可编辑图层`;
+            const actions = document.createElement("div");
+            actions.className = "launcher-actions";
+            const create = document.createElement("button");
+            create.className = "button";
+            create.type = "button";
+            create.textContent = "创建新项目";
+            create.disabled = !state.workspaceDir || ["accepted", "collecting"].includes(offer.state);
+            create.title = state.workspaceDir ? "采集完整 Frame 并生成本地静态项目" : "当前任务没有可写入位置";
+            create.addEventListener("click", async () => {
+              create.disabled = true;
+              elements.launcherStatus.textContent = "正在请求 Figma 采集完整页面…";
+              const result = await callTool("accept_figma_design_offer", {
+                launcherId: state.launcherId,
+                offerId: offer.offerId,
+                action: "create_project",
+                workspaceDir: state.workspaceDir,
+              }, { timeoutMs: 30_000 });
+              if (result) {
+                applyToolResult(result);
+                elements.launcherStatus.textContent = "正在采集并创建项目，完成后会自动进入工作台…";
+              }
+            });
+            const existing = document.createElement("button");
+            existing.className = "button secondary";
+            existing.type = "button";
+            existing.textContent = "加入现有项目";
+            existing.disabled = true;
+            existing.title = "阶段 4 启用";
+            if (offer.state === "payload_received") {
+              create.disabled = true;
+              create.textContent = "页面已采集";
+              meta.textContent += ` · ${offer.payloadSummary?.resourceCount || 0} 个资源 · ${offer.payloadSummary?.degradationCount || 0} 个降级`;
+            } else if (offer.state === "collecting") {
+              create.textContent = "正在采集…";
+              meta.textContent += offer.progress?.message ? ` · ${offer.progress.message}` : "";
+            }
+            actions.append(create, existing);
+            card.append(title, meta, actions);
+            elements.launcherOffers.append(card);
+          }
+        }
+
+        function renderWorkspaceOffers(busy) {
+          elements.workspaceOffers.replaceChildren();
+          for (const offer of state.designOffers || []) {
+            const card = document.createElement("div");
+            card.className = "workspace-offer";
+            const title = document.createElement("strong");
+            title.textContent = offer.rootName || "Figma 页面";
+            title.title = `${offer.rootName || "Figma 页面"} · ${offer.estimatedNodeCount || 0} 个图层`;
+            const add = document.createElement("button");
+            add.className = "button";
+            add.type = "button";
+            add.textContent = offer.state === "collecting"
+              ? "正在采集…"
+              : offer.linkedPageId
+                ? "更新关联页面"
+                : "添加为新页面";
+            const linked = Boolean(offer.linkedPageId);
+            const crossProject = Boolean(
+              offer.linkedProjectKey &&
+              state.preflightReport?.projectKey &&
+              offer.linkedProjectKey !== state.preflightReport.projectKey
+            );
+            add.disabled = busy || crossProject || ["accepted", "collecting"].includes(offer.state);
+            add.title = crossProject
+                ? "这个 Frame 已关联到另一个项目"
+              : linked
+                ? "采集完整 Frame，并以共同基线和 HTML 回读保护更新关联页面"
+                : "采集完整 Frame，并以单一事务加入当前静态项目";
+            add.addEventListener("click", async () => {
+              add.disabled = true;
+              const result = await callTool("accept_figma_design_offer", {
+                offerId: offer.offerId,
+                action: linked ? "update_page" : "add_page",
+                projectDir: state.projectDir,
+                pageId: linked ? offer.linkedPageId : undefined,
+              }, { timeoutMs: 30_000 });
+              if (result) applyToolResult(result);
+            });
+            card.append(title, add);
+            elements.workspaceOffers.append(card);
+          }
         }
 
         function renderPageList(busy) {
@@ -2850,26 +3693,59 @@
         }
 
         function titleForState(value) {
+          if (
+            (Number(value.pendingChangeCount) || 0) > 0 &&
+            failedHandoffSnapshotPath === value.designSnapshotPath
+          ) {
+            return "自动处理失败";
+          }
           if (value.phase === "ended") {
             return "本次设计已结束";
           }
           if (value.phase === "preflight_blocked") return "项目预检未通过";
           if (value.phase === "preflight_fix_available") return "项目需要安全修复";
           if (value.phase === "handoff_confirmation_required") return "等待接管确认";
-          if (value.phase === "error") return "需要处理";
+          if (value.phase === "error") return "自动处理失败";
+          if (value.phase === "conflict") {
+            return `HTML 与 Figma 有 ${(value.syncConflicts || []).length || value.pendingChangeCount || 1} 个冲突`;
+          }
           if (value.phase === "preparing_figma") return "正在准备 Figma";
-          if (value.phase === "applying") return "正在应用修改";
+          if (
+            (Number(value.pendingChangeCount) || 0) > 0 &&
+            processingSnapshotPath === value.designSnapshotPath
+          ) {
+            return `Codex 正在处理 ${value.pendingChangeCount} 处修改`;
+          }
+          if (value.phase === "applying") return "Codex 正在处理修改";
           if ((Number(value.pendingChangeCount) || 0) > 0) {
             return `待应用 ${value.pendingChangeCount} 处 Figma 修改`;
           }
           if (value.phase === "complete") {
             return value.appliedChangeCount || value.changeCount
-              ? `已应用 ${value.appliedChangeCount || value.changeCount} 处修改`
-              : "设计修改已应用";
+              ? `处理完成 · 已应用 ${value.appliedChangeCount || value.changeCount} 处修改`
+              : "处理完成";
           }
           if (value.figmaReady || value.figmaUrl) return "页面与 Figma 已关联";
           if (value.previewUrl) return "页面预览已就绪";
           return "页面准备中";
+        }
+
+        function conflictSummary(value) {
+          const conflicts = Array.isArray(value.syncConflicts) ? value.syncConflicts : [];
+          if (conflicts.length === 0) return "";
+          const shown = conflicts.slice(0, 3).map((entry) => {
+            const html = compactConflictValue(entry.html);
+            const figma = compactConflictValue(entry.figma);
+            return `${entry.pointer || "Page IR"} · ${entry.owner || "shared"} · HTML ${html} / Figma ${figma}`;
+          });
+          if (conflicts.length > shown.length) shown.push(`另有 ${conflicts.length - shown.length} 个`);
+          return `冲突字段：${shown.join("；")}`;
+        }
+
+        function compactConflictValue(value) {
+          if (value === undefined) return "未设置";
+          const text = typeof value === "string" ? value : JSON.stringify(value);
+          return text.length > 80 ? `${text.slice(0, 77)}…` : text;
         }
 
         function stageSummary(value) {
@@ -2886,7 +3762,9 @@
           const preview = value.previewUrl ? "预览已就绪" : "正在准备预览";
           const figma = value.figmaConnected
             ? (Number(value.pendingChangeCount) || 0) > 0
-              ? "Figma 修改已传回"
+              ? processingSnapshotPath === value.designSnapshotPath
+                ? "Figma 修改已传回 · Codex 正在处理"
+                : "Figma 修改已传回"
               : value.unsentChanges
               ? "Figma 有未发送修改"
               : "Figma 已连接"
@@ -2948,16 +3826,37 @@
           );
         }
 
+        function readVerificationImages(value) {
+          return (
+            value?.structuredContent?.verificationImages ||
+            value?._meta?.verificationImages ||
+            value?.verificationImages ||
+            null
+          );
+        }
+
+        function readSourceLocation(value) {
+          return (
+            value?.structuredContent?.sourceLocation ||
+            value?._meta?.sourceLocation ||
+            value?.sourceLocation ||
+            null
+          );
+        }
+
         function previewDimensions() {
           const activePage = (state.pages || []).find(
             (page) => page.id === state.activePageId,
           );
           const width = Number(activePage?.viewport?.width);
           const height = Number(activePage?.viewport?.height);
-          return {
-            width: Number.isFinite(width)
+          const sourceWidth = Number.isFinite(width)
               ? Math.min(1920, Math.max(320, Math.round(width)))
-              : 1440,
+              : 1440;
+          return {
+            width: previewMode === "breakpoint" && Number.isFinite(previewBreakpointWidth)
+              ? previewBreakpointWidth
+              : sourceWidth,
             height: Number.isFinite(height)
               ? Math.min(1200, Math.max(480, Math.round(height)))
               : 900,
@@ -2988,6 +3887,7 @@
                   },
                 ]
               : [],
+            designOffers: [],
             activePageId: demo ? "preview-codex-landing-home" : "",
             phase: demo ? "ready" : "opening",
             previewUrl: demo ? "http://127.0.0.1:4173/" : "",

@@ -456,7 +456,7 @@ export const CAPTURE_PAGE_SCRIPT = String.raw`
         : "left";
     const widthSafety = Math.min(
       12,
-      Math.max(1, fontSize * 0.3, Math.abs(letterSpacing || 0)),
+      Math.max(1, fontSize * 0.35, Math.abs(letterSpacing || 0)),
     );
     const width = positive(rect.width + widthSafety);
     const xAdjustment =

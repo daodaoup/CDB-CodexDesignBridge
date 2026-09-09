@@ -69,7 +69,12 @@ export async function capturePreviewPage({
 
 export function createCapturedPageManifest(
   snapshot,
-  { projectName = "Frontend", previewUrl = "" } = {},
+  {
+    projectName = "Frontend",
+    previewUrl = "",
+    designViewport = { width: CAPTURE_WIDTH, height: CAPTURE_HEIGHT },
+    runtimeViewport = { width: CAPTURE_WIDTH, height: CAPTURE_HEIGHT },
+  } = {},
 ) {
   if (!snapshot?.root || snapshot.root.type !== "frame") {
     throw new Error("The preview did not produce a valid root frame.");
@@ -80,6 +85,17 @@ export function createCapturedPageManifest(
     pageId: `preview-${safeProjectId}`,
     name: `${projectName} · 当前预览`,
     source: previewUrl ? { file: previewUrl } : undefined,
+    responsiveContract: {
+      designViewport: { width: designViewport.width, height: designViewport.height },
+      runtimeViewports: [{
+        id: `runtime-${runtimeViewport.width}`,
+        width: runtimeViewport.width,
+        height: runtimeViewport.height,
+        devicePixelRatio: 1,
+      }],
+      previewScale: { mode: "one-to-one", value: 1, breakpointId: null },
+      breakpoints: [],
+    },
     root: snapshot.root,
   };
 }
@@ -638,6 +654,7 @@ export const CAPTURE_PAGE_SCRIPT = String.raw`
   }
 
   function textDefinition({
+    element = null,
     id,
     name,
     text,
@@ -646,6 +663,7 @@ export const CAPTURE_PAGE_SCRIPT = String.raw`
     style,
     ref = null,
     layoutItem = null,
+    responsive = null,
   }) {
     const fontSize = Number.parseFloat(style.fontSize) || 16;
     const parsedLineHeight = Number.parseFloat(style.lineHeight);
@@ -661,11 +679,14 @@ export const CAPTURE_PAGE_SCRIPT = String.raw`
         : "left";
     const widthSafety = Math.min(
       12,
-      Math.max(1, fontSize * 0.3, Math.abs(letterSpacing || 0)),
+      Math.max(1, fontSize * 0.35, Math.abs(letterSpacing || 0)),
     );
-    const width = positive(rect.width + widthSafety);
+    const fixedSize = element?.getAttribute?.("data-codex-fixed-size") === "true";
+    const width = positive(rect.width + (fixedSize ? 0 : widthSafety));
     const xAdjustment =
-      textAlign === "right"
+      fixedSize
+        ? 0
+        : textAlign === "right"
         ? widthSafety
         : textAlign === "center"
           ? widthSafety / 2
@@ -675,6 +696,7 @@ export const CAPTURE_PAGE_SCRIPT = String.raw`
       type: "text",
       name,
       sourceRef: ref,
+      ...(responsive ? { responsive, constraints: responsive.constraints } : {}),
       width,
       height: positive(rect.height),
       x: round(rect.left - parentRect.left - xAdjustment),
@@ -691,12 +713,19 @@ export const CAPTURE_PAGE_SCRIPT = String.raw`
           Number.isFinite(parsedLineHeight) ? parsedLineHeight : fontSize * 1.2
         ),
         letterSpacing: Number.isFinite(letterSpacing) ? round(letterSpacing) : 0,
+        lineHeightUnit: element?.getAttribute?.("data-codex-line-height-unit") || "",
+        lineHeightValue: element?.getAttribute?.("data-codex-line-height-value") || "",
+        letterSpacingUnit: element?.getAttribute?.("data-codex-letter-spacing-unit") || "",
+        letterSpacingValue: element?.getAttribute?.("data-codex-letter-spacing-value") || "",
       },
       textAlign,
     };
   }
 
   function cleanElementText(element) {
+    if (element?.getAttribute?.("data-codex-fixed-size") === "true") {
+      return String(element.textContent || "").replace(/\r/g, "");
+    }
     return String(element.innerText || element.textContent || "")
       .replace(/\r/g, "")
       .replace(/[ \t]+\n/g, "\n")
@@ -722,6 +751,7 @@ export const CAPTURE_PAGE_SCRIPT = String.raw`
       nodeCount += 1;
       definitions.push(
         textDefinition({
+          element,
           id: uniqueId(element, "text-" + index),
           name: element.tagName.toLowerCase() + " text",
           text: child.textContent.replace(/\s+/g, " ").trim(),
@@ -779,7 +809,9 @@ export const CAPTURE_PAGE_SCRIPT = String.raw`
         }
       }
     }
-    return clone.outerHTML.replace(/currentColor/gi, getComputedStyle(element).color || "#000000");
+    return clone.outerHTML
+      .replace(/currentColor/gi, getComputedStyle(element).color || "#000000")
+      .replace(/>\s+</g, "><");
   }
 
   function transformedGeometry(element, rect, style) {
@@ -968,6 +1000,8 @@ export const CAPTURE_PAGE_SCRIPT = String.raw`
       };
     }
     if (display === "grid" || display === "inline-grid") {
+      const authoredColumns = element.getAttribute("data-codex-grid-columns");
+      const authoredRows = element.getAttribute("data-codex-grid-rows");
       return {
         kind: "grid",
         direction: "none",
@@ -980,8 +1014,8 @@ export const CAPTURE_PAGE_SCRIPT = String.raw`
         primarySizing: display === "inline-grid" ? "hug" : "fixed",
         counterSizing: display === "inline-grid" ? "hug" : "fixed",
         grid: {
-          columns: String(style.gridTemplateColumns || "none").slice(0, 500),
-          rows: String(style.gridTemplateRows || "none").slice(0, 500),
+          columns: String(authoredColumns || style.gridTemplateColumns || "none").slice(0, 500),
+          rows: String(authoredRows || style.gridTemplateRows || "none").slice(0, 500),
         },
       };
     }
@@ -1032,6 +1066,31 @@ export const CAPTURE_PAGE_SCRIPT = String.raw`
     };
   }
 
+  function responsiveDefinition(element, style) {
+    const allowedConstraints = new Set(["MIN", "CENTER", "MAX", "STRETCH", "SCALE"]);
+    const horizontal = String(element.getAttribute("data-codex-constraint-horizontal") || "").toUpperCase();
+    const vertical = String(element.getAttribute("data-codex-constraint-vertical") || "").toUpperCase();
+    const minWidth = optionalCssPixelLimit(style.minWidth);
+    const maxWidth = optionalCssPixelLimit(style.maxWidth);
+    return {
+      constraints: allowedConstraints.has(horizontal) && allowedConstraints.has(vertical)
+        ? { horizontal, vertical }
+        : null,
+      objectFit: element.localName?.toLowerCase() === "img" && ["fill", "contain", "cover", "none", "scale-down"].includes(style.objectFit)
+        ? style.objectFit
+        : "cover",
+      minWidth: Number.isFinite(minWidth) && minWidth > 0 ? round(minWidth) : null,
+      maxWidth: Number.isFinite(maxWidth) ? round(maxWidth) : null,
+    };
+  }
+
+  function optionalCssPixelLimit(value) {
+    const match = String(value || "").trim().match(/^([\d.]+)px$/i);
+    if (!match) return null;
+    const parsed = Number.parseFloat(match[1]);
+    return Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
+  }
+
   function buildNode(element, parentRect, isRoot = false) {
     if (!isVisible(element) || nodeCount >= MAX_NODES) return null;
     const rect = element.getBoundingClientRect();
@@ -1050,6 +1109,7 @@ export const CAPTURE_PAGE_SCRIPT = String.raw`
     const id = uniqueId(element);
     const ref = sourceRef(element);
     const layoutItem = layoutItemDefinition(element, style, isRoot);
+    const responsive = responsiveDefinition(element, style);
     nodeCount += 1;
 
     if (element.localName?.toLowerCase() === "svg") {
@@ -1058,6 +1118,8 @@ export const CAPTURE_PAGE_SCRIPT = String.raw`
         type: "svg",
         name: element.getAttribute("aria-label") || id,
         sourceRef: ref,
+        responsive,
+        constraints: responsive.constraints,
         ...(layoutItem ? { layoutItem } : {}),
         width: geometry.width,
         height: geometry.height,
@@ -1084,6 +1146,8 @@ export const CAPTURE_PAGE_SCRIPT = String.raw`
           ...(ref || {}),
           ...(externalSvg.file ? { file: externalSvg.file } : {}),
         },
+        responsive,
+        constraints: responsive.constraints,
         ...(layoutItem ? { layoutItem } : {}),
         width: geometry.width,
         height: geometry.height,
@@ -1109,6 +1173,8 @@ export const CAPTURE_PAGE_SCRIPT = String.raw`
           ...(ref || {}),
           ...(rasterImage.file ? { file: rasterImage.file } : {}),
         },
+        responsive,
+        constraints: responsive.constraints,
         ...(layoutItem ? { layoutItem } : {}),
         width: geometry.width,
         height: geometry.height,
@@ -1117,9 +1183,7 @@ export const CAPTURE_PAGE_SCRIPT = String.raw`
         opacity: Math.max(0, Math.min(1, Number.parseFloat(style.opacity) || 1)),
         rotation: geometry.rotation,
         style: {},
-        objectFit: ["fill", "contain", "cover", "none", "scale-down"].includes(style.objectFit)
-          ? style.objectFit
-          : "cover",
+        objectFit: responsive.objectFit,
         image: {
           mimeType: rasterImage.mimeType,
           base64: rasterImage.base64,
@@ -1134,6 +1198,7 @@ export const CAPTURE_PAGE_SCRIPT = String.raw`
       !hasDecoration(style)
     ) {
       return textDefinition({
+        element,
         id,
         name: element.getAttribute("aria-label") || id,
         text,
@@ -1142,6 +1207,7 @@ export const CAPTURE_PAGE_SCRIPT = String.raw`
         style,
         ref,
         layoutItem,
+        responsive,
       });
     }
 
@@ -1158,6 +1224,8 @@ export const CAPTURE_PAGE_SCRIPT = String.raw`
       type: "frame",
       name: element.getAttribute("aria-label") || id,
       sourceRef: ref,
+      responsive,
+      constraints: responsive.constraints,
       clipsContent:
         ["hidden", "clip"].includes(style.overflowX) ||
         ["hidden", "clip"].includes(style.overflowY),

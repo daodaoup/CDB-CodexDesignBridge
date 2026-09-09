@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
+  cp,
   mkdir,
   mkdtemp,
   readFile,
@@ -14,6 +15,14 @@ import {
   createCapturedPageManifest,
 } from "../desktop/page-capture.js";
 import { captureLocalPreview } from "../codex-plugin/codex-design-bridge/mcp/browser-capture.mjs";
+import { renderStandalonePageSeed } from "../codex-plugin/codex-design-bridge/mcp/fast-page-patch.mjs";
+import {
+  RESPONSIVE_ACCEPTANCE_WIDTHS,
+  createResponsivePageIrFromNodeTree,
+  diffResponsivePageIr,
+  responsivePageIrToPageSeedNode,
+} from "../codex-plugin/codex-design-bridge/shared/page-ir-responsive-v2.mjs";
+import { CDB_EXACT_BUILD } from "../codex-plugin/codex-design-bridge/shared/runtime-contract.mjs";
 import {
   choosePreviewScript,
   extractPreviewUrl,
@@ -154,6 +163,215 @@ test("captures adjacent inline SVGs as editable SVG nodes", async (t) => {
   );
   assert.match(stars[0].svg, /fill="#D9D9D9"/);
   assert.match(stars[1].svg, /fill="#FF0000"/);
+  assert.equal(stars[0].responsive.maxWidth, null);
+  assert.doesNotMatch(stars[0].svg, />\s+</);
+});
+
+test("preserves exact whitespace for CDB-generated fixed text", async (t) => {
+  const root = await mkdtemp(path.join(os.tmpdir(), "bridge-exact-text-capture-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  await writeFile(
+    path.join(root, "index.html"),
+    [
+      "<!doctype html>",
+      '<main data-codex-root data-codex-id="exact-root">',
+      '  <span data-codex-id="exact-label" data-codex-fixed-size="true"> Leading and trailing </span>',
+      "</main>",
+    ].join("\n"),
+    "utf8",
+  );
+
+  const preview = await startProjectPreview({ rootDirectory: root });
+  t.after(() => preview.stop());
+  const captured = await captureLocalPreview({
+    previewUrl: preview.url,
+    projectDir: root,
+  });
+
+  assert.equal(findNode(captured.manifest.root, "exact-label").text, " Leading and trailing ");
+});
+
+test("captures structure and responsive contract at the requested viewport", async (t) => {
+  const root = await mkdtemp(path.join(os.tmpdir(), "bridge-viewport-capture-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  await writeFile(
+    path.join(root, "index.html"),
+    [
+      "<!doctype html>",
+      "<style>",
+      "  main { width: 100%; min-height: 480px; background: #fff; }",
+      "  .status { width: 120px; height: 40px; background: #ff0000; }",
+      "  @media (max-width: 375px) { .status { width: 96px; background: #00ff00; } }",
+      "</style>",
+      '<main data-codex-root data-codex-id="viewport-root">',
+      '  <div class="status" data-codex-id="viewport-status"></div>',
+      "</main>",
+    ].join("\n"),
+    "utf8",
+  );
+
+  const preview = await startProjectPreview({ rootDirectory: root });
+  t.after(() => preview.stop());
+  const mobile = await captureLocalPreview({
+    previewUrl: preview.url,
+    projectDir: root,
+    width: 320,
+    height: 568,
+  });
+  const desktop = await captureLocalPreview({
+    previewUrl: preview.url,
+    projectDir: root,
+    width: 768,
+    height: 900,
+  });
+
+  assert.deepEqual(mobile.manifest.responsiveContract.designViewport, { width: 320, height: 568 });
+  assert.deepEqual(mobile.manifest.responsiveContract.runtimeViewports[0], {
+    id: "runtime-320",
+    width: 320,
+    height: 568,
+    devicePixelRatio: 1,
+  });
+  assert.equal(findNode(mobile.manifest.root, "viewport-status").width, 96);
+  assert.equal(findNode(mobile.manifest.root, "viewport-status").style.fill, "#00FF00");
+  assert.equal(findNode(desktop.manifest.root, "viewport-status").width, 120);
+  assert.equal(findNode(desktop.manifest.root, "viewport-status").style.fill, "#FF0000");
+});
+
+test("keeps generated HTML stable for ten real browser round trips at all acceptance widths", async (t) => {
+  const root = await mkdtemp(path.join(os.tmpdir(), "bridge-responsive-browser-roundtrip-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  await writeFile(path.join(root, "index.html"), "<!doctype html><title>Preparing</title>", "utf8");
+  const preview = await startProjectPreview({ rootDirectory: root });
+  t.after(() => preview.stop());
+
+  for (const width of RESPONSIVE_ACCEPTANCE_WIDTHS) {
+    const height = width <= 430 ? 874 : width === 768 ? 1024 : 900;
+    let seed = responsiveAcceptanceSeed(width, height);
+    let baseline = null;
+    for (let cycle = 1; cycle <= 10; cycle += 1) {
+      const rendered = renderStandalonePageSeed(seed, {
+        title: `Responsive ${width}`,
+      });
+      await Promise.all([
+        writeFile(path.join(root, "index.html"), rendered.html, "utf8"),
+        writeFile(path.join(root, "styles.css"), rendered.css, "utf8"),
+      ]);
+      const captured = await captureLocalPreview({
+        previewUrl: preview.url,
+        projectDir: root,
+        width,
+        height,
+      });
+      assert.deepEqual(
+        captured.manifest.responsiveContract.designViewport,
+        { width, height },
+        `width ${width}, cycle ${cycle}`,
+      );
+      assert.equal(captured.manifest.root.width, width, `width ${width}, cycle ${cycle}`);
+      assert.equal(captured.manifest.root.height, height, `width ${width}, cycle ${cycle}`);
+
+      const pageIr = createResponsivePageIrFromNodeTree({
+        pageId: `browser-roundtrip-${width}`,
+        projectKey: "browser-roundtrip-matrix",
+        name: `Responsive ${width}`,
+        root: captured.manifest.root,
+        origin: {
+          kind: "html",
+          figmaFileKey: "",
+          rootNodeId: "",
+          rootNodeName: "",
+          sourceFile: "index.html",
+          sourceSelector: '[data-codex-id="page-root"]',
+        },
+        responsiveContract: captured.manifest.responsiveContract,
+        exactBuild: CDB_EXACT_BUILD,
+      });
+      if (baseline) {
+        assert.deepEqual(
+          diffResponsivePageIr(baseline, pageIr),
+          [],
+          `width ${width}, cycle ${cycle}`,
+        );
+        assert.equal(pageIr.irHash, baseline.irHash, `width ${width}, cycle ${cycle}`);
+      } else {
+        baseline = pageIr;
+      }
+      seed = responsivePageIrToPageSeedNode(pageIr);
+    }
+  }
+});
+
+test("keeps the frozen home and search-explore pages exact for ten real browser round trips", async (t) => {
+  const fixturePages = path.resolve("test/fixtures/page-ir-responsive-v2/pages");
+  const pages = [
+    { name: "home", html: "index.html", width: 402, height: 874 },
+    { name: "search-explore", html: "search-explore.html", width: 402, height: 905 },
+  ];
+
+  for (const page of pages) {
+    const root = await mkdtemp(path.join(os.tmpdir(), `bridge-frozen-${page.name}-`));
+    t.after(() => rm(root, { recursive: true, force: true }));
+    await cp(path.join(fixturePages, page.name), root, { recursive: true });
+    if (page.html !== "index.html") {
+      await writeFile(
+        path.join(root, "index.html"),
+        await readFile(path.join(root, page.html), "utf8"),
+        "utf8",
+      );
+    }
+    const preview = await startProjectPreview({ rootDirectory: root });
+    t.after(() => preview.stop());
+    const capturePageIr = async () => {
+      const captured = await captureLocalPreview({
+        previewUrl: preview.url,
+        projectDir: root,
+        width: page.width,
+        height: page.height,
+      });
+      return createResponsivePageIrFromNodeTree({
+        pageId: page.name,
+        projectKey: "frozen-real-pages",
+        name: page.name,
+        root: captured.manifest.root,
+        origin: {
+          kind: "html",
+          figmaFileKey: "",
+          rootNodeId: "",
+          rootNodeName: "",
+          sourceFile: "index.html",
+          sourceSelector: "[data-codex-root]",
+        },
+        responsiveContract: captured.manifest.responsiveContract,
+        exactBuild: CDB_EXACT_BUILD,
+      });
+    };
+
+    const baseline = await capturePageIr();
+    assert.equal(Object.keys(baseline.nodes).length, 69, page.name);
+    let seed = responsivePageIrToPageSeedNode(baseline);
+    for (let cycle = 1; cycle <= 10; cycle += 1) {
+      const rendered = renderStandalonePageSeed(seed, { title: page.name });
+      const assetDirectory = path.join(root, "codex-design-assets");
+      await mkdir(assetDirectory, { recursive: true });
+      await Promise.all([
+        writeFile(path.join(root, "index.html"), rendered.html, "utf8"),
+        writeFile(path.join(root, "styles.css"), rendered.css, "utf8"),
+        ...rendered.assets.map((asset) =>
+          writeFile(path.join(assetDirectory, asset.fileName), asset.bytes),
+        ),
+      ]);
+      const roundTrip = await capturePageIr();
+      assert.equal(Object.keys(roundTrip.nodes).length, 69, `${page.name}, cycle ${cycle}`);
+      assert.deepEqual(
+        diffResponsivePageIr(baseline, roundTrip),
+        [],
+        `${page.name}, cycle ${cycle}`,
+      );
+      assert.equal(roundTrip.irHash, baseline.irHash, `${page.name}, cycle ${cycle}`);
+      seed = responsivePageIrToPageSeedNode(roundTrip);
+    }
+  }
 });
 
 test("activates a declared static tab state before capture", async (t) => {
@@ -279,6 +497,39 @@ test("captures computed SVG paint, gradients, shadows, rotation, and safe text w
   ]);
   assert.equal(version.type, "text");
   assert.ok(version.width > 23, `expected padded text width, received ${version.width}`);
+});
+
+test("round-trips authored Grid tracks and Figma resize constraints through browser capture", async (t) => {
+  const root = await mkdtemp(path.join(os.tmpdir(), "bridge-responsive-grid-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  await writeFile(
+    path.join(root, "index.html"),
+    [
+      "<!doctype html>",
+      "<style>",
+      "  main { width: 640px; min-width: 320px; max-width: 960px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: auto; gap: 12px 16px; }",
+      "  article { width: 240px; height: 80px; background: #7262ff; grid-column: 2; }",
+      "</style>",
+      '<main data-codex-root data-codex-id="responsive-grid" data-codex-grid-columns="repeat(2, minmax(0, 1fr))" data-codex-grid-rows="auto" data-codex-constraint-horizontal="STRETCH" data-codex-constraint-vertical="MIN">',
+      '  <article data-codex-id="grid-card" data-codex-constraint-horizontal="MAX" data-codex-constraint-vertical="CENTER"></article>',
+      "</main>",
+    ].join("\n"),
+    "utf8",
+  );
+
+  const preview = await startProjectPreview({ rootDirectory: root });
+  t.after(() => preview.stop());
+  const captured = await captureLocalPreview({ previewUrl: preview.url, projectDir: root });
+  const pageRoot = captured.manifest.root;
+  const card = findNode(pageRoot, "grid-card");
+
+  assert.equal(pageRoot.layout.kind, "grid");
+  assert.equal(pageRoot.layout.grid.columns, "repeat(2, minmax(0, 1fr))");
+  assert.deepEqual(pageRoot.constraints, { horizontal: "STRETCH", vertical: "MIN" });
+  assert.equal(pageRoot.responsive.minWidth, 320);
+  assert.equal(pageRoot.responsive.maxWidth, 960);
+  assert.equal(card.layoutItem.gridColumn, "2");
+  assert.deepEqual(card.constraints, { horizontal: "MAX", vertical: "CENTER" });
 });
 
 test("captures CSS border triangles and pseudo-element icon details", async (t) => {
@@ -443,6 +694,117 @@ function findNode(node, id) {
     if (found) return found;
   }
   return undefined;
+}
+
+function responsiveAcceptanceSeed(width, height) {
+  const contentWidth = width - 40;
+  return {
+    id: "page-root",
+    type: "frame",
+    tag: "main",
+    name: `Acceptance ${width}`,
+    width,
+    height,
+    x: 0,
+    y: 0,
+    opacity: 1,
+    visible: true,
+    rotation: 0,
+    clipsContent: true,
+    style: { fill: "#101114" },
+    constraints: { horizontal: "STRETCH", vertical: "MIN" },
+    responsive: {
+      constraints: { horizontal: "STRETCH", vertical: "MIN" },
+      minWidth: width,
+      maxWidth: width,
+    },
+    layoutItem: {
+      horizontalSizing: "fixed",
+      verticalSizing: "fixed",
+    },
+    layout: {
+      kind: "flex",
+      mode: "VERTICAL",
+      direction: "vertical",
+      wrap: false,
+      itemSpacing: 16,
+      counterAxisSpacing: 16,
+      padding: { top: 24, right: 20, bottom: 24, left: 20 },
+      primaryAxisAlignItems: "MIN",
+      counterAxisAlignItems: "MIN",
+      primaryAxisSizingMode: "FIXED",
+      counterAxisSizingMode: "FIXED",
+    },
+    children: [{
+      id: "acceptance-title",
+      type: "text",
+      tag: "span",
+      name: "Acceptance title",
+      text: `Acceptance ${width}`,
+      width: contentWidth,
+      height: 44,
+      x: 0,
+      y: 0,
+      opacity: 1,
+      visible: true,
+      rotation: 0,
+      style: { fill: "#FFFFFF" },
+      constraints: { horizontal: "STRETCH", vertical: "MIN" },
+      layoutItem: {
+        horizontalSizing: "fixed",
+        verticalSizing: "fixed",
+      },
+      fontName: { family: "Inter", style: "Regular" },
+      fontSize: 24,
+      lineHeight: { unit: "PIXELS", value: 32 },
+      letterSpacing: { unit: "PIXELS", value: 0 },
+      textAlignHorizontal: "LEFT",
+      textAlignVertical: "TOP",
+      textCase: "ORIGINAL",
+      textDecoration: "NONE",
+      textAutoResize: "NONE",
+      textTruncation: "ENDING",
+      maxLines: 1,
+    }, {
+      id: "acceptance-card",
+      type: "frame",
+      tag: "section",
+      name: "Acceptance card",
+      width: contentWidth,
+      height: 160,
+      x: 0,
+      y: 0,
+      opacity: 1,
+      visible: true,
+      rotation: 0,
+      clipsContent: true,
+      style: {
+        fill: "#1C1D22",
+        stroke: "#30323A",
+        strokeWeight: 1,
+        cornerRadius: 18,
+      },
+      constraints: { horizontal: "STRETCH", vertical: "MIN" },
+      layoutItem: {
+        horizontalSizing: "fixed",
+        verticalSizing: "fixed",
+      },
+      layout: {
+        kind: "flex",
+        mode: "HORIZONTAL",
+        direction: "horizontal",
+        wrap: false,
+        itemSpacing: 12,
+        counterAxisSpacing: 12,
+        padding: { top: 16, right: 16, bottom: 16, left: 16 },
+        primaryAxisAlignItems: "MIN",
+        counterAxisAlignItems: "CENTER",
+        primaryAxisSizingMode: "FIXED",
+        counterAxisSizingMode: "FIXED",
+      },
+      children: [],
+    }],
+  };
 }
 
 function collectNodeText(node) {

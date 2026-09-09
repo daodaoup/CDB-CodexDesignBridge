@@ -1,0 +1,692 @@
+[
+  {
+    "pageNodeId": "figma-node-566-100",
+    "figmaNodeId": "566:100",
+    "nodeType": "frame",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-100\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-101",
+    "figmaNodeId": "566:101",
+    "nodeType": "text",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-101\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-102",
+    "figmaNodeId": "566:102",
+    "nodeType": "text",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-102\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-103",
+    "figmaNodeId": "566:103",
+    "nodeType": "frame",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-103\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-104",
+    "figmaNodeId": "566:104",
+    "nodeType": "image",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-104\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-105",
+    "figmaNodeId": "566:105",
+    "nodeType": "frame",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-105\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-106",
+    "figmaNodeId": "566:106",
+    "nodeType": "text",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-106\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-107",
+    "figmaNodeId": "566:107",
+    "nodeType": "text",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-107\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-108",
+    "figmaNodeId": "566:108",
+    "nodeType": "frame",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-108\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-109",
+    "figmaNodeId": "566:109",
+    "nodeType": "text",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-109\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-110",
+    "figmaNodeId": "566:110",
+    "nodeType": "frame",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-110\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-111",
+    "figmaNodeId": "566:111",
+    "nodeType": "frame",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-111\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-112",
+    "figmaNodeId": "566:112",
+    "nodeType": "image",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-112\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-113",
+    "figmaNodeId": "566:113",
+    "nodeType": "frame",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-113\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-114",
+    "figmaNodeId": "566:114",
+    "nodeType": "text",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-114\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-115",
+    "figmaNodeId": "566:115",
+    "nodeType": "text",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-115\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-116",
+    "figmaNodeId": "566:116",
+    "nodeType": "text",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-116\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-117",
+    "figmaNodeId": "566:117",
+    "nodeType": "frame",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-117\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-118",
+    "figmaNodeId": "566:118",
+    "nodeType": "image",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-118\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-120",
+    "figmaNodeId": "566:120",
+    "nodeType": "frame",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-120\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-121",
+    "figmaNodeId": "566:121",
+    "nodeType": "image",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-121\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-122",
+    "figmaNodeId": "566:122",
+    "nodeType": "frame",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-122\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-123",
+    "figmaNodeId": "566:123",
+    "nodeType": "text",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-123\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-124",
+    "figmaNodeId": "566:124",
+    "nodeType": "text",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-124\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-125",
+    "figmaNodeId": "566:125",
+    "nodeType": "text",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-125\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-126",
+    "figmaNodeId": "566:126",
+    "nodeType": "frame",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-126\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-127",
+    "figmaNodeId": "566:127",
+    "nodeType": "image",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-127\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-129",
+    "figmaNodeId": "566:129",
+    "nodeType": "frame",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-129\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-130",
+    "figmaNodeId": "566:130",
+    "nodeType": "frame",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-130\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-131",
+    "figmaNodeId": "566:131",
+    "nodeType": "frame",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-131\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-132",
+    "figmaNodeId": "566:132",
+    "nodeType": "image",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-132\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-134",
+    "figmaNodeId": "566:134",
+    "nodeType": "text",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-134\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-135",
+    "figmaNodeId": "566:135",
+    "nodeType": "frame",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-135\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-136",
+    "figmaNodeId": "566:136",
+    "nodeType": "image",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-136\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-138",
+    "figmaNodeId": "566:138",
+    "nodeType": "text",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-138\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-139",
+    "figmaNodeId": "566:139",
+    "nodeType": "frame",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-139\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-140",
+    "figmaNodeId": "566:140",
+    "nodeType": "image",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-140\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-142",
+    "figmaNodeId": "566:142",
+    "nodeType": "text",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-142\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-143",
+    "figmaNodeId": "566:143",
+    "nodeType": "frame",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-143\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-144",
+    "figmaNodeId": "566:144",
+    "nodeType": "image",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-144\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-146",
+    "figmaNodeId": "566:146",
+    "nodeType": "text",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-146\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-147",
+    "figmaNodeId": "566:147",
+    "nodeType": "frame",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-147\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-148",
+    "figmaNodeId": "566:148",
+    "nodeType": "svg",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-148\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-72",
+    "figmaNodeId": "566:72",
+    "nodeType": "frame",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-72\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-73",
+    "figmaNodeId": "566:73",
+    "nodeType": "frame",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-73\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-74",
+    "figmaNodeId": "566:74",
+    "nodeType": "text",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-74\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-75",
+    "figmaNodeId": "566:75",
+    "nodeType": "frame",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-75\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-76",
+    "figmaNodeId": "566:76",
+    "nodeType": "image",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-76\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-78",
+    "figmaNodeId": "566:78",
+    "nodeType": "image",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-78\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-80",
+    "figmaNodeId": "566:80",
+    "nodeType": "image",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-80\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-82",
+    "figmaNodeId": "566:82",
+    "nodeType": "frame",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-82\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-83",
+    "figmaNodeId": "566:83",
+    "nodeType": "frame",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-83\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-84",
+    "figmaNodeId": "566:84",
+    "nodeType": "text",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-84\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-85",
+    "figmaNodeId": "566:85",
+    "nodeType": "text",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-85\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-86",
+    "figmaNodeId": "566:86",
+    "nodeType": "frame",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-86\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-87",
+    "figmaNodeId": "566:87",
+    "nodeType": "frame",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-87\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-88",
+    "figmaNodeId": "566:88",
+    "nodeType": "frame",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-88\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-89",
+    "figmaNodeId": "566:89",
+    "nodeType": "text",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-89\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-90",
+    "figmaNodeId": "566:90",
+    "nodeType": "text",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-90\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-91",
+    "figmaNodeId": "566:91",
+    "nodeType": "frame",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-91\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-92",
+    "figmaNodeId": "566:92",
+    "nodeType": "frame",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-92\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-93",
+    "figmaNodeId": "566:93",
+    "nodeType": "frame",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-93\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-94",
+    "figmaNodeId": "566:94",
+    "nodeType": "image",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-94\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-95",
+    "figmaNodeId": "566:95",
+    "nodeType": "frame",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-95\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-96",
+    "figmaNodeId": "566:96",
+    "nodeType": "text",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-96\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-97",
+    "figmaNodeId": "566:97",
+    "nodeType": "text",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-97\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-98",
+    "figmaNodeId": "566:98",
+    "nodeType": "frame",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-98\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "figma-node-566-99",
+    "figmaNodeId": "566:99",
+    "nodeType": "image",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"figma-node-566-99\"]",
+      "component": ""
+    }
+  },
+  {
+    "pageNodeId": "page-root",
+    "figmaNodeId": "566:71",
+    "nodeType": "frame",
+    "sourceRef": {
+      "file": "index.html",
+      "selector": "[data-codex-id=\"page-root\"]",
+      "component": ""
+    }
+  }
+]

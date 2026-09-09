@@ -18,4 +18,26 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: Validate Windows release package
+        shell: pwsh
+        run: |
+          ./scripts/install-codex-design-bridge.ps1 `
+            -CheckOnly `
+            -SourcePath ./codex-plugin/codex-design-bridge `
+            -ReportPath "$env:RUNNER_TEMP\cdb-windows-package-check.json"
+      - name: Verify Windows daemon crash recovery
+        shell: pwsh
+        run: |
+          node ./scripts/verify-local-runtime.mjs `
+            --plugin-root ./codex-plugin/codex-design-bridge `
+            --report "$env:RUNNER_TEMP\cdb-windows-runtime-recovery.json"
+      - name: Upload Windows verification evidence
+        uses: actions/upload-artifact@v7
+        with:
+          name: cdb-windows-verification
+          path: |
+            ${{ runner.temp }}/cdb-windows-package-check.json
+            ${{ runner.temp }}/cdb-windows-runtime-recovery.json
+          if-no-files-found: error
+          retention-days: 14
       - run: npm run check

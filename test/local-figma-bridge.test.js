@@ -7,10 +7,300 @@ import {
   rm,
   writeFile,
 } from "node:fs/promises";
+import { readFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { WebSocket } from "ws";
+import { WebSocket } from "../codex-plugin/codex-design-bridge/vendor/ws/wrapper.mjs";
 import { LocalFigmaBridge } from "../codex-plugin/codex-design-bridge/mcp/local-figma-bridge.mjs";
+import { DesignOfferStore } from "../codex-plugin/codex-design-bridge/mcp/design-offer-store.mjs";
+import { SyncBaselineStore } from "../codex-plugin/codex-design-bridge/mcp/sync-baseline-store.mjs";
+import { preparePageManifest } from "../codex-plugin/codex-design-bridge/shared/page.mjs";
+import { responsivePageIrToPageSeedNode as pageIrToPageSeedNode } from "../codex-plugin/codex-design-bridge/shared/page-ir-responsive-v2.mjs";
+
+function runtimeIdentity(exactBuild = "0.9.0+codex.20260829100031") {
+  return {
+    kind: "cdb-0.9-responsive-v2",
+    protocolVersion: 16,
+    pageIrSchemaVersion: 2,
+    exactBuild,
+  };
+}
+
+function responsiveContract(width = 402, height = 874) {
+  return {
+    designViewport: { width, height },
+    runtimeViewports: [{ id: `figma-${width}`, width, height, devicePixelRatio: 1 }],
+    previewScale: { mode: "one-to-one", value: 1, breakpointId: null },
+    breakpoints: [],
+  };
+}
+
+test("accepts protocol 16 exact-build design offers idempotently and replays results", async (t) => {
+  const projectDir = await mkdtemp(path.join(os.tmpdir(), "local-figma-offer-"));
+  const offerStore = new DesignOfferStore(path.join(projectDir, "offers.json"));
+  const bridge = new LocalFigmaBridge(projectDir, {
+    port: 0,
+    runtimeVersion: "0.9.0+codex.20260829100031",
+    offerStore,
+    onDesignPayload: async (receivedOffer) => ({
+      projectDir: path.join(projectDir, "generated"),
+      pageId: receivedOffer.payloadSummary.pageId,
+      preflightStatus: "pass",
+    }),
+  });
+  await bridge.start();
+  t.after(async () => {
+    await bridge.stop();
+    await rm(projectDir, { recursive: true, force: true });
+  });
+  const pairing = await fetch(`http://localhost:${bridge.status().port}/api/pair`, {
+    headers: { origin: "https://www.figma.com" },
+  }).then((response) => response.json());
+  const socket = new WebSocket(`${pairing.wsUrl}?token=${pairing.token}`, {
+    origin: "https://www.figma.com",
+  });
+  const inbox = messageInbox(socket);
+  await new Promise((resolve, reject) => {
+    socket.once("open", resolve);
+    socket.once("error", reject);
+  });
+  t.after(() => socket.close());
+  socket.send(JSON.stringify({
+    type: "plugin.hello",
+    protocolVersion: 16,
+    runtimeIdentity: runtimeIdentity(),
+    pluginVersion: "0.9.0",
+    sessionId: "session-12345678",
+  }));
+  assert.equal((await inbox.next("plugin.ready")).protocolVersion, 16);
+  await inbox.next("figma.design.inbox");
+  const offer = {
+    type: "figma.design.offer",
+    protocolVersion: 16,
+    runtimeIdentity: runtimeIdentity(),
+    offerId: "offer-12345678",
+    sessionId: "session-12345678",
+    figmaFileKey: "file-1",
+    rootNodeId: "42:17",
+    rootName: "Home",
+    rootType: "FRAME",
+    width: 402,
+    height: 874,
+    responsiveContract: responsiveContract(),
+    estimatedNodeCount: 20,
+    linkedProjectKey: "",
+    linkedPageId: "",
+    createdAt: "2026-08-12T00:00:00.000Z",
+  };
+  socket.send(JSON.stringify(offer));
+  assert.equal((await inbox.next("figma.design.offer.ack")).duplicate, false);
+  await inbox.next("figma.design.inbox");
+  socket.send(JSON.stringify(offer));
+  assert.equal((await inbox.next("figma.design.offer.ack")).duplicate, true);
+  socket.send(JSON.stringify({
+    type: "figma.design.result.query",
+    protocolVersion: 16,
+    runtimeIdentity: runtimeIdentity(),
+    sessionId: offer.sessionId,
+    offerId: offer.offerId,
+  }));
+  assert.equal((await inbox.next("figma.design.result")).state, "pending");
+  const acceptPromise = bridge.acceptDesignOffer(offer.offerId, {
+    action: "create_project",
+    workspaceDir: projectDir,
+  });
+  const accepted = await inbox.next("figma.design.accept");
+  assert.equal(accepted.rootNodeId, "42:17");
+  assert.equal(accepted.target.action, "create_project");
+  await acceptPromise;
+  socket.send(JSON.stringify({
+    type: "figma.design.progress",
+    protocolVersion: 16,
+    runtimeIdentity: runtimeIdentity(),
+    offerId: offer.offerId,
+    sessionId: offer.sessionId,
+    phase: "collecting",
+    completed: 1,
+    total: 20,
+    message: "Collecting layers",
+  }));
+  await inbox.next("figma.design.inbox");
+  socket.send(JSON.stringify({
+    type: "figma.design.payload",
+    protocolVersion: 16,
+    runtimeIdentity: runtimeIdentity(),
+    offerId: offer.offerId,
+    sessionId: offer.sessionId,
+    figma: { rootNodeId: "42:17", rootNodeName: "Home" },
+    pageSeed: { node: {
+      id: "page-root",
+      type: "frame",
+      name: "Home",
+      width: 402,
+      height: 874,
+      constraints: { horizontal: "MIN", vertical: "MIN" },
+      layoutItem: { horizontalSizing: "fixed", verticalSizing: "fixed" },
+      layout: { kind: "none", direction: "none" },
+      children: [],
+    } },
+    referenceImage: sampleVisualReference(),
+    responsiveContract: responsiveContract(),
+    report: { nodeCount: 1, resourceBytes: 0, resourceCount: 0, degradations: [] },
+    capturedAt: "2026-08-12T00:01:00.000Z",
+  }));
+  const payloadResult = await inbox.next("figma.design.result");
+  assert.equal(payloadResult.state, "completed");
+  assert.equal(payloadResult.result.preflightStatus, "pass");
+  assert.equal((await offerStore.get(offer.offerId)).payloadSummary.nodeCount, 1);
+  assert.equal((await offerStore.get(offer.offerId)).state, "completed");
+});
+
+function sampleVisualReference() {
+  const bytes = readFileSync(new URL(
+    "./fixtures/page-ir-responsive-v2/screenshots/home-402x874.png",
+    import.meta.url,
+  ));
+  return {
+    mimeType: "image/png",
+    base64: bytes.toString("base64"),
+    width: 402,
+    height: 874,
+  };
+}
+
+test("replaces an older project connection and sends page imports only to the latest client", async (t) => {
+  const projectDir = await mkdtemp(path.join(os.tmpdir(), "local-figma-client-replace-"));
+  const bridge = new LocalFigmaBridge(projectDir, {
+    port: 0,
+    runtimeVersion: "0.9.0+codex.20260829100031",
+    projectKey: "shared-project-key",
+  });
+  await bridge.start();
+  t.after(async () => {
+    await bridge.stop();
+    await rm(projectDir, { recursive: true, force: true });
+  });
+  const pairing = await fetch(`http://localhost:${bridge.status().port}/api/pair`, {
+    headers: { origin: "https://www.figma.com" },
+  }).then((response) => response.json());
+
+  const firstSocket = new WebSocket(`${pairing.wsUrl}?token=${pairing.token}`, {
+    origin: "https://www.figma.com",
+  });
+  const firstInbox = messageInbox(firstSocket);
+  await new Promise((resolve, reject) => {
+    firstSocket.once("open", resolve);
+    firstSocket.once("error", reject);
+  });
+  t.after(() => firstSocket.close());
+  firstSocket.send(JSON.stringify({
+    type: "plugin.hello",
+    protocolVersion: 16,
+    runtimeIdentity: runtimeIdentity(),
+    pluginVersion: "0.9.0",
+    sessionId: "first-session-1234",
+    projectKey: "shared-project-key",
+  }));
+  await firstInbox.next("plugin.ready");
+
+  const secondSocket = new WebSocket(`${pairing.wsUrl}?token=${pairing.token}`, {
+    origin: "https://www.figma.com",
+  });
+  const secondInbox = messageInbox(secondSocket);
+  await new Promise((resolve, reject) => {
+    secondSocket.once("open", resolve);
+    secondSocket.once("error", reject);
+  });
+  t.after(() => secondSocket.close());
+  secondSocket.send(JSON.stringify({
+    type: "plugin.hello",
+    protocolVersion: 16,
+    runtimeIdentity: runtimeIdentity(),
+    pluginVersion: "0.9.0",
+    sessionId: "second-session-1234",
+    projectKey: "shared-project-key",
+  }));
+  assert.equal((await firstInbox.next("session.replaced")).reason, "newer_connection");
+  await secondInbox.next("plugin.ready");
+
+  const importPromise = bridge.pushPage(sampleManifest());
+  const upsert = await secondInbox.next("page.upsert");
+  secondSocket.send(JSON.stringify({
+    type: "page.import.result",
+    result: {
+      ok: true,
+      pageId: upsert.page.pageId,
+      sourceHash: upsert.page.sourceHash,
+      nodeId: "22:1",
+      fileKey: "latest-file",
+      figmaPageId: "2:1",
+      nodes: upsert.page.nodeIds.length,
+      nodeMappings: [{ pageNodeId: "root", figmaNodeId: "22:1" }],
+    },
+  }));
+  await importPromise;
+  await new Promise((resolve) => setTimeout(resolve, 25));
+  assert.equal(firstInbox.count("page.upsert"), 0);
+});
+
+test("honors the configured Figma long-operation timeout for a slow page import", async (t) => {
+  const projectDir = await mkdtemp(path.join(os.tmpdir(), "local-figma-slow-import-"));
+  const bridge = new LocalFigmaBridge(projectDir, {
+    port: 0,
+    runtimeVersion: "0.9.0+codex.20260829100031",
+    projectKey: "slow-import-project",
+    operationTimeoutMs: 100,
+  });
+  await bridge.start();
+  t.after(async () => {
+    await bridge.stop();
+    await rm(projectDir, { recursive: true, force: true });
+  });
+  const pairing = await fetch(`http://localhost:${bridge.status().port}/api/pair`, {
+    headers: { origin: "https://www.figma.com" },
+  }).then((response) => response.json());
+  const socket = new WebSocket(`${pairing.wsUrl}?token=${pairing.token}`, {
+    origin: "https://www.figma.com",
+  });
+  const inbox = messageInbox(socket);
+  await new Promise((resolve, reject) => {
+    socket.once("open", resolve);
+    socket.once("error", reject);
+  });
+  t.after(() => socket.close());
+  socket.send(JSON.stringify({
+    type: "plugin.hello",
+    protocolVersion: 16,
+    runtimeIdentity: runtimeIdentity(),
+    pluginVersion: "0.9.0",
+    sessionId: "slow-import-session",
+    projectKey: "slow-import-project",
+  }));
+  await inbox.next("plugin.ready");
+
+  const importPromise = bridge.pushPage(sampleManifest());
+  const upsert = await inbox.next("page.upsert");
+  await new Promise((resolve) => setTimeout(resolve, 35));
+  socket.send(JSON.stringify({
+    type: "page.import.result",
+    result: {
+      ok: true,
+      pageId: upsert.page.pageId,
+      sourceHash: upsert.page.sourceHash,
+      nodeId: "52:1",
+      fileKey: "slow-file",
+      figmaPageId: "5:1",
+      nodes: upsert.page.nodeIds.length,
+      nodeMappings: upsert.page.nodeIds.map((pageNodeId, index) => ({
+        pageNodeId,
+        figmaNodeId: `52:${index + 1}`,
+      })),
+    },
+  }));
+  const imported = await importPromise;
+  assert.equal(imported.ok, true);
+  assert.equal(imported.nodeCount, 2);
+});
 
 test("local Figma bridge auto-pairs, imports a page, and stores changes", async (t) => {
   const projectDir = await mkdtemp(path.join(os.tmpdir(), "local-figma-bridge-"));
@@ -22,7 +312,7 @@ test("local Figma bridge auto-pairs, imports a page, and stores changes", async 
   await writeFile(path.join(projectDir, "styles.css"), "", "utf8");
   const bridge = new LocalFigmaBridge(projectDir, {
     port: 0,
-    runtimeVersion: "0.7.0+codex.test",
+    runtimeVersion: "0.9.0+codex.20260829100031",
     onFastApply: async (result) => ({
       sourceHash: `synced-${result.pageId}`,
     }),
@@ -99,15 +389,26 @@ test("local Figma bridge auto-pairs, imports a page, and stores changes", async 
   socket.send(
     JSON.stringify({
       type: "plugin.hello",
-      protocolVersion: 14,
+      protocolVersion: 16,
+    runtimeIdentity: runtimeIdentity(),
       pluginVersion: "0.6.0",
+      sessionId: "outdated-session",
       importedAssetIds: [],
       importedPageIds: [],
     }),
   );
   const buildMismatch = await inbox.next("bridge.error");
   assert.equal(buildMismatch.code, "version_mismatch");
-  assert.match(buildMismatch.error, /0\.6\.0.*0\.7\.0/);
+  assert.match(buildMismatch.error, /0\.6\.0.*0\.9\.0/);
+
+  socket.send(JSON.stringify({
+    type: "plugin.hello",
+    protocolVersion: 16,
+    runtimeIdentity: runtimeIdentity("0.9.0+codex.20260825000000"),
+    pluginVersion: "0.9.0",
+    sessionId: "stale-exact-build",
+  }));
+  assert.equal((await inbox.next("bridge.error")).code, "runtime_identity_mismatch");
 
   socket.send(
     JSON.stringify({
@@ -117,11 +418,25 @@ test("local Figma bridge auto-pairs, imports a page, and stores changes", async 
       importedPageIds: [],
     }),
   );
+  const legacyMismatch = await inbox.next("bridge.error");
+  assert.equal(legacyMismatch.code, "version_mismatch");
+
+  socket.send(
+    JSON.stringify({
+      type: "plugin.hello",
+      protocolVersion: 16,
+    runtimeIdentity: runtimeIdentity(),
+      pluginVersion: "0.9.0",
+      sessionId: "session-current-only",
+      importedAssetIds: [],
+      importedPageIds: [],
+    }),
+  );
   const ready = await inbox.next("plugin.ready");
-  assert.equal(ready.protocolVersion, 14);
-  assert.equal(ready.runtimeVersion, "0.7.0+codex.test");
+  assert.equal(ready.protocolVersion, 16);
+  assert.equal(ready.runtimeVersion, "0.9.0+codex.20260829100031");
   assert.equal(ready.localWorkspace, true);
-  assert.deepEqual(bridge.status().figmaPluginVersions, ["protocol-13"]);
+  assert.deepEqual(bridge.status().figmaPluginVersions, ["0.9.0"]);
   assert.equal(bridge.status().connected, true);
   assert.equal(bridge.status().lastError, "");
 
@@ -137,12 +452,120 @@ test("local Figma bridge auto-pairs, imports a page, and stores changes", async 
         nodeId: "12:34",
         fileKey: "test-file",
         nodes: upsert.page.nodeIds.length,
+        nodeMappings: [
+          { pageNodeId: "root", figmaNodeId: "12:34" },
+          { pageNodeId: "headline", figmaNodeId: "12:35" },
+        ],
       },
     }),
   );
   const imported = await importPromise;
   assert.equal(imported.nodeCount, upsert.page.nodeIds.length);
   assert.equal(imported.figmaUrl, undefined);
+  const importBaseline = await new SyncBaselineStore(projectDir).get("local-preview");
+  assert.equal(importBaseline.sourceHash, upsert.page.sourceHash);
+  assert.equal(importBaseline.figma.rootNodeId, "12:34");
+  assert.equal(importBaseline.pageIr.nodes.headline.content.characters, "Before");
+  assert.equal(importBaseline.pageIr.nodes.headline.figma.nodeId, "12:35");
+  assert.equal(importBaseline.nodeMappings.find((entry) => entry.pageNodeId === "headline").figmaNodeId, "12:35");
+
+  socket.send(JSON.stringify({
+    type: "plugin.hello",
+    protocolVersion: 16,
+    runtimeIdentity: runtimeIdentity(),
+    pluginVersion: "0.9.0",
+    sessionId: "session-current-only",
+    importedAssetIds: [],
+    importedPageIds: ["local-preview"],
+  }));
+  await inbox.next("plugin.ready");
+  await inbox.next("page.catalog");
+  await new Promise((resolve) => setTimeout(resolve, 25));
+  assert.equal(
+    inbox.count("page.upsert"),
+    0,
+    "repeated hello on the same connection must not replay imported pages",
+  );
+
+  const conflictManifest = sampleManifest();
+  conflictManifest.sourceHash = "html-conflict-source";
+  conflictManifest.root.style.fill = "#F0F4FF";
+  const conflictImport = bridge.pushPage(conflictManifest, {
+    conflictResolution: {
+      direction: "html",
+      transactionId: "conflict-html:bridge-test",
+    },
+  });
+  const conflictUpsert = await inbox.next("page.upsert");
+  assert.equal(
+    conflictUpsert.page.conflictResolution.transactionId,
+    "conflict-html:bridge-test",
+  );
+  socket.send(JSON.stringify({
+    type: "page.import.result",
+    result: {
+      ok: true,
+      pageId: conflictUpsert.page.pageId,
+      nodeId: "12:34",
+      fileKey: "test-file",
+      nodes: conflictUpsert.page.nodeIds.length,
+      sourceHash: upsert.page.sourceHash,
+      transactionId: "",
+    },
+  }));
+  socket.send(JSON.stringify({
+    type: "page.import.result",
+    result: {
+      ok: true,
+      pageId: conflictUpsert.page.pageId,
+      nodeId: "12:34",
+      fileKey: "test-file",
+      nodes: conflictUpsert.page.nodeIds.length,
+      sourceHash: conflictUpsert.page.sourceHash,
+      transactionId: "conflict-html:bridge-test",
+    },
+  }));
+  await conflictImport;
+  const conflictBaseline = await new SyncBaselineStore(projectDir).get("local-preview");
+  assert.equal(conflictBaseline.sourceHash, conflictUpsert.page.sourceHash);
+  assert.equal(conflictBaseline.pageIr.nodes.root.appearance.fill, "#F0F4FF");
+
+  const mismatchedManifest = structuredClone(conflictManifest);
+  mismatchedManifest.sourceHash = "html-conflict-source-mismatch";
+  mismatchedManifest.root.style.fill = "#F0F4FE";
+  const mismatchedConflictImport = bridge.pushPage(mismatchedManifest, {
+    conflictResolution: {
+      direction: "html",
+      transactionId: "conflict-html:bridge-test-mismatch",
+    },
+  });
+  const mismatchedUpsert = await inbox.next("page.upsert");
+  socket.send(JSON.stringify({
+    type: "page.import.result",
+    result: {
+      ok: true,
+      pageId: mismatchedUpsert.page.pageId,
+      nodeId: "12:34",
+      fileKey: "test-file",
+      nodes: mismatchedUpsert.page.nodeIds.length,
+      sourceHash: mismatchedUpsert.page.sourceHash,
+      transactionId: "",
+    },
+  }));
+  await assert.rejects(
+    mismatchedConflictImport,
+    (error) => error.code === "figma_conflict_transaction_mismatch",
+  );
+  const preservedBaseline = await new SyncBaselineStore(projectDir).get("local-preview");
+  assert.equal(preservedBaseline.sourceHash, conflictBaseline.sourceHash);
+  assert.equal(preservedBaseline.pageIr.nodes.root.appearance.fill, "#F0F4FF");
+  await bridge.baselineStore.commit({
+    pageIr: importBaseline.pageIr,
+    sourceHash: importBaseline.sourceHash,
+    figma: importBaseline.figma,
+    transactionId: importBaseline.transactionId,
+  });
+  bridge.pages.set(upsert.page.pageId, upsert.page);
 
   const secondManifest = sampleManifest();
   secondManifest.pageId = "settings-preview";
@@ -171,6 +594,8 @@ test("local Figma bridge auto-pairs, imports a page, and stores changes", async 
       type: "page.changes.record",
       requestId: request.requestId,
       changeSet: {
+        protocolVersion: 16,
+    runtimeIdentity: runtimeIdentity(),
         changeSetId: "change-1",
         pageId: "local-preview",
         sourceHash: upsert.page.sourceHash,
@@ -196,6 +621,8 @@ test("local Figma bridge auto-pairs, imports a page, and stores changes", async 
       type: "page.changes.record",
       requestId: request.requestId,
       changeSet: {
+        protocolVersion: 16,
+    runtimeIdentity: runtimeIdentity(),
         changeSetId: "change-2",
         pageId: "settings-preview",
         sourceHash: secondUpsert.page.sourceHash,
@@ -304,7 +731,10 @@ test("publishes manifest pages and accepts page-list import requests", async (t)
   socket.send(
     JSON.stringify({
       type: "plugin.hello",
-      protocolVersion: 14,
+      protocolVersion: 16,
+    runtimeIdentity: runtimeIdentity(),
+      pluginVersion: "0.9.0",
+      sessionId: "workspace-session-1234",
       importedAssetIds: [],
       importedPageIds: [],
       changedPageIds: ["settings"],
@@ -341,6 +771,7 @@ test("publishes manifest pages and accepts page-list import requests", async (t)
 
 test("accepts a Figma-first page without importing a Codex page first", async (t) => {
   const projectDir = await mkdtemp(path.join(os.tmpdir(), "local-figma-seed-"));
+  const seedHashAfter = "a".repeat(64);
   await writeFile(
     path.join(projectDir, "index.html"),
     '<link rel="stylesheet" href="./styles.css"><main data-codex-root data-codex-id="page-root"><p data-codex-id="figma-seed-placeholder">Waiting</p></main>',
@@ -349,7 +780,7 @@ test("accepts a Figma-first page without importing a Codex page first", async (t
   await writeFile(path.join(projectDir, "styles.css"), "", "utf8");
   const bridge = new LocalFigmaBridge(projectDir, {
     port: 0,
-    onFastApply: async () => ({ sourceHash: "seed-hash-after" }),
+    onFastApply: async () => ({ sourceHash: seedHashAfter }),
   });
   bridge.setPageCatalog([{
     id: "seed-page",
@@ -380,7 +811,10 @@ test("accepts a Figma-first page without importing a Codex page first", async (t
   t.after(() => socket.close());
   socket.send(JSON.stringify({
     type: "plugin.hello",
-    protocolVersion: 14,
+    protocolVersion: 16,
+    runtimeIdentity: runtimeIdentity(),
+    pluginVersion: "0.9.0",
+    sessionId: "seed-session-1234",
     importedAssetIds: [],
     importedPageIds: [],
   }));
@@ -392,9 +826,12 @@ test("accepts a Figma-first page without importing a Codex page first", async (t
     type: "page.changes.record",
     requestId: "seed-request",
     changeSet: {
+      protocolVersion: 16,
+    runtimeIdentity: runtimeIdentity(),
       changeSetId: "seed-change",
       pageId: "seed-page",
       sourceHash: "seed-hash-before",
+      responsiveContract: responsiveContract(),
       changes: [{
         nodeId: "page-root",
         nodeType: "FRAME",
@@ -406,8 +843,9 @@ test("accepts a Figma-first page without importing a Codex page first", async (t
             type: "frame",
             tag: "main",
             name: "Figma page",
-            width: 390,
-            height: 844,
+            figmaNodeId: "42:1",
+            width: 402,
+            height: 874,
             opacity: 1,
             visible: true,
             rotation: 0,
@@ -418,14 +856,424 @@ test("accepts a Figma-first page without importing a Codex page first", async (t
         },
       }],
       annotations: [],
+      figma: { fileKey: "figma-seed-file", rootNodeId: "42:1", rootNodeName: "Figma page" },
     },
   }));
   const accepted = await inbox.next("page.changes.ack");
   assert.equal(accepted.state, "applied");
-  assert.equal(accepted.sourceHash, "seed-hash-after");
+  assert.equal(accepted.sourceHash, seedHashAfter);
   const source = await readFile(path.join(projectDir, "index.html"), "utf8");
   assert.match(source, /data-codex-root data-codex-id="page-root"/);
   assert.doesNotMatch(source, /figma-seed-placeholder/);
+  const seedBaseline = await new SyncBaselineStore(projectDir).get("seed-page");
+  assert.notEqual(seedBaseline.transactionId, "seed-change");
+  assert.equal(seedBaseline.sourceHash, seedHashAfter);
+  assert.equal(seedBaseline.pageIr.origin.kind, "figma");
+  assert.equal(seedBaseline.figma.fileKey, "figma-seed-file");
+  assert.equal(seedBaseline.nodeMappings.find((entry) => entry.pageNodeId === "page-root").figmaNodeId, "42:1");
+});
+
+test("preflights complete Figma snapshots with a three-way Page IR merge", async (t) => {
+  const projectDir = await mkdtemp(path.join(os.tmpdir(), "local-figma-page-ir-"));
+  t.after(() => rm(projectDir, { recursive: true, force: true }));
+  const baselineManifest = sampleManifest();
+  const imageBase64 = Buffer.from("stable-image-resource").toString("base64");
+  baselineManifest.nodeIds.push("cover");
+  baselineManifest.root.children.push({
+    id: "cover",
+    type: "image",
+    tag: "img",
+    name: "Cover",
+    width: 160,
+    height: 160,
+    x: 0,
+    y: 80,
+    rotation: 0,
+    visible: true,
+    opacity: 1,
+    sourceRef: { file: "cover.png", selector: '[data-codex-id="cover"]' },
+    constraints: { horizontal: "MIN", vertical: "MIN" },
+    layoutItem: { horizontalSizing: "fixed", verticalSizing: "fixed" },
+    style: { fill: "#FFFFFF" },
+    image: { mimeType: "image/png", base64: imageBase64 },
+  });
+  const prepared = preparePageManifest({
+    json: JSON.stringify(baselineManifest),
+    sourcePath: "index.html",
+  });
+  let htmlManifest = baselineManifest;
+  const bridge = new LocalFigmaBridge(projectDir, {
+    projectKey: "project-1",
+    onCaptureHtmlPage: async () => structuredClone(htmlManifest),
+  });
+  const mappedBaseline = structuredClone(prepared.pageIr);
+  mappedBaseline.nodes.root.figma = { nodeId: "42:17" };
+  mappedBaseline.nodes.headline.figma = { nodeId: "42:18" };
+  await bridge.baselineStore.commit({
+    pageIr: mappedBaseline,
+    sourceHash: prepared.sourceHash,
+    figma: { fileKey: "figma-file", rootNodeId: "42:17" },
+  });
+  const seed = pageIrToPageSeedNode(mappedBaseline);
+  seed.children[0].text = "From Figma";
+  // Compact baselines intentionally exclude resource bytes. A current Figma
+  // snapshot supplies them again and must not be overwritten by that compact
+  // metadata before Page IR validation.
+  seed.children[1].image = { mimeType: "image/png", base64: imageBase64 };
+  const changeSet = {
+    protocolVersion: 16,
+    runtimeIdentity: runtimeIdentity(),
+    changeSetId: "page-ir-change-1",
+    pageId: "local-preview",
+    sourceHash: prepared.sourceHash,
+    changes: [{ nodeId: "headline", property: "characters", to: "From Figma" }],
+    figma: { fileKey: "figma-file", rootNodeId: "42:17", rootNodeName: "Root" },
+    pageSnapshot: {
+      responsiveContract: responsiveContract(1440, 900),
+      pageSeed: { node: seed },
+      report: { nodeCount: 2, resourceBytes: 0, resourceCount: 0, degradations: [] },
+      capturedAt: "2026-08-18T00:00:00.000Z",
+    },
+  };
+
+  const clean = await bridge.prepareThreeWaySync(changeSet);
+  assert.equal(clean.merge.conflicts.length, 0);
+  assert.equal(clean.merge.merged.nodes.headline.content.characters, "From Figma");
+  assert.equal(clean.figmaPageIr.nodes.cover.resource.bytes, Buffer.byteLength("stable-image-resource"));
+
+  htmlManifest = structuredClone(baselineManifest);
+  htmlManifest.root.children[0].text = "From HTML";
+  const conflict = await bridge.prepareThreeWaySync(changeSet);
+  assert.equal(conflict.merge.conflicts.length, 1);
+  assert.equal(conflict.merge.conflicts[0].reason, "concurrent_change");
+  assert.match(conflict.conflictRecord.filePath, /\.cdb\/sync-conflicts\/page-ir-change-1\.json$/);
+  assert.equal((await bridge.baselineStore.get("local-preview")).pageIr.nodes.headline.content.characters, "Before");
+});
+
+test("preserves normalized Page IR across browser capture preparation", async (t) => {
+  const projectDir = await mkdtemp(path.join(os.tmpdir(), "local-figma-capture-metadata-"));
+  t.after(() => rm(projectDir, { recursive: true, force: true }));
+  const manifest = sampleManifest();
+  const prepared = preparePageManifest({
+    json: JSON.stringify(manifest),
+    sourcePath: "index.html",
+  });
+  const normalizedPageIr = structuredClone(prepared.pageIr);
+  normalizedPageIr.nodes.root.sourceRef.file = "index.html";
+  const bridge = new LocalFigmaBridge(projectDir, {
+    onCaptureHtmlPage: async () => ({
+      ...manifest,
+      pageIr: normalizedPageIr,
+    }),
+  });
+
+  const captured = await bridge.captureHtmlPageIr("local-preview");
+  assert.equal("legacySourceHash" in captured, false);
+  assert.equal(captured.pageIr.nodes.root.sourceRef.file, "index.html");
+});
+
+test("automatically rolls back a linked-page transaction when HTML readback diverges", async (t) => {
+  const projectDir = await mkdtemp(path.join(os.tmpdir(), "local-figma-linked-rollback-"));
+  t.after(() => rm(projectDir, { recursive: true, force: true }));
+  const originalSource = '<link rel="stylesheet" href="./styles.css"><main data-codex-id="root"><span data-codex-id="headline">Before</span></main>';
+  await writeFile(path.join(projectDir, "index.html"), originalSource, "utf8");
+  await writeFile(path.join(projectDir, "styles.css"), "", "utf8");
+  const baselineManifest = sampleManifest();
+  baselineManifest.root.sourceRef.selector = '[data-codex-id="root"]';
+  const divergentManifest = structuredClone(baselineManifest);
+  divergentManifest.root.children[0].text = "Unexpected readback";
+  const prepared = preparePageManifest({
+    json: JSON.stringify(baselineManifest),
+    sourcePath: "index.html",
+  });
+  let captureCount = 0;
+  let rollbackResult = null;
+  const bridge = new LocalFigmaBridge(projectDir, {
+    projectKey: "project-1",
+    onCaptureHtmlPage: async () => structuredClone(
+      captureCount++ < 2 ? baselineManifest : divergentManifest,
+    ),
+    onFastApply: async ({ fastApply }) => ({
+      fastApply,
+      sourceHash: "b".repeat(64),
+    }),
+    onFastRollback: async (result) => {
+      rollbackResult = result;
+    },
+  });
+  bridge.setPageCatalog([{
+    id: "local-preview",
+    name: "Local preview",
+    entry: "index.html",
+    route: "/",
+    sourceHash: prepared.sourceHash,
+    syncState: "synced",
+  }]);
+  await bridge.baselineStore.commit({
+    pageIr: prepared.pageIr,
+    sourceHash: prepared.sourceHash,
+    figma: { fileKey: "figma-file", rootNodeId: "42:17", rootNodeName: "Root" },
+  });
+  const seed = pageIrToPageSeedNode(prepared.pageIr);
+  seed.children[0].text = "From Figma";
+
+  await assert.rejects(
+    bridge.applyDesignPayloadToLinkedPage({
+      offer: {
+        offerId: "linked-rollback",
+        figmaFileKey: "figma-file",
+        rootNodeId: "42:17",
+        rootName: "Root",
+        linkedPageId: "local-preview",
+      },
+      pageId: "local-preview",
+      payload: {
+        protocolVersion: 16,
+        runtimeIdentity: runtimeIdentity(),
+        figma: { pageId: "1:1" },
+        pageSeed: { node: seed },
+        responsiveContract: responsiveContract(1440, 900),
+        report: { nodeCount: 2, resourceBytes: 0, resourceCount: 0, degradations: [] },
+      },
+    }),
+    (error) => error.code === "page_ir_readback_mismatch" && error.rollback?.status === "committed",
+  );
+  assert.equal(await readFile(path.join(projectDir, "index.html"), "utf8"), originalSource);
+  assert.equal(rollbackResult.reason, "page_ir_readback_mismatch");
+  assert.ok(rollbackResult.rollback.undoneTransactionId);
+});
+
+test("automatically rolls back when linked-page HTML readback throws", async (t) => {
+  const projectDir = await mkdtemp(path.join(os.tmpdir(), "local-figma-linked-readback-error-"));
+  t.after(() => rm(projectDir, { recursive: true, force: true }));
+  const originalSource = '<main data-codex-id="root"><span data-codex-id="headline">Before</span></main>';
+  await writeFile(path.join(projectDir, "index.html"), originalSource, "utf8");
+  await writeFile(path.join(projectDir, "styles.css"), "", "utf8");
+  const baselineManifest = sampleManifest();
+  baselineManifest.root.sourceRef.selector = '[data-codex-id="root"]';
+  const prepared = preparePageManifest({
+    json: JSON.stringify(baselineManifest),
+    sourcePath: "index.html",
+  });
+  let captureCount = 0;
+  let rollbackResult = null;
+  const bridge = new LocalFigmaBridge(projectDir, {
+    projectKey: "project-1",
+    onCaptureHtmlPage: async () => {
+      if (captureCount++ < 2) return structuredClone(baselineManifest);
+      throw new Error("synthetic browser capture failure");
+    },
+    onFastApply: async ({ fastApply }) => ({
+      fastApply,
+      sourceHash: "b".repeat(64),
+    }),
+    onFastRollback: async (result) => {
+      rollbackResult = result;
+    },
+  });
+  bridge.setPageCatalog([{
+    id: "local-preview",
+    name: "Local preview",
+    entry: "index.html",
+    route: "/",
+    sourceHash: prepared.sourceHash,
+    syncState: "synced",
+  }]);
+  await bridge.baselineStore.commit({
+    pageIr: prepared.pageIr,
+    sourceHash: prepared.sourceHash,
+    figma: { fileKey: "figma-file", rootNodeId: "42:17", rootNodeName: "Root" },
+  });
+  const seed = pageIrToPageSeedNode(prepared.pageIr);
+  seed.children[0].text = "From Figma";
+
+  await assert.rejects(
+    bridge.applyDesignPayloadToLinkedPage({
+      offer: {
+        offerId: "linked-readback-error",
+        figmaFileKey: "figma-file",
+        rootNodeId: "42:17",
+        rootName: "Root",
+        linkedPageId: "local-preview",
+      },
+      pageId: "local-preview",
+      payload: {
+        protocolVersion: 16,
+        runtimeIdentity: runtimeIdentity(),
+        figma: { pageId: "1:1" },
+        pageSeed: { node: seed },
+        responsiveContract: responsiveContract(1440, 900),
+        report: { nodeCount: 2, resourceBytes: 0, resourceCount: 0, degradations: [] },
+      },
+    }),
+    (error) => error.code === "page_ir_readback_failed" && error.rollback?.status === "committed",
+  );
+  assert.equal(await readFile(path.join(projectDir, "index.html"), "utf8"), originalSource);
+  assert.equal(rollbackResult.reason, "page_ir_readback_failed");
+  assert.ok(rollbackResult.rollback.undoneTransactionId);
+});
+
+test("applies a conflict-free snapshot, verifies HTML readback, and advances the baseline", async (t) => {
+  const projectDir = await mkdtemp(path.join(os.tmpdir(), "local-figma-page-ir-apply-"));
+  t.after(() => rm(projectDir, { recursive: true, force: true }));
+  await writeFile(
+    path.join(projectDir, "index.html"),
+    '<link rel="stylesheet" href="./styles.css"><main data-codex-id="root"><span data-codex-id="headline">Before</span></main>',
+    "utf8",
+  );
+  await writeFile(path.join(projectDir, "styles.css"), "", "utf8");
+  const baselineManifest = sampleManifest();
+  const postManifest = structuredClone(baselineManifest);
+  postManifest.root.children[0].text = "From Figma";
+  let captureCount = 0;
+  let committed = null;
+  const bridge = new LocalFigmaBridge(projectDir, {
+    projectKey: "project-1",
+    onCaptureHtmlPage: async () => structuredClone(captureCount++ === 0 ? baselineManifest : postManifest),
+    onFastApply: async ({ fastApply }) => ({ fastApply }),
+    onSyncCommitted: async (result) => { committed = result; },
+  });
+  const prepared = preparePageManifest({
+    json: JSON.stringify(baselineManifest),
+    sourcePath: "index.html",
+  });
+  bridge.pages.set(prepared.pageId, prepared);
+  await bridge.baselineStore.commit({ pageIr: prepared.pageIr, sourceHash: prepared.sourceHash });
+  const seed = pageIrToPageSeedNode(prepared.pageIr);
+  seed.children[0].text = "From Figma";
+  const sent = [];
+  const client = {
+    webSocket: { readyState: 1, send: (value) => sent.push(JSON.parse(value)) },
+  };
+  await bridge.handleMessage(client, Buffer.from(JSON.stringify({
+    type: "page.changes.record",
+    requestId: "page-ir-request",
+    changeSet: {
+      protocolVersion: 16,
+    runtimeIdentity: runtimeIdentity(),
+      changeSetId: "page-ir-apply-1",
+      pageId: "local-preview",
+      sourceHash: prepared.sourceHash,
+      changes: [{
+        nodeId: "headline",
+        nodeType: "TEXT",
+        property: "characters",
+        sourceRef: { file: "index.html", selector: '[data-codex-id="headline"]' },
+        from: "Before",
+        to: "From Figma",
+      }],
+      annotations: [],
+      figma: { fileKey: "figma-file", rootNodeId: "42:17", rootNodeName: "Root" },
+      pageSnapshot: {
+        responsiveContract: responsiveContract(1440, 900),
+        pageSeed: { node: seed },
+        report: { nodeCount: 2, resourceBytes: 0, resourceCount: 0, degradations: [] },
+        capturedAt: "2026-08-18T00:00:00.000Z",
+      },
+    },
+  })));
+
+  const ack = sent.find((message) => message.type === "page.changes.ack");
+  const expectedPost = preparePageManifest({ json: JSON.stringify(postManifest), sourcePath: "index.html" });
+  assert.equal(ack.state, "applied");
+  assert.equal(ack.sourceHash, expectedPost.sourceHash);
+  assert.equal(committed.pageId, "local-preview");
+  assert.equal(committed.sourceHash, expectedPost.sourceHash);
+  assert.match(await readFile(path.join(projectDir, "index.html"), "utf8"), />From Figma<\/span>/);
+  const baseline = await bridge.baselineStore.get("local-preview");
+  assert.equal(baseline.pageIr.nodes.headline.content.characters, "From Figma");
+  assert.equal(baseline.sourceHash, expectedPost.sourceHash);
+});
+
+test("blocks source writes when HTML and Figma change the same shared Page IR field", async (t) => {
+  const projectDir = await mkdtemp(path.join(os.tmpdir(), "local-figma-page-ir-conflict-"));
+  t.after(() => rm(projectDir, { recursive: true, force: true }));
+  const sourcePath = path.join(projectDir, "index.html");
+  const originalSource = '<main data-codex-id="root"><span data-codex-id="headline">From HTML</span></main>';
+  await writeFile(sourcePath, originalSource, "utf8");
+  await writeFile(path.join(projectDir, "styles.css"), "", "utf8");
+  const baselineManifest = sampleManifest();
+  const htmlManifest = structuredClone(baselineManifest);
+  htmlManifest.root.children[0].text = "From HTML";
+  const prepared = preparePageManifest({ json: JSON.stringify(baselineManifest), sourcePath: "index.html" });
+  const bridge = new LocalFigmaBridge(projectDir, {
+    onCaptureHtmlPage: async () => structuredClone(htmlManifest),
+  });
+  bridge.pages.set(prepared.pageId, prepared);
+  await bridge.baselineStore.commit({ pageIr: prepared.pageIr, sourceHash: prepared.sourceHash });
+  const seed = pageIrToPageSeedNode(prepared.pageIr);
+  seed.children[0].text = "From Figma";
+  const sent = [];
+  await bridge.handleMessage(
+    { webSocket: { readyState: 1, send: (value) => sent.push(JSON.parse(value)) } },
+    Buffer.from(JSON.stringify({
+      type: "page.changes.record",
+      requestId: "conflict-request",
+      changeSet: {
+        protocolVersion: 16,
+    runtimeIdentity: runtimeIdentity(),
+        changeSetId: "page-ir-conflict-1",
+        pageId: "local-preview",
+        sourceHash: prepared.sourceHash,
+        changes: [{
+          nodeId: "headline",
+          nodeType: "TEXT",
+          property: "characters",
+          sourceRef: { file: "index.html", selector: '[data-codex-id="headline"]' },
+          from: "Before",
+          to: "From Figma",
+        }],
+        annotations: [],
+        figma: { rootNodeId: "42:17", rootNodeName: "Root" },
+        pageSnapshot: {
+          responsiveContract: responsiveContract(1440, 900),
+          pageSeed: { node: seed },
+          report: { nodeCount: 2, resourceBytes: 0, resourceCount: 0, degradations: [] },
+          capturedAt: "2026-08-18T00:00:00.000Z",
+        },
+      },
+    })),
+  );
+
+  const ack = sent.find((message) => message.type === "page.changes.ack");
+  assert.equal(ack.state, "pending");
+  assert.equal(ack.fastApply.pending[0].reason, "page_ir_conflict");
+  assert.equal(await readFile(sourcePath, "utf8"), originalSource);
+  assert.equal((await bridge.baselineStore.get("local-preview")).pageIr.nodes.headline.content.characters, "Before");
+  assert.equal(
+    JSON.parse(await readFile(path.join(projectDir, ".cdb", "sync-conflicts", "page-ir-conflict-1.json"), "utf8")).conflicts.length,
+    1,
+  );
+  const figmaManifest = structuredClone(baselineManifest);
+  figmaManifest.root.children[0].text = "From Figma";
+  let resolutionCapture = 0;
+  bridge.onCaptureHtmlPage = async () => structuredClone(resolutionCapture++ === 0 ? htmlManifest : figmaManifest);
+  const resolution = await bridge.resolveThreeWaySync({
+    protocolVersion: 16,
+    runtimeIdentity: runtimeIdentity(),
+    changeSetId: "page-ir-conflict-1",
+    pageId: "local-preview",
+    sourceHash: prepared.sourceHash,
+    changes: [{
+      nodeId: "headline",
+      nodeType: "TEXT",
+      property: "characters",
+      sourceRef: { file: "index.html", selector: '[data-codex-id="headline"]' },
+      from: "Before",
+      to: "From Figma",
+    }],
+    annotations: [],
+    figma: { rootNodeId: "42:17", rootNodeName: "Root" },
+    pageSnapshot: {
+      responsiveContract: responsiveContract(1440, 900),
+      pageSeed: { node: seed },
+      report: { nodeCount: 2, resourceBytes: 0, resourceCount: 0, degradations: [] },
+      capturedAt: "2026-08-18T00:00:00.000Z",
+    },
+  }, "figma");
+  assert.equal(resolution.resolution, "figma");
+  assert.match(await readFile(sourcePath, "utf8"), />From Figma<\/span>/);
+  assert.equal((await bridge.baselineStore.get("local-preview")).pageIr.nodes.headline.content.characters, "From Figma");
 });
 
 function messageInbox(socket) {
@@ -444,6 +1292,9 @@ function messageInbox(socket) {
     messages.push(message);
   });
   return {
+    count(type) {
+      return messages.filter((message) => message.type === type).length;
+    },
     next(type) {
       const index = messages.findIndex((message) => message.type === type);
       if (index >= 0) {
@@ -463,6 +1314,7 @@ function sampleManifest() {
     name: "Local preview",
     sourceHash: "test-source",
     source: { file: "index.html", previewUrl: "http://127.0.0.1:3000/" },
+    responsiveContract: responsiveContract(1440, 900),
     nodeIds: ["root", "headline"],
     root: {
       id: "root",

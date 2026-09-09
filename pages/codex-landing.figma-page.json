@@ -1,6 +1,12 @@
 {
   "pageId": "codex-landing",
   "name": "Codex Flow Landing",
+  "responsiveContract": {
+    "designViewport": { "width": 1440, "height": 900 },
+    "runtimeViewports": [{ "id": "desktop-1440", "width": 1440, "height": 900, "devicePixelRatio": 1 }],
+    "previewScale": { "mode": "one-to-one", "value": 1, "breakpointId": null },
+    "breakpoints": []
+  },
   "source": {
     "file": "examples/codex-landing/index.html",
     "component": "CodexLanding"

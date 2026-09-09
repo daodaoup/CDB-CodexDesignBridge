@@ -1,90 +1,175 @@
-# Codex Design Bridge
+# Codex Design Bridge (CDB)
 
-[English](README.md) | [简体中文](README.zh-CN.md)
+English | [简体中文](README.zh-CN.md)
 
-Codex Design Bridge (CDB) is a designer-first workspace embedded in Codex. It previews static frontend pages, sends editable layers to a local Figma development plugin, and applies supported Figma changes back to the existing source without using the official Figma MCP quota.
+CDB connects Codex, local HTML/CSS projects, and Figma Desktop. It moves pages between source code and editable Figma layers, then writes supported design changes back through guarded local transactions.
 
-Current source candidate: `0.7.0`. The Codex plugin build in this repository is `0.7.0+codex.20260808103256`; the workbench displays the public version `V 0.7.0`.
+> **This is a public beta, not a production-stable release.** The public version is `0.9.0`; the current exact build is `0.9.0+codex.20260829100031`. The primary macOS path has real desktop evidence. Windows installers and automation are ready, but real Codex/Figma Desktop acceptance is still pending. When anything breaks, Codex can inspect this repository, diagnose the exact build, patch the implementation, run tests, and reinstall CDB.
 
-This repository is the clean source distribution. It intentionally excludes local connection tokens, Codex/Figma runtime state, dependency caches, generated release archives, and machine-specific plugin caches.
+## Best-fit projects
 
-## Documentation
+CDB currently works best with explicit, locally runnable static HTML/CSS pages.
 
-- [`docs/README.zh-CN.md`](docs/README.zh-CN.md) — Chinese documentation index and source-of-truth map.
-- [`docs/product-status.zh-CN.md`](docs/product-status.zh-CN.md) — current implementation, evidence, boundaries, and release gates.
-- [`docs/next-version-plan.zh-CN.md`](docs/next-version-plan.zh-CN.md) — complete 0.5.2 product and system plan, now annotated with implementation status.
-- [`docs/release-0.5.2.zh-CN.md`](docs/release-0.5.2.zh-CN.md) — 0.5.2 candidate changes, compatibility, and security boundaries.
-- [`docs/release-0.6.0.zh-CN.md`](docs/release-0.6.0.zh-CN.md) — Figma-first pages, streamlined startup, and round-trip reliability fixes.
-- [`docs/release-0.7.0.zh-CN.md`](docs/release-0.7.0.zh-CN.md) — atomic reparenting, verified source patches, and Auto Layout/Flex/Grid mapping.
-- [`docs/installation.zh-CN.md`](docs/installation.zh-CN.md) — Windows/macOS installation and recovery.
-- [`docs/figma-smoke-test.md`](docs/figma-smoke-test.md) — required real Codex/Figma desktop acceptance.
-- [`docs/repository-layout.zh-CN.md`](docs/repository-layout.zh-CN.md) — source, Codex plugin, Figma plugin, tests, and documentation layout.
-- [`docs/handoff-2026-08-07.zh-CN.md`](docs/handoff-2026-08-07.zh-CN.md) — current GitHub handoff, validation status, and remaining release gates.
+- HTML → Figma: editable frames, text, images, safe SVG, and supported layout semantics.
+- Figma → HTML: create a project, add a page, or update an already linked page from one complete top-level frame.
+- Round trips: supported text, color, size, opacity, radius, stroke, typography, Flex/Auto Layout, basic Grid, constraints, and selected structural edits.
+- Multi-page and responsive review: isolated page identity plus `320 / 375 / 402 / 430 / 768 / 1440` acceptance widths.
+- Guarded writes: source hashes, shared baselines, multi-file transactions, live browser verification, and Undo.
 
-> Release status: the 0.7.0 source and automated coverage are implemented. The Windows plugin/cache update is part of this release flow; a fresh Codex task, real Figma Desktop round trips, and macOS acceptance remain release gates.
+React, Vue, Vite, CSS-in-JS, complex runtime DOM, complete Figma Variables/Variants, and prototype animation are not fully supported by this beta.
 
-## Daily use
+## Requirements
 
-1. Invoke **CDB** with no extra text. A current CDB project resumes directly; otherwise the focused launcher opens.
-2. Start from an existing Figma page Frame or use “new design: `<description>`” to create a dependency-free CDB project.
-3. Local HTML upload remains available internally but is hidden from the normal interface.
-4. CDB preflights the source. Safe deterministic fixes require an explicit report-bound action; blockers do not start the real workspace.
-5. Keep the local **CDB** development plugin open in Figma. Its **CDB Pages** list shows manifest pages and their sync state.
-6. Import the current/selected pages or update all changed pages. Supported Figma edits use the existing transactional fast lane; larger or ambiguous changes remain pending for Codex.
+Both platforms require:
 
-Pages come from `.cdb/manifest.json`: HTML entries or routes are pages; CSS, JavaScript, images, SVGs, and fonts are dependencies. Runtime add/rename of fake pages is no longer supported.
+- Codex Desktop and a usable Codex CLI.
+- Figma Desktop; browser-only Figma cannot load the local development plugin.
+- The **complete cloned or downloaded repository**, not an installer or manifest by itself.
+- Node.js 20 or newer. Installers prefer the Node runtime bundled with Codex, then fall back to a system Node installation.
+- Codex/ChatGPT must be fully closed during installation. Reopen it and create a new task afterward.
 
-## One-time Figma setup
+CDB listens only on loopback. It requires no Figma API key, does not use the official Figma MCP connector, and consumes no official Figma MCP quota.
 
-1. In Figma Desktop, choose **Plugins → Development → Import plugin from manifest**.
-2. Select [`plugin/manifest.json`](plugin/manifest.json).
-3. Run **Plugins → Development → CDB** in the target file.
+## Download
 
-The plugin pairs with the active local workspace automatically. There is no connection code or separate Bridge window in the normal workflow. Protocol 14 requires reopening any plugin window left over from an older release; protocol 13 clients remain accepted during migration.
+Repository: <https://github.com/daodaoup/CDB-CodexDesignBridge>
 
-## Architecture
+Clone it with GitHub Desktop or choose **Code → Download ZIP** on GitHub. Keep the extracted directory structure intact.
 
-```text
-CDB intent / launcher
-  → source resolver
-  → manifest + unified preflight
-  → single-workspace lease
-  → embedded Apps UI + local preview
-  → loopback Figma Bridge (protocol 14; protocol 13 migration compatibility)
-  → local Figma development plugin
-  → transactional source patch / safe Undo
+## Install on macOS
+
+macOS also requires `python3`; install the Xcode Command Line Tools if it is missing.
+
+1. Quit Codex/ChatGPT completely.
+2. Open the complete repository folder in Finder.
+3. Double-click `Install Codex Design Bridge.command`.
+4. Wait for the exact version, cache path, and installation report.
+5. Reopen Codex and create a new task.
+
+If macOS blocks the first launch, Control-click the command and choose **Open**. If executable permissions are missing:
+
+```bash
+chmod +x "./Install Codex Design Bridge.command"
+chmod +x "./scripts/install-codex-design-bridge-macos.sh"
+./Install\ Codex\ Design\ Bridge.command
 ```
 
-Only one real workspace owns preview/Figma resources at a time. Opening a new real workspace always closes the old workspace and takes over the Figma connection without a confirmation dialog.
+Validate without installing:
 
-## Scope boundary
+```bash
+bash ./scripts/install-codex-design-bridge-macos.sh \
+  --source ./codex-plugin/codex-design-bridge \
+  --check-only
+```
 
-0.7.0 prioritizes atomic cross-parent structure edits and Flex/Grid layout round trips for static HTML/CSS while retaining manifest-backed multi-page selection. React/Vue/Vite semantic adapters, ZIP import, components/variants/tokens, advanced responsive inference, and bulk multi-page workflows remain deferred.
+## Install on Windows
 
-## Core files
+Windows also requires PowerShell 5.1 or newer and a discoverable `codex.exe` or `codex.cmd`. Windows 10/11 x64 is recommended.
 
-- [`codex-plugin/codex-design-bridge/mcp/server.mjs`](codex-plugin/codex-design-bridge/mcp/server.mjs) — MCP tools and orchestration.
-- [`codex-plugin/codex-design-bridge/mcp/project-contract.mjs`](codex-plugin/codex-design-bridge/mcp/project-contract.mjs) — scaffold, manifest, preflight, and safe fixes.
-- [`codex-plugin/codex-design-bridge/mcp/workspace-lease.mjs`](codex-plugin/codex-design-bridge/mcp/workspace-lease.mjs) — cross-process ownership and handoff.
-- [`codex-plugin/codex-design-bridge/mcp/workspace.html`](codex-plugin/codex-design-bridge/mcp/workspace.html) — launcher and workbench UI.
-- [`codex-plugin/codex-design-bridge/mcp/local-figma-bridge.mjs`](codex-plugin/codex-design-bridge/mcp/local-figma-bridge.mjs) — local Figma transport and page catalog.
-- [`plugin/code.js`](plugin/code.js) and [`plugin/ui.html`](plugin/ui.html) — Figma development plugin.
-- [`scripts/install-codex-design-bridge.ps1`](scripts/install-codex-design-bridge.ps1) — Windows package/install/cache verification.
-- [`Install Codex Design Bridge.vbs`](Install%20Codex%20Design%20Bridge.vbs) — terminal-free Windows installer that waits for Codex to exit without force-closing it.
+1. Quit Codex/ChatGPT completely.
+2. Double-click `Install Codex Design Bridge.vbs` inside the complete extracted repository.
+3. Wait for the installation result. Use the PowerShell installer when detailed output is needed.
+4. Reopen Codex and create a new task.
 
-## Development verification
+Package validation:
 
-Requires Node.js 20 or newer; Node.js 22 is recommended for the current Electron development dependency.
+```powershell
+.\scripts\install-codex-design-bridge.ps1 `
+  -CheckOnly `
+  -SourcePath .\codex-plugin\codex-design-bridge `
+  -ReportPath "$env:TEMP\cdb-package-check.json"
+```
+
+Detailed installation:
+
+```powershell
+.\scripts\install-codex-design-bridge.ps1 `
+  -SourcePath .\codex-plugin\codex-design-bridge `
+  -ReportPath "$env:TEMP\cdb-install.json" `
+  -WaitForExit
+```
+
+Windows remains a real-desktop acceptance target for this beta. See the [Windows handoff and acceptance guide](docs/handoff-2026-08-31-windows.zh-CN.md).
+
+## Install the Figma plugin
+
+The Figma side is currently a local development plugin and is not yet published in Figma Community.
+
+- GitHub file: [plugin/manifest.json](https://github.com/daodaoup/CDB-CodexDesignBridge/blob/main/plugin/manifest.json)
+- Local path after download: `CDB-CodexDesignBridge/plugin/manifest.json`
+
+In Figma Desktop:
+
+1. Choose **Plugins → Development → Import plugin from manifest**.
+2. Select the local `plugin/manifest.json`.
+3. In the target file, choose **Plugins → Development → CDB**.
+
+After upgrading CDB, close the previous CDB plugin window and run the development plugin again. Do not leave multiple old instances open.
+
+## Usage
+
+### Open CDB
+
+In a new Codex task:
+
+```text
+@codex-design-bridge open the workspace
+@codex-design-bridge open project /absolute/project/path
+@codex-design-bridge start from Figma
+```
+
+The local browser workspace can also be opened with `Open CDB Workspace.command` on macOS or `Open CDB Workspace.cmd` on Windows.
+
+### HTML → Figma
+
+1. Open the local HTML/CSS project through CDB.
+2. Run the CDB development plugin in Figma Desktop and verify the project name/key.
+3. Select a page in the workspace and send it to Figma.
+4. Wait for editable layers; separate pages must produce separate frames.
+5. Success requires “synced” and `pendingChangeCount = 0`.
+
+### Figma → HTML
+
+1. Select exactly one complete top-level Frame, Group, Component, or Instance.
+2. Choose **Send to CDB Workspace** in the Figma plugin.
+3. In CDB, create a project, add a page, or update the linked page.
+4. Wait for the source transaction and live-preview verification.
+5. Confirm that source files, assets, and the preview actually changed and both sides return to “synced.”
+
+## Bugs: ask Codex to continue fixing CDB
+
+If the workspace hangs, a page has the wrong size, elements do not sync, a second page fails, installation fails, or stale state interferes, provide Codex with the screenshot, full error, and project path. Codex can inspect the exact runtime, logs, implementation, and tests, then patch and reinstall the plugin.
+
+Suggested prompt:
+
+```text
+Continue fixing Codex Design Bridge. Read README.zh-CN.md, docs/product-status.zh-CN.md, and the latest handoff first. Preserve all existing worktree changes. Verify the exact plugin.json build, get_cdb_health, installation report, and Figma plugin connection. Reproduce this issue, identify the root cause, patch the implementation, and add a regression test. If core plugin files change, bump the cachebuster, reinstall, and verify in a new Codex task. Do not add compatibility or migration for any legacy version, protocol, Page IR, cache, binding, or sync data.
+```
+
+Include the OS, Codex/Figma versions, exact build, project path, screenshots, complete error text, health output, and the shortest reliable reproduction steps.
+
+## Development and verification
+
+Node.js 20 or newer is required; Node.js 22 is recommended.
 
 ```bash
 npm ci
 npm run check
 ```
 
-The repository retains the v0.4 CLI/Electron implementation for regression coverage; it is not the recommended CDB workflow.
+The current macOS full result is 166 tests: 162 passed, 0 failed, and 4 Windows-only tests skipped. The project remains beta until real Windows desktop acceptance is complete.
 
-## Repository and licensing notes
+## Documentation
 
-- Do not commit `.figma-sync`, `.codex`, `.cdb-imports`, environment files, logs, or generated release archives.
-- Vendored runtime dependencies retain their own license files under `codex-plugin/codex-design-bridge/vendor/`.
-- No open-source license is granted by this repository yet. Publishing the source on GitHub does not by itself grant reuse rights; choose and add a license before accepting external redistribution or contributions.
+- [Chinese documentation center](docs/README.zh-CN.md)
+- [Current product status](docs/product-status.zh-CN.md)
+- [Detailed installation and recovery](docs/installation.zh-CN.md)
+- [Desktop acceptance checklist](docs/figma-smoke-test.md)
+- [Windows handoff and acceptance](docs/handoff-2026-08-31-windows.zh-CN.md)
+- [0.9 development plan](docs/next-version-plan-0.9.zh-CN.md)
+
+## Security and licensing
+
+CDB listens only on loopback. Do not commit `.figma-sync/`, `.codex/`, `.cdb/`, pairing tokens, transaction backups, logs, installed plugin caches, or real user projects.
+
+No open-source license is currently granted. Public visibility alone does not grant rights to copy, modify, or redistribute this code.

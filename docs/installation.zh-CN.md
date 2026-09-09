@@ -1,157 +1,189 @@
-# CDB 安装与快速上手
+# CDB 0.9 测试版安装与快速上手
 
-适用版本：`0.7.0`（安装缓存可带 `+codex.<时间戳>` 后缀）  
-工作台显示：`V 0.7.0`
+适用公开版本：`0.9.0`
 
-CDB 不使用官方 Figma 连接器，也不消耗官方 Figma MCP 额度。普通使用不需要手动配置端口、Token、连接码或 Electron。
+精确构建：以发布目录中的 `codex-plugin/codex-design-bridge/.codex-plugin/plugin.json` 为准。
 
-> 当前候选尚未完成真实 Codex/Figma 桌面发布验收。只打开普通 `127.0.0.1` 浏览器预览不代表 Apps UI 已挂载，也不能作为发布通过证据。
+> CDB 0.9 当前是测试版。macOS 主路径已有真实桌面证据；Windows 安装和自动化已完成开发，但真实 Codex/Figma Desktop 联合验收仍在进行。安装失败、页面卡住或同步异常时，可以直接让 Codex读取本仓库并继续修复。
 
 ## 安装前准备
 
-- Codex 桌面应用。
-- Figma Desktop。
-- 完整 CDB 发布包，包含 Codex 插件、`plugin/manifest.json` 和对应平台安装器。
-- 升级前保存当前工作，并完整退出 Codex/ChatGPT；安装器需要刷新个人插件注册和运行缓存。
+- Codex Desktop 与 Figma Desktop。
+- 完整仓库或完整 ZIP，不能只复制安装器、Codex 插件目录或 Figma manifest。
+- Node.js 20 以上。安装器优先使用 Codex 自带 Node，再回退到系统 Node。
+- Codex CLI 可用。找不到 `codex`、`codex.exe` 或 `codex.cmd` 时，先更新或重新安装 Codex。
+- macOS 需要 `python3`；缺少时安装 Xcode Command Line Tools。
+- Windows 需要 PowerShell 5.1 以上；推荐 Windows 10/11 64 位。
+- 安装前保存工作并完全退出 Codex/ChatGPT。安装后必须重新打开并新建任务，旧任务不会热加载新工具。
 
-## Windows 安装或升级
+CDB 只监听本机回环地址，不需要 Figma API Key，不使用官方 Figma MCP 配额，也不要求完全磁盘访问、关闭 Gatekeeper 或关闭系统完整性保护。
 
-1. 解压完整发布包到稳定本地目录。
-2. 完整退出 Codex/ChatGPT，包括后台进程。
-3. 双击 `Install Codex Design Bridge.vbs`。它在后台等待 Codex 自然退出，不显示终端，也不会强杀应用。
-4. 保存当前工作并退出 Codex；安装完成后系统弹窗会报告成功或失败。需要查看详细诊断时才使用 `Install Codex Design Bridge.cmd`。
-5. 等待安装器显示与当前发布包 manifest 完全一致的版本。
-6. 检查个人插件目录旁的 `.codex-design-bridge-install-report.json`：`status` 为 `installed`、`hashesVerified` 与 `pluginListConfirmed` 为 `true`。
-7. 重新打开 Codex并新建任务；旧任务不会自动换到新缓存。
+## 获取完整项目
 
-安装器会验证 18 个核心文件（含 protocol 14 schema）、在更改前创建时间戳备份、重新注册个人插件并核对个人源码与运行缓存哈希。任一步失败都会尝试恢复旧源码和旧注册。
+GitHub：<https://github.com/daodaoup/CDB-CodexDesignBridge>
+
+可以使用 GitHub Desktop 克隆，或在 GitHub 选择 **Code → Download ZIP**。解压后不要改变内部目录关系。
 
 ## macOS 安装或升级
 
-1. 解压完整发布包到稳定本地目录。
-2. 完整退出 Codex/ChatGPT。
+1. 完全退出 Codex/ChatGPT。
+2. 在 Finder 打开完整项目目录。
 3. 双击 `Install Codex Design Bridge.command`。
-4. 等待看到与候选版本一致的安装成功信息和报告路径。
+4. 等待终端显示安装版本、运行缓存和安装报告路径。
 5. 重新打开 Codex并新建任务。
 
-若系统提示来自未识别开发者，可在 Finder 中按住 Control 点击 `.command`，选择“打开”并确认。不要绕过系统保护运行来源不明的包。macOS 必须对同一精确候选完成 `CheckOnly`、安装、缓存和桌面验收后才可宣告支持通过。
+若 macOS 阻止首次运行，Control-点击 `.command` 并选择“打开”。若文件缺少执行权限：
 
-## 一次性导入 Figma 开发插件
+```bash
+chmod +x "./Install Codex Design Bridge.command"
+chmod +x "./scripts/install-codex-design-bridge-macos.sh"
+./Install\ Codex\ Design\ Bridge.command
+```
+
+只校验发布目录、不安装：
+
+```bash
+bash ./scripts/install-codex-design-bridge-macos.sh \
+  --source ./codex-plugin/codex-design-bridge \
+  --check-only
+```
+
+成功报告应包含当前 exact-build、`status: installed`、`hashesVerified: true` 和 `pluginListConfirmed: true`。
+
+## Windows 安装或升级
+
+1. 完全退出 Codex/ChatGPT。
+2. 在完整解压目录中双击 `Install Codex Design Bridge.vbs`。
+3. 等待系统弹窗显示成功或失败。
+4. 重新打开 Codex并新建任务。
+
+需要查看详细输出时使用 PowerShell：
+
+```powershell
+$checkReport = Join-Path $env:TEMP "cdb-package-check.json"
+.\scripts\install-codex-design-bridge.ps1 `
+  -CheckOnly `
+  -SourcePath .\codex-plugin\codex-design-bridge `
+  -ReportPath $checkReport
+Get-Content $checkReport -Raw
+```
+
+真实安装：
+
+```powershell
+$installReport = Join-Path $env:TEMP "cdb-install.json"
+.\scripts\install-codex-design-bridge.ps1 `
+  -SourcePath .\codex-plugin\codex-design-bridge `
+  -ReportPath $installReport `
+  -WaitForExit
+Get-Content $installReport -Raw
+```
+
+成功报告要求：
+
+- `status: installed`
+- `hashesVerified: true`
+- `pluginListConfirmed: true`
+- `version` 等于 `plugin.json` 的 exact-build
+- `mcpNodePath` 指向存在的 `node.exe`
+
+全新 Windows 用户目录不需要预建 `personal` marketplace；安装器会建立独立的 `codex-design-bridge-local` marketplace。
+
+安装后可验证 daemon 强杀恢复：
+
+```powershell
+$report = Get-Content "$env:TEMP\cdb-install.json" -Raw | ConvertFrom-Json
+& $report.mcpNodePath .\scripts\verify-local-runtime.mjs `
+  --plugin-root $report.installedPath `
+  --report "$env:TEMP\cdb-runtime-verification.json"
+```
+
+报告必须是 `status: passed`，且 `originalPid` 与 `recoveredPid` 不同。该脚本不能替代真实 Figma Desktop 验收；完整 Windows 清单见 [Windows 开发与验收交接](handoff-2026-08-31-windows.zh-CN.md)。
+
+## 安装 Figma Desktop 插件
+
+当前 Figma 插件尚未发布到 Figma Community，需要导入本地开发插件。
+
+- GitHub 地址：[plugin/manifest.json](https://github.com/daodaoup/CDB-CodexDesignBridge/blob/main/plugin/manifest.json)
+- 本地文件：`项目目录/plugin/manifest.json`
 
 1. 打开 Figma Desktop。
 2. 选择 **Plugins → Development → Import plugin from manifest**。
-3. 选择发布包中的 `plugin/manifest.json`。
-4. 在目标 Figma 文件中运行 **Plugins → Development → CDB**。
+3. 选择本地 `plugin/manifest.json`。
+4. 在目标 Figma 文件运行 **Plugins → Development → CDB**。
 
-0.7.0 使用本地 Bridge 协议 14，并在迁移期接受协议 13 客户端。升级后必须关闭旧的 Figma 插件窗口并重新运行 CDB；manifest 文件路径未变化时通常不必重新导入。
+升级时通常不必重新导入 manifest，但必须关闭旧 CDB 插件窗口并重新运行。不要同时保留多个旧插件实例。
 
-## 三种启动方式
+## 打开 CDB
 
-### 只调用 `@CDB`
-
-打开空启动器。此时 CDB：
-
-- 不扫描当前项目；
-- 不创建假草稿；
-- 不启动 preview；
-- 不连接或占用 Figma Bridge；
-- 不获取活动工作台 lease。
-
-启动器可以拖入 HTML/文件夹、选择项目，或填写新设计描述。表单通过当前 Codex 任务的 follow-up 继续，不另建任务。
-
-### 打开已有项目
-
-发送“`@CDB 打开项目`”并提供明确路径/附件，或让当前任务已明确打开目标工作区。CDB 只按以下顺序做有界解析：
-
-1. 消息中的明确路径；
-2. 当前消息附件；
-3. 当前任务明确打开的工作区。
-
-找不到静态入口时回到启动器，不创建假页面。当前 0.7.0 的完整闭环面向依赖为零的静态 HTML/CSS 项目；React/Vue/Vite 等框架语义支持延期。
-
-### 新建设计
-
-发送“`@CDB 新建设计：<描述>`”。存在描述时 CDB 直接创建并打开，不追问框架、包管理器、端口、项目名或页面数量。默认项目包含：
+在安装后的新 Codex 任务中发送：
 
 ```text
-index.html
-styles.css
-assets/
-AGENTS.md
-.cdb/manifest.json
+@codex-design-bridge 打开工作台
 ```
 
-没有描述时打开启动器表单，不创建空草稿。
+也可以明确指定：
 
-## 预检与页面模型
+```text
+@codex-design-bridge 打开项目 /绝对/项目路径
+@codex-design-bridge 从 Figma 开始
+@codex-design-bridge 新建设计：一个简洁的摄影师作品集首页
+```
 
-真实工作台启动前，所有来源执行同一预检：入口/唯一捕获根、稳定 ID、资源、跨域、运行时 DOM、可编辑层、空白捕获、SVG 安全和多页面路由。
+本地 Web Workspace 可以独立打开：
 
-| 结果 | 行为 |
-| --- | --- |
-| 通过 | 可以启动真实工作台。 |
-| 警告 | 可以继续；诊断区保留限制说明。 |
-| 安全自动修复 | 预览暂不启动；用户应用明确修复后重新预检。 |
-| 阻断错误 | 不启动 preview/Figma；先修正源码或 manifest。 |
+- macOS：双击 `Open CDB Workspace.command`
+- Windows：双击 `Open CDB Workspace.cmd`
+- Node 环境：运行 `npm run workspace`
 
-自动修复绑定当次报告和源码哈希。源码变化后旧修复计划会被拒绝，避免覆盖新编辑。
+## HTML → Figma
 
-`.cdb/manifest.json` 是页面清单主要来源。HTML 入口或路由是页面；CSS、JavaScript、图片、SVG 和字体只是依赖，不出现在页面列表。缺少 manifest 的根目录静态 HTML 项目可内存推断并显示警告。
+1. 用 CDB 打开静态 HTML/CSS 项目。
+2. 在 Figma Desktop 运行 CDB 插件，确认显示的项目名称和短键正确。
+3. 在工作台选择页面并发送到 Figma。
+4. 等待 Figma 创建可编辑 Frame；多页项目应生成独立 Frame。
+5. 页面为“已同步”且工作台 `pendingChangeCount = 0` 才算成功。
 
-## 在 Figma 中使用 CDB 页面列表
+## Figma → HTML
 
-连接成功后，Figma 插件显示“CDB 页面”，每项包含页面名称、入口/路由和以下状态之一：未导入、已同步、源码更新、Figma 修改、冲突、失败。
+1. 在 Figma 只选择一个完整顶层 `Frame`、`Group`、`Component` 或 `Instance`。
+2. 点击“发送到 CDB 工作台”。
+3. 在工作台选择创建项目、添加为新页面或更新关联页。
+4. 等待事务写入和真实浏览器验证完成。
+5. 检查 HTML/CSS、资源和预览实际变化，并确认两端重新为“已同步”。
 
-- **定位 Frame**：定位当前页对应的 Figma Frame。
-- **导入当前**：导入当前活动页。
-- **导入选中**：导入勾选页。
-- **更新全部**：更新未导入、源码变化或失败的页面。
+## 状态含义
 
-该列表不是源码文件管理器，不显示 CSS/JS/素材目录，也不允许在 Figma 中重命名源码页面。
-
-## 修改回传与 Undo
-
-0.7.0 在既有安全边界上增加原子跨父级移动、Flex/Auto Layout 双向映射和基础 Grid placement。稳定映射内的文字、视觉属性、普通元素结构以及安全内联/同源 SVG 继续走快速事务。
-
-跨父容器移动只有在静态源码父子关系、目标布局和稳定 ID 都明确时自动应用。动态模板、循环/条件渲染、交错未映射内容、危险 SVG 和复杂业务组件重写不会被强行写回；它们保留为待处理差异。
-
-快速写回使用多文件事务。工作台 Undo 只撤销最近一次 CDB 安全事务；若文件在事务后被其他编辑修改，Undo 会报告冲突而不是覆盖源码。
-
-## 关闭与工作台接管
-
-- 关闭当前任务会停止 preview、Figma Bridge 并释放 lease。
-- 打开另一个真实项目时，旧工作台会自动优雅关闭，新工作台直接接管预览与 Figma 连接。
-- 接管不再弹确认；旧工作台中未发送的 Figma 修改不会写回源码。
-- 启动器和预检阻断状态不占用连接，因此不会关闭正在工作的旧项目。
-
-## 成功状态速查
-
-| 阶段 | 成功 | 不算成功 |
+| 状态 | 含义 | 建议 |
 | --- | --- | --- |
-| 版本 | 个人源、缓存、安装报告均为精确候选；UI 显示 `V 0.7.0` | 磁盘有新文件，但当前任务仍加载旧缓存 |
-| 启动器 | `@CDB` 显示空启动器且无 preview/Figma/lease | 自动扫描、建草稿或抢占旧工作台 |
-| 工作台 | Codex 内嵌 Apps UI 显示项目预览，`workspaceMounted: true` | 只有外部浏览器 localhost 页面 |
-| Figma | 页面列表出现并显示真实状态，导入得到可编辑 Frame | 一直“寻找 Codex 页面”或只出现截图 |
-| 回传 | Codex 显示修改、文件和耗时，同一预览刷新 | Figma 显示发送但源码/工作台无结果 |
+| 未导入 | 当前项目页面没有当前 exact-build 映射 | 重新发送当前页面，不恢复旧绑定 |
+| 已同步 | 源码、Figma、视觉门禁和共同基线一致 | 可以继续修改任一端 |
+| 源码更新 | 同步后 HTML/CSS 发生变化 | 从 CDB 更新 Figma |
+| Figma 修改 | Figma 有尚未应用的变化 | 发送到 CDB 工作台 |
+| 两边均有修改 | 两端都偏离共同基线 | 明确选择保留方向 |
+| 已收到但生成未完成 | Bridge 收到数据，但转换或事务失败 | 查看具体错误，交给 Codex修复后重试 |
+| 发送失败 | 连接、会话、版本或协议失败 | 检查 exact-build 和唯一插件客户端 |
 
-## 常见恢复
+## 遇到问题时让 Codex修复
 
-### 仍像旧版本
+不要盲目反复安装、清缓存或恢复旧版本。将截图、完整错误、项目路径、操作系统与 exact-build 发给 Codex，让它先复现并检查：
 
-完整退出 Codex/ChatGPT，重新运行安装器并新建任务。核对安装报告中的版本、缓存路径和 18 个核心文件哈希；不要把“磁盘存在新版源码”当成“当前任务已加载新版”。
+- `plugin.json`、安装报告与运行缓存是否为同一 exact-build。
+- `get_cdb_health` 的 daemon、活动项目、preview 与 Figma 客户端状态。
+- 工作台 pending、同步基线、事务日志和真实浏览器结果。
+- Figma 连接是否来自当前项目和唯一插件窗口。
 
-### Figma 提示协议不匹配或一直等待
+推荐提示词：
 
-关闭并重新运行 Figma 的 CDB 开发插件。确认 Codex 中是真实内嵌工作台，而不是启动器、预检阻断页或外部浏览器预览。
+```text
+继续修复 Codex Design Bridge。先阅读 README.zh-CN.md、docs/product-status.zh-CN.md 和最新交接文档，保留当前工作树已有修改。核对当前 exact-build、get_cdb_health、安装报告和 Figma 连接，复现我提供的问题，定位根因，修改源码并补回归测试。修改插件核心文件后更新 cachebuster、重新安装并在新 Codex 任务验证。不要兼容或迁移任何旧版本、旧协议、旧 Page IR、旧缓存、旧绑定或旧同步数据。
+```
 
-### 预检要求自动修复
+## 成功判定
 
-查看问题代码与文件，确认只是首次补唯一捕获根/稳定 ID，再点击安全修复。存在同步历史时缺失 ID 会阻断，不会自动生成新映射。
+- 新 Codex 任务加载的 `runtimeVersion` 与发布目录 exact-build 一致。
+- `get_cdb_health` healthy，活动项目正确，Figma 客户端通常为 1。
+- Figma 页面显示“已同步”。
+- 工作台 pending 为 0，源码、资源和本地预览实际变化。
 
-### 工作台无法接管
-
-新工作台会直接请求旧 owner 释放资源并接管。若旧 owner 不可达，等待 lease TTL 后重试；项目源码和事务记录不会被删除。
-
-### 启动耗时异常
-
-目标是数秒。明显超出正常交互时间时不要反复点击；记录阶段、版本、耗时和错误，完整退出后重试一次。仍异常则停止并保留诊断证据。
+当前 0.9 仍是测试版。完整能力和已知限制见[当前产品状态](product-status.zh-CN.md)，真实验收见[桌面验收清单](figma-smoke-test.md)。

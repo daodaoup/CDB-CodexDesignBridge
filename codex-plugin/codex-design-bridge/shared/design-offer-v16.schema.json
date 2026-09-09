@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cdb.local/schemas/design-offer-v16.schema.json",
+  "title": "CDB Figma design offer protocol 16",
+  "type": "object",
+  "required": [
+    "type", "protocolVersion", "runtimeIdentity", "offerId", "sessionId", "figmaFileKey",
+    "rootNodeId", "rootName", "rootType", "width", "height", "responsiveContract",
+    "estimatedNodeCount", "createdAt"
+  ],
+  "properties": {
+    "type": { "const": "figma.design.offer" },
+    "protocolVersion": { "const": 16 },
+    "runtimeIdentity": { "$ref": "#/$defs/runtimeIdentity" },
+    "offerId": { "type": "string", "minLength": 8, "maxLength": 128 },
+    "sessionId": { "type": "string", "minLength": 8, "maxLength": 128 },
+    "figmaFileKey": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "rootNodeId": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "rootName": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "rootType": { "enum": ["FRAME", "COMPONENT", "INSTANCE", "GROUP"] },
+    "width": { "enum": [320, 375, 402, 430, 768, 1440] },
+    "height": { "type": "number", "exclusiveMinimum": 0, "maximum": 100000 },
+    "responsiveContract": { "$ref": "#/$defs/responsiveContract" },
+    "estimatedNodeCount": { "type": "integer", "minimum": 1, "maximum": 500 },
+    "linkedProjectKey": { "type": "string", "maxLength": 256 },
+    "linkedPageId": { "type": "string", "maxLength": 256 },
+    "referenceImage": { "$ref": "#/$defs/referenceImage" },
+    "createdAt": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "runtimeIdentity": {
+      "type": "object",
+      "required": ["kind", "protocolVersion", "pageIrSchemaVersion", "exactBuild"],
+      "properties": {
+        "kind": { "const": "cdb-0.9-responsive-v2" },
+        "protocolVersion": { "const": 16 },
+        "pageIrSchemaVersion": { "const": 2 },
+        "exactBuild": { "const": "0.9.0+codex.20260829100031" }
+      },
+      "additionalProperties": false
+    },
+    "viewport": {
+      "type": "object",
+      "required": ["width", "height"],
+      "properties": {
+        "width": { "type": "number", "exclusiveMinimum": 0 },
+        "height": { "type": ["number", "null"], "exclusiveMinimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "responsiveContract": {
+      "type": "object",
+      "required": ["designViewport", "runtimeViewports", "previewScale", "breakpoints"],
+      "properties": {
+        "designViewport": { "$ref": "#/$defs/viewport" },
+        "runtimeViewports": { "type": "array", "minItems": 1, "maxItems": 6 },
+        "previewScale": { "type": "object" },
+        "breakpoints": { "type": "array", "maxItems": 32 }
+      },
+      "additionalProperties": false
+    },
+    "referenceImage": {
+      "type": "object",
+      "required": ["mimeType", "base64", "width", "height"],
+      "properties": {
+        "mimeType": { "const": "image/png" },
+        "base64": { "type": "string", "minLength": 1 },
+        "width": { "type": "integer", "minimum": 1, "maximum": 4096 },
+        "height": { "type": "integer", "minimum": 1, "maximum": 4096 }
+      },
+      "additionalProperties": false
+    }
+  }
+}
