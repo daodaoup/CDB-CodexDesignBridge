@@ -21,7 +21,7 @@
     "node": ">=20"
   },
   "dependencies": {
-    "@xmldom/xmldom": "^0.8.11",
+    "@xmldom/xmldom": "^0.9.12",
     "ws": "^8.18.3"
   },
   "devDependencies": {
